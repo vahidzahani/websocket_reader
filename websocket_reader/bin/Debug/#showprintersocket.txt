@@ -1,0 +1,2 @@
+Copy the following phrase so that the desired form is displayed.
+#showprintersocket
