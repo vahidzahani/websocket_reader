@@ -84,18 +84,18 @@ namespace websocket_reader
         {
             if (!mutex.WaitOne(TimeSpan.Zero, true))
             {
-                // برنامه قبلاً اجرا شده است
-                Console.WriteLine("برنامه قبلاً اجرا شده است.");
                 MessageBox.Show("this program already running.");
                 Application.Exit();
             }
             myversion();
             //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
             HttpListener listener = new HttpListener();
-            listener.Prefixes.Add("http://127.0.0.1:8080/");
+            int port = 8080;
+            port = getport();
+            listener.Prefixes.Add("http://127.0.0.1:"+port+"/");
             listener.Start();
-            Console.WriteLine("Listening connections [8080] ...");
-            textBox1.Text += "\nListening connections [8080] ...";
+            Console.WriteLine("Listening connections ["+port+"] ...");
+            textBox1.Text += "\nListening connections ["+port+"] ...";
 
             ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
 
@@ -112,6 +112,29 @@ namespace websocket_reader
             setHeaderFooter("Shrink_To_Fit", "yes");
 
 
+        }
+        private int getport()
+        {
+            int port = 3270; // default value
+
+            if (File.Exists("config.txt"))
+            {
+                string[] lines = File.ReadAllLines("config.txt");
+                foreach (string line in lines)
+                {
+                    string[] parts = line.Split('=');
+                    if (parts.Length == 2 && parts[0].Trim() == "port")
+                    {
+                        if (int.TryParse(parts[1].Trim(), out int parsedPort))
+                        {
+                            port = parsedPort;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return(port);
         }
         private void HideMainForm(bool mode)
         {
