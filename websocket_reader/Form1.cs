@@ -200,6 +200,11 @@ namespace websocket_reader
 
                     }));
 
+                    //back to response
+                    string response = "ok";
+                    byte[] responseBytes = Encoding.UTF8.GetBytes(response);
+                    await webSocket.SendAsync(new ArraySegment<byte>(responseBytes), WebSocketMessageType.Text, true, CancellationToken.None);
+
                     //Console.WriteLine("Message: " + receivedMessage);
 
                     buffer = new byte[2048];
