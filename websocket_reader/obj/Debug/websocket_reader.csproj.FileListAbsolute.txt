@@ -9,3 +9,14 @@ C:\Users\vahid\Desktop\TCP\websocket_reader\websocket_reader\obj\Debug\websocket
 C:\Users\vahid\Desktop\TCP\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CoreCompileInputs.cache
 C:\Users\vahid\Desktop\TCP\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
 C:\Users\vahid\Desktop\TCP\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.exe.config
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.exe
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.pdb
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.AssemblyReference.cache
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.SuggestedBindingRedirects.cache
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Form1.resources
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Properties.Resources.resources
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.GenerateResource.cache
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CoreCompileInputs.cache
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
