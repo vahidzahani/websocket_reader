@@ -79,7 +79,39 @@ namespace websocket_reader
             instance = this;
         }
         static readonly Mutex mutex = new Mutex(true, "c676b1d7-c868-4e9a-8409-135cec4dff43");
+        private void SetStartup()
+        {
+            try
+            {
+                string keys =@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run";
+                string value = "websocket";
 
+                if (Registry.GetValue(keys, value, null) == null)
+                {
+                    // if key doesn't exist
+                    using (RegistryKey key =Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                    {
+                        key.SetValue("websocket", Path.GetDirectoryName(Application.ExecutablePath)+"\\"+Path.GetFileName(Application.ExecutablePath));
+                        key.Dispose();
+                        key.Flush();
+                    }
+                }
+                else
+                {
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                    {
+                        key.SetValue("websocket", Path.GetDirectoryName(Application.ExecutablePath) + "\\" + Path.GetFileName(Application.ExecutablePath));
+                        key.Dispose();
+                        key.Flush();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show(e.Message);
+                Console.WriteLine(e.Message);
+            }
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
             if (!mutex.WaitOne(TimeSpan.Zero, true))
@@ -111,6 +143,7 @@ namespace websocket_reader
             setHeaderFooter("Print_Background", "no");
             setHeaderFooter("Shrink_To_Fit", "yes");
 
+            SetStartup();
 
         }
         private int getport()

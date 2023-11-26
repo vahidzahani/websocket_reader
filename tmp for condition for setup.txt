@@ -1,0 +1,9 @@
+https://go.microsoft.com/fwlink/?LinkId=397707
+
+
+
+
+.NET Framework
+http://go.microsoft.com/fwlink/?LinkId=863262
+[VSDNETMSG]
+.NET Framework 4.7.2

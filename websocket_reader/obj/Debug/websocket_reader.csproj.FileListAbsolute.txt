@@ -20,3 +20,7 @@ C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_r
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CoreCompileInputs.cache
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.exe.manifest
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.application
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe.manifest
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.application
