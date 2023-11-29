@@ -9,6 +9,7 @@ using System.Drawing.Printing;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace websocket_reader
 {
@@ -78,7 +79,6 @@ namespace websocket_reader
             InitializeComponent();
             instance = this;
         }
-        static readonly Mutex mutex = new Mutex(true, "c676b1d7-c868-4e9a-8409-135cec4dff43");
         private void SetStartup()
         {
             try
@@ -112,6 +112,7 @@ namespace websocket_reader
                 Console.WriteLine(e.Message);
             }
         }
+        static readonly Mutex mutex = new Mutex(true, "c676b1d7-c868-4e9a-8409-135cec4dff43");
         private void Form1_Load(object sender, EventArgs e)
         {
             if (!mutex.WaitOne(TimeSpan.Zero, true))
@@ -216,19 +217,34 @@ namespace websocket_reader
 
                     form.Invoke(new Action(() =>
                     {
-                        receivedMessage= receivedMessage.Replace("<body>", "");
-                        receivedMessage=receivedMessage.Replace("</body>", "");
-                        receivedMessage=receivedMessage.Replace("<head>", "");
-                        receivedMessage=receivedMessage.Replace("</head>", "");
 
-                        string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
-                        form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
 
+
+                        //string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
+                        //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
+
+                        //receivedMessage= receivedMessage.Replace("<body>", "");
+                        //receivedMessage=receivedMessage.Replace("</body>", "");
+                        //receivedMessage=receivedMessage.Replace("<head>", "");
+                        //receivedMessage=receivedMessage.Replace("</head>", "");
+
+                        // خواندن JSON
+                        var data = JsonConvert.DeserializeObject<Data_For_Print>(receivedMessage);
+
+                        data.visibleContent=data.visibleContent.Replace(data.rootPath, data.serverAddress+"/");
+                        //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
+                        form.webBrowser1.DocumentText = data.visibleContent ;
+
+                        //MessageBox.Show(data.rootPath);
 
                         //string printername = "Microsoft Print to PDF";
-                        string printername = receivedMessage.Split('|')[0];
-                        SetDefaultPrinter(printername);
-                        SetDefaultPageSizeA5(printername);
+                        //string printername = receivedMessage.Split('|')[0];
+
+                        string printername = data.printer_name;
+                        SetDefaultPrinter(data.printer_name);
+
+                        //SetDefaultPageSizeA5(printername);
+
                         //DisableHeaderFooter(printername);
 
                     }));
@@ -313,5 +329,14 @@ namespace websocket_reader
         {
 
         }
+    }
+
+
+    public class Data_For_Print
+    {
+        public string printer_name { get; set; }
+        public string visibleContent { get; set; }
+        public string serverAddress { get; set; }
+        public string rootPath { get; set; }
     }
 }

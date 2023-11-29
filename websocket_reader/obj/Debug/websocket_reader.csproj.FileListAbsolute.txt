@@ -24,3 +24,6 @@ C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketpr
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.application
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe.manifest
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.application
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\Newtonsoft.Json.dll
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\Newtonsoft.Json.xml
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CopyComplete
