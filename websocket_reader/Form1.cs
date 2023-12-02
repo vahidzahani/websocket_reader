@@ -231,6 +231,9 @@ namespace websocket_reader
                         // خواندن JSON
                         var data = JsonConvert.DeserializeObject<Data_For_Print>(receivedMessage);
 
+                        if (data.rootPath == null) data.rootPath = "nullnull";
+                        if (data.serverAddress == null) data.serverAddress= "nullnull";
+
                         data.visibleContent=data.visibleContent.Replace(data.rootPath, data.serverAddress+"/");
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
                         form.webBrowser1.DocumentText = data.visibleContent ;
