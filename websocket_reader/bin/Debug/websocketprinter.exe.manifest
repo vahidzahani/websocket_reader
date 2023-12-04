@@ -3,7 +3,7 @@
   <asmv1:assemblyIdentity name="websocketprinter.exe" version="1.0.0.1" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="websocketprinter" version="1.3.2.0" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="websocketprinter" version="1.3.3.0" language="neutral" processorArchitecture="msil" />
     <commandLine file="websocketprinter.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -54,14 +54,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="websocketprinter.exe" size="22000">
-      <assemblyIdentity name="websocketprinter" version="1.3.2.0" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="websocketprinter.exe" size="23024">
+      <assemblyIdentity name="websocketprinter" version="1.3.3.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>k5JLeWP2bdvcYDPFo7hCbQ/eX1CiAo6CHG1JO6wmAT8=</dsig:DigestValue>
+        <dsig:DigestValue>e+2ov61mr9x/fonbL8MsletE5fZrl/TxYIx0FggvWwI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

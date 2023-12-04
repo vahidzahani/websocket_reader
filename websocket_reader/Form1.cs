@@ -5,10 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
-using System.Drawing.Printing;
-using System.Drawing;
 using System.IO;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace websocket_reader
@@ -18,9 +15,7 @@ namespace websocket_reader
     {
         private static Form1 instance;
 
-
         //public Form mainForm = Application.OpenForms["Form1"];
-        
 
         public static void SetDefaultPrinter(string printerName)
         {
@@ -64,7 +59,7 @@ namespace websocket_reader
             }
         }
 
-        public static void setHeaderFooter(string keyname,string keyvalue)
+        public static void SetHeaderFooter(string keyname,string keyvalue)
             {
             string keyPath = @"SOFTWARE\Microsoft\Internet Explorer\PageSetup";
             bool bolWritable = true;
@@ -108,7 +103,6 @@ namespace websocket_reader
             }
             catch (Exception e)
             {
-                //MessageBox.Show(e.Message);
                 Console.WriteLine(e.Message);
             }
         }
@@ -197,7 +191,7 @@ namespace websocket_reader
 
             try
             {
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[10485760];
                 WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
                 while (!result.CloseStatus.HasValue)
@@ -209,8 +203,6 @@ namespace websocket_reader
 
                     form.Invoke(new Action(() =>
                     {
-
-
 
                         //string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
@@ -240,14 +232,14 @@ namespace websocket_reader
                         //MessageBox.Show(printsetting.header);
 
                         
-                        setHeaderFooter("footer", printsetting.footer);
-                        setHeaderFooter("header", printsetting.header);
-                        setHeaderFooter("margin_bottom", printsetting.margin_bottom);
-                        setHeaderFooter("margin_left", printsetting.margin_left);
-                        setHeaderFooter("margin_right", printsetting.margin_right);
-                        setHeaderFooter("margin_top", printsetting.margin_top);
-                        setHeaderFooter("Print_Background", "no");
-                        setHeaderFooter("Shrink_To_Fit", "yes");
+                        SetHeaderFooter("footer", printsetting.footer);
+                        SetHeaderFooter("header", printsetting.header);
+                        SetHeaderFooter("margin_bottom", printsetting.margin_bottom);
+                        SetHeaderFooter("margin_left", printsetting.margin_left);
+                        SetHeaderFooter("margin_right", printsetting.margin_right);
+                        SetHeaderFooter("margin_top", printsetting.margin_top);
+                        SetHeaderFooter("Print_Background", "no");
+                        SetHeaderFooter("Shrink_To_Fit", "yes");
 
                         SetDefaultPrinter(printsetting.printer_name);
 
@@ -337,6 +329,11 @@ namespace websocket_reader
         {
 
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
     public class print_setting
@@ -352,6 +349,7 @@ namespace websocket_reader
         public string header {get ; set; }
         public string footer {get ; set; }
         public string page_address { get; set; }
+        public string is_direct{ get; set; }
     }
     public class Data_For_Print
     {
