@@ -207,10 +207,10 @@ namespace websocket_reader
                         //string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
 
-                        //receivedMessage= receivedMessage.Replace("<body>", "");
-                        //receivedMessage=receivedMessage.Replace("</body>", "");
                         //receivedMessage=receivedMessage.Replace("<head>", "");
                         //receivedMessage=receivedMessage.Replace("</head>", "");
+                        //receivedMessage= receivedMessage.Replace("<body>", "");
+                        //receivedMessage=receivedMessage.Replace("</body>", "");
 
                         // خواندن JSON
                         var data = JsonConvert.DeserializeObject<Data_For_Print>(receivedMessage);
