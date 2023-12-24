@@ -338,6 +338,11 @@ namespace websocket_reader
         {
 
         }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            webBrowser1.DocumentText = "";
+        }
     }
 
     public class print_setting
