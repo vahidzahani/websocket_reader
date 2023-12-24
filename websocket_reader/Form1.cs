@@ -219,9 +219,12 @@ namespace websocket_reader
                         if (data.rootPath == null) data.rootPath = "nullnull";
                         if (data.serverAddress == null) data.serverAddress= "nullnull";
 
-                        data.visibleContent=data.visibleContent.Replace(data.rootPath, data.serverAddress+"/");
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
-                        form.webBrowser1.DocumentText = data.visibleContent ;
+                        if (printsetting.is_direct=="1")
+                        {
+                            data.visibleContent=data.visibleContent.Replace(data.rootPath, data.serverAddress+"/");
+                            form.webBrowser1.DocumentText = data.visibleContent ;
+                        }
 
                         //MessageBox.Show(data.rootPath);
 
@@ -276,6 +279,7 @@ namespace websocket_reader
         {
             webBrowser1.Document.RightToLeft = true;
             //webBrowser1.Print();
+           
             webBrowser1.Print();
             //webBrowser1.ShowPrintPreviewDialog();
 
