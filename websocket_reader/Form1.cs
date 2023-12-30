@@ -14,7 +14,7 @@ namespace websocket_reader
     public partial class Form1 : Form
     {
         private static Form1 instance;
-
+        private static bool isDirect=false;
         //public Form mainForm = Application.OpenForms["Form1"];
 
         public static void SetDefaultPrinter(string printerName)
@@ -118,7 +118,7 @@ namespace websocket_reader
             //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
             HttpListener listener = new HttpListener();
             int port = 8080;
-            port = getport();
+            port = Getport();
             listener.Prefixes.Add("http://127.0.0.1:"+port+"/");
             listener.Start();
             Console.WriteLine("Listening connections ["+port+"] ...");
@@ -133,7 +133,7 @@ namespace websocket_reader
             SetStartup();
 
         }
-        private int getport()
+        private int Getport()
         {
             int port = 3270; // default value
 
@@ -200,10 +200,8 @@ namespace websocket_reader
 
                     //SetLabel1Text("vahid");
 
-
                     form.Invoke(new Action(() =>
                     {
-
                         //string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
 
@@ -217,14 +215,13 @@ namespace websocket_reader
                         var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
 
                         if (data.rootPath == null) data.rootPath = "nullnull";
-                        if (data.serverAddress == null) data.serverAddress= "nullnull";
+                        if (data.serverAddress == null) data.serverAddress = "nullnull";
 
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
-                        if (printsetting.is_direct=="1")
-                        {
-                            data.visibleContent=data.visibleContent.Replace(data.rootPath, data.serverAddress+"/");
-                            form.webBrowser1.DocumentText = data.visibleContent ;
-                        }
+                        isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
+                        
+                        data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
+                        form.webBrowser1.DocumentText = data.visibleContent;
 
                         //MessageBox.Show(data.rootPath);
 
@@ -233,7 +230,6 @@ namespace websocket_reader
 
                         string printername = printsetting.printer_name;
                         //MessageBox.Show(printsetting.header);
-
                         
                         SetHeaderFooter("footer", printsetting.footer);
                         SetHeaderFooter("header", printsetting.header);
@@ -247,7 +243,6 @@ namespace websocket_reader
                         SetDefaultPrinter(printsetting.printer_name);
 
                         //SetDefaultPageSizeA5(printername);
-
                         //DisableHeaderFooter(printername);
 
                     }));
@@ -279,11 +274,15 @@ namespace websocket_reader
         {
             webBrowser1.Document.RightToLeft = true;
             //webBrowser1.Print();
-           
-            webBrowser1.Print();
+            if (isDirect)
+            {
+                webBrowser1.Print();
+            }
+            else{ 
+                webBrowser1.ShowPrintDialog();
+            }
+
             //webBrowser1.ShowPrintPreviewDialog();
-
-
 
         }
         static void myversion()
