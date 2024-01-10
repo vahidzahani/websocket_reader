@@ -15,13 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_07D96CB77ADB4FA9841A0C3354C46EE8"
+        "MsmKey" = "8:_4AB22A7F6DBF441D9D282B1A9AD9CB89"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4AB22A7F6DBF441D9D282B1A9AD9CB89"
+        "MsmKey" = "8:_69C05E54B14A4E2AA344E949A531A883"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -39,26 +39,26 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_94BA452F30FF4110445FC5A15026F84F"
-        "OwnerKey" = "8:_F108C4FCE1B94944B806A77F292F1B86"
+        "MsmKey" = "8:_A646C0601E9ECFC250B5996A10C57DB6"
+        "OwnerKey" = "8:_69C05E54B14A4E2AA344E949A531A883"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_F108C4FCE1B94944B806A77F292F1B86"
+        "MsmKey" = "8:_EBA3A3B6D7D84C54A988DEA37A78B279"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F108C4FCE1B94944B806A77F292F1B86"
+        "OwnerKey" = "8:_A646C0601E9ECFC250B5996A10C57DB6"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_94BA452F30FF4110445FC5A15026F84F"
+        "OwnerKey" = "8:_69C05E54B14A4E2AA344E949A531A883"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -118,6 +118,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -148,10 +156,10 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_07D96CB77ADB4FA9841A0C3354C46EE8"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AB22A7F6DBF441D9D282B1A9AD9CB89"
             {
-            "SourcePath" = "8:..\\..\\..\\Downloads\\action.ico"
-            "TargetName" = "8:action.ico"
+            "SourcePath" = "8:..\\websocket_reader\\bin\\Debug\\show.txt"
+            "TargetName" = "8:show.txt"
             "Tag" = "8:"
             "Folder" = "8:_4CA6B27E315441339E6D68E80C899684"
             "Condition" = "8:"
@@ -168,10 +176,21 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AB22A7F6DBF441D9D282B1A9AD9CB89"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_69C05E54B14A4E2AA344E949A531A883"
             {
-            "SourcePath" = "8:..\\websocket_reader\\bin\\Debug\\show.txt"
-            "TargetName" = "8:show.txt"
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:websocketprinter, Version=1.3.6.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_69C05E54B14A4E2AA344E949A531A883"
+                    {
+                    "Name" = "8:websocketprinter.exe"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\websocket_reader\\bin\\Debug\\websocketprinter.exe"
+            "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_4CA6B27E315441339E6D68E80C899684"
             "Condition" = "8:"
@@ -228,14 +247,14 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_94BA452F30FF4110445FC5A15026F84F"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A646C0601E9ECFC250B5996A10C57DB6"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_94BA452F30FF4110445FC5A15026F84F"
+                    "_A646C0601E9ECFC250B5996A10C57DB6"
                     {
                     "Name" = "8:Newtonsoft.Json.dll"
                     "Attributes" = "3:512"
@@ -259,21 +278,10 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F108C4FCE1B94944B806A77F292F1B86"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EBA3A3B6D7D84C54A988DEA37A78B279"
             {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:websocketprinter, Version=1.3.5.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_F108C4FCE1B94944B806A77F292F1B86"
-                    {
-                    "Name" = "8:websocketprinter.exe"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:..\\websocket_reader\\bin\\Debug\\websocketprinter.exe"
-            "TargetName" = "8:"
+            "SourcePath" = "8:..\\websocket_reader\\bin\\Debug\\printer.ico"
+            "TargetName" = "8:printer.ico"
             "Tag" = "8:"
             "Folder" = "8:_4CA6B27E315441339E6D68E80C899684"
             "Condition" = "8:"
@@ -467,18 +475,18 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_2AE8734144D041B4970800C29D6D8EA3"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_1A0AB442000441FB9809C702C1EDA5F1"
             {
-            "Name" = "8:Shortcut to %swebsocketprinter.exe"
+            "Name" = "8:socket print"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_F108C4FCE1B94944B806A77F292F1B86"
+            "Target" = "8:_69C05E54B14A4E2AA344E949A531A883"
             "Folder" = "8:_4813C8CBB24E43EAAFFB4B63A0F35DA8"
             "WorkingFolder" = "8:_4CA6B27E315441339E6D68E80C899684"
-            "Icon" = "8:_07D96CB77ADB4FA9841A0C3354C46EE8"
+            "Icon" = "8:_EBA3A3B6D7D84C54A988DEA37A78B279"
             "Feature" = "8:"
             }
         }

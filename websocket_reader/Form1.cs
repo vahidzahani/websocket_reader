@@ -132,6 +132,9 @@ namespace websocket_reader
 
             SetStartup();
 
+
+            this.TopMost = true;
+
         }
         private int Getport()
         {
@@ -272,6 +275,7 @@ namespace websocket_reader
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
+            this.TopMost = true;
             webBrowser1.Document.RightToLeft = true;
             //webBrowser1.Print();
             if (isDirect)
@@ -281,9 +285,7 @@ namespace websocket_reader
             else{ 
                 webBrowser1.ShowPrintDialog();
             }
-
             //webBrowser1.ShowPrintPreviewDialog();
-
         }
         static void myversion()
         {
@@ -341,6 +343,16 @@ namespace websocket_reader
         private void btnClear_Click(object sender, EventArgs e)
         {
             webBrowser1.DocumentText = "";
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            
         }
     }
 
