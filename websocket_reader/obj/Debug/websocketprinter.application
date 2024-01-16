@@ -7,14 +7,14 @@
     <framework targetVersion="4.5.2" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="websocketprinter.exe.manifest" size="4188">
+    <dependentAssembly dependencyType="install" codebase="websocketprinter.exe.manifest" size="4661">
       <assemblyIdentity name="websocketprinter.exe" version="1.0.0.3" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>rrrXBRVKE5J3LFc5YK0bX4rUe3TCpInpeTBpwORvKzk=</dsig:DigestValue>
+        <dsig:DigestValue>jspehBA26f5qTJ2oK2DcUcBmchHMizSPz1SHvI16tDc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

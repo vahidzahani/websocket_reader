@@ -114,47 +114,60 @@ namespace websocket_reader
                 MessageBox.Show("this program already running.");
                 Application.Exit();
             }
-            myversion();
-            //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
-            HttpListener listener = new HttpListener();
-            int port = 8080;
-            port = Getport();
-            listener.Prefixes.Add("http://127.0.0.1:"+port+"/");
-            listener.Start();
-            Console.WriteLine("Listening connections ["+port+"] ...");
-            textBox1.Text += "\nListening connections ["+port+"] ...";
+            try
+            {
+                myversion();
+                //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
+                HttpListener listener = new HttpListener();
+                int port = 8080;
+                port = Getport();
+                listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
+                listener.Start();
+                Console.WriteLine("Listening connections [" + port + "] ...");
+                textBox1.Text += "\nListening connections [" + port + "] ...";
 
-            ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
+                ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
 
-            HideMainForm(true);//true is hide my form
-            label1.Text = "ver : " + Application.ProductVersion;
+                HideMainForm(true);//true is hide my form
+                label1.Text = "ver : " + Application.ProductVersion;
 
+                SetStartup();
 
-            SetStartup();
+                this.TopMost = true;
 
-
-            this.TopMost = true;
+            }
+            catch (Exception ex)
+            {
+                fnErrorToFile(ex.Message);
+            }
 
         }
         private int Getport()
         {
             int port = 3270; // default value
 
-            if (File.Exists("config.txt"))
+            try
             {
-                string[] lines = File.ReadAllLines("config.txt");
-                foreach (string line in lines)
+                if (File.Exists("config.txt"))
                 {
-                    string[] parts = line.Split('=');
-                    if (parts.Length == 2 && parts[0].Trim() == "port")
+                    string[] lines = File.ReadAllLines("config.txt");
+                    foreach (string line in lines)
                     {
-                        if (int.TryParse(parts[1].Trim(), out int parsedPort))
+                        string[] parts = line.Split('=');
+                        if (parts.Length == 2 && parts[0].Trim() == "port")
                         {
-                            port = parsedPort;
-                            break;
+                            if (int.TryParse(parts[1].Trim(), out int parsedPort))
+                            {
+                                port = parsedPort;
+                                break;
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                fnErrorToFile(ex.Message);
             }
 
             return(port);
@@ -223,7 +236,9 @@ namespace websocket_reader
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
                         isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
                         
-                        data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
+                        //data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
+                        data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
+
                         form.webBrowser1.DocumentText = data.visibleContent;
 
                         //MessageBox.Show(data.rootPath);
@@ -245,8 +260,6 @@ namespace websocket_reader
 
                         SetDefaultPrinter(printsetting.printer_name);
 
-                        //SetDefaultPageSizeA5(printername);
-                        //DisableHeaderFooter(printername);
 
                     }));
 
@@ -266,10 +279,38 @@ namespace websocket_reader
             catch (WebSocketException ex)
             {
                 Console.WriteLine("WebSocket exception: " + ex.Message);
+                fnErrorToFile(ex.Message);
             }
             finally
             {
                 webSocket.Dispose();
+            }
+        }
+        private string ReplaceAllOccurrences(string input, string oldValue, string newValue)
+        {
+            int index = input.IndexOf(oldValue);
+
+            while (index != -1)
+            {
+                input = input.Remove(index, oldValue.Length).Insert(index, newValue);
+                index = input.IndexOf(oldValue, index + newValue.Length);
+            }
+
+            return input;
+        }
+        private static void fnErrorToFile(string content)
+        {
+            try
+            {
+                string filePath = Path.GetDirectoryName(Application.ExecutablePath) + "\\errorfilelog.txt" ; 
+                File.WriteAllText(filePath, content);
+            }
+            catch (Exception ex)
+            {
+                string er = $"Error to write error file code 800: {ex.Message}";
+                MessageBox.Show(er);
+                Console.WriteLine(er);
+
             }
         }
 
@@ -297,7 +338,6 @@ namespace websocket_reader
 
             // Write the version into the file
             File.WriteAllText(filePath, version.ToString());
-
         }
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -354,6 +394,8 @@ namespace websocket_reader
         {
             
         }
+
+       
     }
 
     public class print_setting
