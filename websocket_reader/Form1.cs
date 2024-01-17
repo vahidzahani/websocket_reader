@@ -7,15 +7,20 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using System.IO;
 using Newtonsoft.Json;
+using System.Drawing;
 
 namespace websocket_reader
 {
 
     public partial class Form1 : Form
     {
+        private bool isDragging = false;
+        private Point offset;
+
         private static Form1 instance;
         private static bool isDirect=false;
         //public Form mainForm = Application.OpenForms["Form1"];
+       
 
         public static void SetDefaultPrinter(string printerName)
         {
@@ -73,7 +78,43 @@ namespace websocket_reader
         {
             InitializeComponent();
             instance = this;
+
+            this.MouseDown += Form_MouseDown;
+            this.MouseMove += Form_MouseMove;
+            this.MouseUp += Form_MouseUp;
+
         }
+
+        private void Form_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isDragging = true;
+                offset = new Point(e.X, e.Y);
+            }
+        }
+
+        private void Form_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDragging)
+            {
+                Point newLocation = this.PointToScreen(new Point(e.X, e.Y));
+                newLocation.Offset(-offset.X, -offset.Y);
+                this.Location = newLocation;
+            }
+        }
+
+        private void Form_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isDragging = false;
+            }
+        }
+
+
+
+
         private void SetStartup()
         {
             try
@@ -114,8 +155,13 @@ namespace websocket_reader
                 MessageBox.Show("this program already running.");
                 Application.Exit();
             }
+
             try
             {
+                if (File.Exists("tmpupdate.exe"))
+                {
+                    File.Delete("tmpupdate.exe");
+                }
                 myversion();
                 //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
                 HttpListener listener = new HttpListener();
@@ -134,6 +180,7 @@ namespace websocket_reader
                 SetStartup();
 
                 this.TopMost = true;
+
 
             }
             catch (Exception ex)
@@ -231,66 +278,75 @@ namespace websocket_reader
 
                 form.Invoke(new Action(() =>
                 {
-                        //string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
-                        //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
+                    //string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
+                    //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
 
-                        //receivedMessage=receivedMessage.Replace("<head>", "");
-                        //receivedMessage=receivedMessage.Replace("</head>", "");
-                        //receivedMessage= receivedMessage.Replace("<body>", "");
-                        //receivedMessage=receivedMessage.Replace("</body>", "");
+                    //receivedMessage=receivedMessage.Replace("<head>", "");
+                    //receivedMessage=receivedMessage.Replace("</head>", "");
+                    //receivedMessage= receivedMessage.Replace("<body>", "");
+                    //receivedMessage=receivedMessage.Replace("</body>", "");
 
-                        // خواندن JSON
-                        try
-                        {
-                            var data = JsonConvert.DeserializeObject<Data_For_Print>(receivedMessage);
-                            var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
+                    // خواندن JSON
+                    try
+                    {
+                        var data = JsonConvert.DeserializeObject<Data_For_Print>(receivedMessage);
+                        var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
 
-                            if (data.rootPath == null) data.rootPath = "nullnull";
-                            if (data.serverAddress == null) data.serverAddress = "nullnull";
-
-                            //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
-                            isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
-
-                            //data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
-                            data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
-
-                            form.webBrowser1.DocumentText = data.visibleContent;
-
-                            //MessageBox.Show(data.rootPath);
-
-                            //string printername = "Microsoft Print to PDF";
-                            //string printername = receivedMessage.Split('|')[0];
-
-                            string printername = printsetting.printer_name;
-                            //MessageBox.Show(printsetting.header);
-
-                            SetHeaderFooter("footer", printsetting.footer);
-                            SetHeaderFooter("header", printsetting.header);
-                            SetHeaderFooter("margin_bottom", printsetting.margin_bottom);
-                            SetHeaderFooter("margin_left", printsetting.margin_left);
-                            SetHeaderFooter("margin_right", printsetting.margin_right);
-                            SetHeaderFooter("margin_top", printsetting.margin_top);
-                            SetHeaderFooter("Print_Background", "no");
-                            SetHeaderFooter("Shrink_To_Fit", "yes");
-
-                            SetDefaultPrinter(printsetting.printer_name);
+                        if (data.rootPath == null) data.rootPath = "nullnull";
+                        if (data.serverAddress == null){
+                            data.serverAddress = "nullnull";
                         }
-                        catch (WebSocketException ex)
+                        else
                         {
-                            Console.WriteLine("WebSocket exception: " + ex.Message);
-                            fnErrorToFile(ex.Message);
+                            string fileServertxt = data.serverAddress;
+                            string executablePath = AppDomain.CurrentDomain.BaseDirectory;
+                            string fileServer = Path.Combine(executablePath, "server.txt");
+                            File.WriteAllText(fileServer, fileServertxt);
                         }
-                    }));
+
+                        //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
+                        isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
+
+                        //data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
+                        data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
+
+                        form.webBrowser1.DocumentText = data.visibleContent;
+
+                        //MessageBox.Show(data.rootPath);
+
+                        //string printername = "Microsoft Print to PDF";
+                        //string printername = receivedMessage.Split('|')[0];
+
+                        string printername = printsetting.printer_name;
+                        //MessageBox.Show(printsetting.header);
+
+                        SetHeaderFooter("footer", printsetting.footer);
+                        SetHeaderFooter("header", printsetting.header);
+                        SetHeaderFooter("margin_bottom", printsetting.margin_bottom);
+                        SetHeaderFooter("margin_left", printsetting.margin_left);
+                        SetHeaderFooter("margin_right", printsetting.margin_right);
+                        SetHeaderFooter("margin_top", printsetting.margin_top);
+                        SetHeaderFooter("Print_Background", "no");
+                        SetHeaderFooter("Shrink_To_Fit", "yes");
+
+                        SetDefaultPrinter(printsetting.printer_name);
+                    }
+                    catch (WebSocketException ex)
+                    {
+                        Console.WriteLine("WebSocket exception: " + ex.Message);
+                        fnErrorToFile(ex.Message);
+                    }
+                }));
                 
-                    //back to response
-                    string response = "ok";
-                    byte[] responseBytes = Encoding.UTF8.GetBytes(response);
-                    await webSocket.SendAsync(new ArraySegment<byte>(responseBytes), WebSocketMessageType.Text, true, CancellationToken.None);
+                //back to response
+                string response = "ok";
+                byte[] responseBytes = Encoding.UTF8.GetBytes(response);
+                await webSocket.SendAsync(new ArraySegment<byte>(responseBytes), WebSocketMessageType.Text, true, CancellationToken.None);
 
-                    //Console.WriteLine("Message: " + receivedMessage);
+                //Console.WriteLine("Message: " + receivedMessage);
 
-                    buffer = new byte[2048];
-                    result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                buffer = new byte[2048];
+                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 
 
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
@@ -366,7 +422,7 @@ namespace websocket_reader
         }
         private void button2_Click_1(object sender, EventArgs e)
         {
-            Application.Restart();
+            
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -414,7 +470,21 @@ namespace websocket_reader
             
         }
 
-       
+        private void button4_Click_2(object sender, EventArgs e)
+        {
+            button4.Enabled = false;
+
+            Updater updater = new Updater();
+            string s=updater.CheckAndUpdate();
+            if (s == "isupdate")
+            {
+                MessageBox.Show("برنامه آخرین نسخه فعال است");
+                textBox1.Text += "\nlast update is using";
+            }
+            
+            button4.Enabled = true;
+
+        }
     }
 
     public class print_setting
