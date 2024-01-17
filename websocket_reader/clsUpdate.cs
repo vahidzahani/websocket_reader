@@ -30,6 +30,7 @@ namespace websocket_reader
 
             string localVersion = ReadVersion(localVerFilePath);
             string webVersion = DownloadString(webVerFilePath);
+            if (webVersion== "notfoundnewversion") { return (webVersion); }
 
             if (CompareVersions(localVersion, webVersion) < 0)
             {
@@ -93,9 +94,17 @@ start """" ""%targetFile%""
 
         private string DownloadString(string url)
         {
-            using (var client = new WebClient())
+            try
             {
-                return client.DownloadString(url);
+                using (var client = new WebClient())
+                {
+                    return client.DownloadString(url);
+                }
+            }
+            catch (Exception)
+            {
+
+                return "notfoundnewversion";
             }
         }
 

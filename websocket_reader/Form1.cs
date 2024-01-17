@@ -476,8 +476,14 @@ namespace websocket_reader
 
             Updater updater = new Updater();
             string s=updater.CheckAndUpdate();
-            if (s == "isupdate")
+            if (s == "notfoundnewversion")
             {
+                MessageBox.Show("نسخه جدید جهت بروز رسانی یافت نشد");
+                textBox1.Text += "\nnew version not found";
+            }
+                
+            if (s == "isupdate")
+                {
                 MessageBox.Show("برنامه آخرین نسخه فعال است");
                 textBox1.Text += "\nlast update is using";
             }
