@@ -119,7 +119,7 @@ namespace websocket_reader
                 myversion();
                 //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
                 HttpListener listener = new HttpListener();
-                int port = 8080;
+                int port = 1988;
                 port = Getport();
                 listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
                 listener.Start();
@@ -144,7 +144,7 @@ namespace websocket_reader
         }
         private int Getport()
         {
-            int port = 3270; // default value
+            int port = 1988; // default value
 
             try
             {
@@ -208,16 +208,29 @@ namespace websocket_reader
             try
             {
                 byte[] buffer = new byte[10485760];
-                WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
-                while (!result.CloseStatus.HasValue)
+
+                WebSocketReceiveResult result;
+                string receivedMessage = "";
+                do
                 {
-                    string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    receivedMessage += Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    // پردازش داده دریافتی
+                } while (!result.EndOfMessage);
 
-                    //SetLabel1Text("vahid");
+                //WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
-                    form.Invoke(new Action(() =>
-                    {
+                
+                //fnErrorToFile(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                //Console.WriteLine(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                //webSocket.Dispose();
+                //string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
+
+                //SetLabel1Text("vahid");
+
+                form.Invoke(new Action(() =>
+                {
                         //string mystyle = "";//"<style> @media print { @page { size: auto; margin: 0; } @page: first { header: none; footer: none; } }</style>";
                         //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + receivedMessage.Split('|')[1] + "</body></html>";
 
@@ -227,42 +240,48 @@ namespace websocket_reader
                         //receivedMessage=receivedMessage.Replace("</body>", "");
 
                         // خواندن JSON
-                        var data = JsonConvert.DeserializeObject<Data_For_Print>(receivedMessage);
-                        var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
+                        try
+                        {
+                            var data = JsonConvert.DeserializeObject<Data_For_Print>(receivedMessage);
+                            var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
 
-                        if (data.rootPath == null) data.rootPath = "nullnull";
-                        if (data.serverAddress == null) data.serverAddress = "nullnull";
+                            if (data.rootPath == null) data.rootPath = "nullnull";
+                            if (data.serverAddress == null) data.serverAddress = "nullnull";
 
-                        //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
-                        isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
-                        
-                        //data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
-                        data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
+                            //form.webBrowser1.DocumentText = "<html><head>"+mystyle+"</head><body>" + data.visibleContent + "</body></html>";
+                            isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
 
-                        form.webBrowser1.DocumentText = data.visibleContent;
+                            //data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
+                            data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
 
-                        //MessageBox.Show(data.rootPath);
+                            form.webBrowser1.DocumentText = data.visibleContent;
 
-                        //string printername = "Microsoft Print to PDF";
-                        //string printername = receivedMessage.Split('|')[0];
+                            //MessageBox.Show(data.rootPath);
 
-                        string printername = printsetting.printer_name;
-                        //MessageBox.Show(printsetting.header);
-                        
-                        SetHeaderFooter("footer", printsetting.footer);
-                        SetHeaderFooter("header", printsetting.header);
-                        SetHeaderFooter("margin_bottom", printsetting.margin_bottom);
-                        SetHeaderFooter("margin_left", printsetting.margin_left);
-                        SetHeaderFooter("margin_right", printsetting.margin_right);
-                        SetHeaderFooter("margin_top", printsetting.margin_top);
-                        SetHeaderFooter("Print_Background", "no");
-                        SetHeaderFooter("Shrink_To_Fit", "yes");
+                            //string printername = "Microsoft Print to PDF";
+                            //string printername = receivedMessage.Split('|')[0];
 
-                        SetDefaultPrinter(printsetting.printer_name);
+                            string printername = printsetting.printer_name;
+                            //MessageBox.Show(printsetting.header);
 
+                            SetHeaderFooter("footer", printsetting.footer);
+                            SetHeaderFooter("header", printsetting.header);
+                            SetHeaderFooter("margin_bottom", printsetting.margin_bottom);
+                            SetHeaderFooter("margin_left", printsetting.margin_left);
+                            SetHeaderFooter("margin_right", printsetting.margin_right);
+                            SetHeaderFooter("margin_top", printsetting.margin_top);
+                            SetHeaderFooter("Print_Background", "no");
+                            SetHeaderFooter("Shrink_To_Fit", "yes");
 
+                            SetDefaultPrinter(printsetting.printer_name);
+                        }
+                        catch (WebSocketException ex)
+                        {
+                            Console.WriteLine("WebSocket exception: " + ex.Message);
+                            fnErrorToFile(ex.Message);
+                        }
                     }));
-
+                
                     //back to response
                     string response = "ok";
                     byte[] responseBytes = Encoding.UTF8.GetBytes(response);
@@ -272,7 +291,7 @@ namespace websocket_reader
 
                     buffer = new byte[2048];
                     result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                }
+                
 
                 await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             }
