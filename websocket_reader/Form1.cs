@@ -167,6 +167,8 @@ namespace websocket_reader
                 {
                     File.Delete("tmpupdate.exe");
                 }
+                textBox1.Text = "";
+                textBox1.Text += "ver : " + Application.ProductVersion + "\r\n"; 
                 myversion();
                 //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
                 HttpListener listener = new HttpListener();
@@ -175,7 +177,7 @@ namespace websocket_reader
                 listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
                 listener.Start();
                 Console.WriteLine("Listening connections [" + port + "] ...");
-                textBox1.Text += "\nListening connections [" + port + "] ...";
+                textBox1.Text += "Listening connections [" + port + "] ..." + "\r\n";
 
                 ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
 
@@ -185,6 +187,8 @@ namespace websocket_reader
                 SetStartup();
 
                 this.TopMost = true;
+                
+                
 
 
             }
@@ -241,6 +245,8 @@ namespace websocket_reader
         }
         static void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
+            
+            
             WebBrowser webTMP = (WebBrowser)sender;
 
             if (webTMP.DocumentText == "") { return; }
@@ -361,11 +367,25 @@ namespace websocket_reader
                         data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
                         //form.webBrowser1.DocumentText = data.visibleContent;
 
+
+                        //Panel panel1 = new Panel();
+                        //panel1.Dock = DockStyle.Fill;
+                        //form.Controls.Add(panel1);
+
+
                         WebBrowser WBB = new WebBrowser();
+                        WBB.DocumentCompleted += WebBrowser1_DocumentCompleted;
+                        WBB.Dock = DockStyle.Fill;
+                        form.panel1.Controls.Add(WBB);
+
+
                         WBB.DocumentText = data.visibleContent;
                         form.webBrowser1.DocumentText = data.visibleContent;
+                       
+                        //form.TopMost = true;
+                        
 
-                        WBB.DocumentCompleted += WebBrowser1_DocumentCompleted;
+
 
 
 
@@ -482,14 +502,14 @@ namespace websocket_reader
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
-
+           
             if (Clipboard.ContainsText())
             {
                 string clipboardText = Clipboard.GetText();
 
                 if (clipboardText.Contains("#showprintersocket"))
                 {
-                    textBox1.Text += Clipboard.GetText();
+                    textBox1.Text += Clipboard.GetText() + "\r\n";
                     HideMainForm(false);//show this form
                     Clipboard.Clear();
                 }
@@ -498,7 +518,11 @@ namespace websocket_reader
 
         private void button3_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            DialogResult result = MessageBox.Show("آیا مطمئن هستید که می‌خواهید از برنامه خارج شوید؟", "تأیید خروج", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -528,6 +552,7 @@ namespace websocket_reader
 
         private void button4_Click_2(object sender, EventArgs e)
         {
+            textBox1.Text += "Checking for updates . . ." + "\r\n";
             button4.Enabled = false;
 
             Updater updater = new Updater();
@@ -535,17 +560,38 @@ namespace websocket_reader
             if (s == "notfoundnewversion")
             {
                 MessageBox.Show("نسخه جدید جهت بروز رسانی یافت نشد");
-                textBox1.Text += "\nnew version not found";
+                textBox1.Text += "new version not found" + "\r\n";
             }
                 
             if (s == "isupdate")
                 {
                 MessageBox.Show("برنامه آخرین نسخه فعال است");
-                textBox1.Text += "\nlast update is using";
+                textBox1.Text += "\nlast update is using" + "\r\n";
             }
             
             button4.Enabled = true;
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+
+            webBrowser1.DocumentText = "<h2>thi is test.</h2><h4>this is Ttext.</h4>"; 
+            webBrowser1.ShowPrintDialog();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            webBrowser1.DocumentText = "<h2>thi is test.</h2><h4>this is Ttext.</h4>";
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            if (this.Width <= 450)
+                this.Width = 450;
+            if (this.Height <= 400)
+                this.Height = 400;
         }
     }
 
