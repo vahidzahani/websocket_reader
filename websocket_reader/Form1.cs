@@ -8,10 +8,11 @@ using Microsoft.Win32;
 using System.IO;
 using Newtonsoft.Json;
 using System.Drawing;
-
+using System.Drawing.Printing;
+using System.Runtime.InteropServices;
 namespace websocket_reader
 {
-
+    
     public partial class Form1 : Form
     {
         private bool isDragging = false;
@@ -19,6 +20,9 @@ namespace websocket_reader
 
         private static Form1 instance;
         private static bool isDirect=false;
+
+
+        public string defaultPrinterName;
         //public Form mainForm = Application.OpenForms["Form1"];
        
 
@@ -114,7 +118,6 @@ namespace websocket_reader
 
 
 
-
         private void SetStartup()
         {
             try
@@ -148,6 +151,8 @@ namespace websocket_reader
             }
         }
         static readonly Mutex mutex = new Mutex(true, "c676b1d7-c868-4e9a-8409-135cec4dff43");
+
+
         private void Form1_Load(object sender, EventArgs e)
         {
             if (!mutex.WaitOne(TimeSpan.Zero, true))
@@ -234,7 +239,23 @@ namespace websocket_reader
 
             }
         }
+        static void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
+            WebBrowser webTMP = (WebBrowser)sender;
 
+            if (webTMP.DocumentText == "") { return; }
+            webTMP.Document.RightToLeft = true;
+            //webBrowser1.Print();
+            if (isDirect)
+            {
+                webTMP.Print();
+            }
+            else
+            {
+                webTMP.ShowPrintDialog();
+            }
+
+        }
         static void ProcessWebSocketRequests(object state)
         {
             HttpListener listener = (HttpListener)state;
@@ -308,9 +329,13 @@ namespace websocket_reader
                         isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
 
                         //data.visibleContent = data.visibleContent.Replace(data.rootPath, data.serverAddress + "/");
-                        data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
+                        
+                       
 
-                        form.webBrowser1.DocumentText = data.visibleContent;
+
+                        
+
+
 
                         //MessageBox.Show(data.rootPath);
 
@@ -318,6 +343,8 @@ namespace websocket_reader
                         //string printername = receivedMessage.Split('|')[0];
 
                         string printername = printsetting.printer_name;
+
+                        MyPrinters.SetDefaultPrinter(printername);
                         //MessageBox.Show(printsetting.header);
 
                         SetHeaderFooter("footer", printsetting.footer);
@@ -328,8 +355,23 @@ namespace websocket_reader
                         SetHeaderFooter("margin_top", printsetting.margin_top);
                         SetHeaderFooter("Print_Background", "no");
                         SetHeaderFooter("Shrink_To_Fit", "yes");
+                        
+                        
+                        
+                        data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
+                        //form.webBrowser1.DocumentText = data.visibleContent;
 
-                        SetDefaultPrinter(printsetting.printer_name);
+                        WebBrowser WBB = new WebBrowser();
+                        WBB.DocumentText = data.visibleContent;
+                        form.webBrowser1.DocumentText = data.visibleContent;
+
+                        WBB.DocumentCompleted += WebBrowser1_DocumentCompleted;
+
+
+
+                        //SetDefaultPrinter(printsetting.printer_name);
+                        //MyPrinters.SetDefaultPrinter("Microsoft Print to PDF");
+
                     }
                     catch (WebSocketException ex)
                     {
@@ -361,6 +403,7 @@ namespace websocket_reader
                 webSocket.Dispose();
             }
         }
+       
         private string ReplaceAllOccurrences(string input, string oldValue, string newValue)
         {
             int index = input.IndexOf(oldValue);
@@ -388,21 +431,34 @@ namespace websocket_reader
 
             }
         }
-
+        
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            this.TopMost = true;
+            
+            /*
+            
+
+
+            if (webBrowser1.DocumentText == "") { return; }
             webBrowser1.Document.RightToLeft = true;
             //webBrowser1.Print();
             if (isDirect)
             {
                 webBrowser1.Print();
             }
-            else{ 
+            else
+            {
                 webBrowser1.ShowPrintDialog();
             }
+             */
+  
+
+            //webBrowser1.Refresh();
             //webBrowser1.ShowPrintPreviewDialog();
+           
+
         }
+
         static void myversion()
         {
             // Get the version of your application
@@ -515,4 +571,12 @@ namespace websocket_reader
         public string serverAddress { get; set; }
         public string rootPath { get; set; }
     }
+    public static class MyPrinters
+    {
+        [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool SetDefaultPrinter(string Name);
+    }
 }
+
+   
+
