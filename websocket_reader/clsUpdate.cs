@@ -13,18 +13,42 @@ namespace websocket_reader
     internal class Updater
     {
         private const string UpdaterBatPath = "updater.bat";
+        public string serverAddress = "http://192.168.1.200/care2";//is Default
+        public string GetServerAddress() {
+            Form1 form1 = new Form1();
+            IniFile iniFile = new IniFile(form1.strConfigFile);
+            string tmp = iniFile.GetValue("Settings", "server");
+            if (tmp == null)
+                iniFile.SetValue("Settings", "server", serverAddress);
+            else
+                serverAddress = tmp;
+
+
+            return serverAddress;
+        }
+
         public string CheckAndUpdate()
         {
             string localVerFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ver.txt");
-            string fileServerConfig= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server.txt");
 
-            string serverAddress = "http://192.168.1.200/care2";//is Default
-            string executablePath = AppDomain.CurrentDomain.BaseDirectory;
-            string fileServer = Path.Combine(executablePath, "server.txt");
 
-            if (File.Exists(fileServer)) {
-                serverAddress= File.ReadAllText(fileServer);
-            }
+
+            //string executablePath = AppDomain.CurrentDomain.BaseDirectory;
+            //string fileServer = Path.Combine(executablePath, "server.txt");
+            //if (File.Exists(fileServer)) {
+            //    serverAddress= File.ReadAllText(fileServer);
+            //}
+
+            //Form1 form1 = new Form1();
+            //IniFile iniFile = new IniFile(form1.strConfigFile);
+            //string tmp = iniFile.GetValue("Settings", "server");
+            //if (tmp == null)
+            //    iniFile.SetValue("Settings", "server", serverAddress);
+            //else
+            //    serverAddress = tmp;
+
+            serverAddress = GetServerAddress();
+
             string webVerFilePath = serverAddress + "/printsoft/ver.txt";
             string setupExeUrl = serverAddress + "/printsoft/websocketprinter.exe";
 
@@ -38,9 +62,6 @@ namespace websocket_reader
 
                 DownloadFile(setupExeUrl, "tmpupdate.exe");
 
-                //File.Delete("vahid.exe");
-
-                //File.Move("update.exe", "vahid.exe");
 
                 Console.WriteLine("update completed.");
                 WriteBatchFile();

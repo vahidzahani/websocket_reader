@@ -63,3 +63,4 @@ C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprin
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CopyComplete
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
+C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.form_config.resources
