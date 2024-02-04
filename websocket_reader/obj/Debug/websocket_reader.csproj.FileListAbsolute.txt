@@ -64,3 +64,4 @@ C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_rea
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.form_config.resources
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.form_config.resources

@@ -46,6 +46,7 @@ function printer_socket(print_setting,data,serverAddress,rootPath,closewindow) {
     var ws = new WebSocket("ws://localhost:1988");
 	ws.binaryType="arraybuffer";
     ws.onopen = function () {
+        //console.log(arrbuf);
         ws.send(arrbuf); // I WANT TO SEND THIS MESSAGE TO THE SERVER!!!!!!!!
 		if(closewindow==1)
 			setTimeout(function (){window.close();},300);

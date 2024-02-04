@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Runtime.InteropServices;
+using System.Net.Sockets;
+
 namespace websocket_reader
 {
     
@@ -175,6 +177,7 @@ namespace websocket_reader
                 port = Getport2();
                 listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
                 listener.Start();
+                
                 Console.WriteLine("Listening connections [" + port + "] ...");
                 textBox1.Text += "Listening connections [" + port + "] ..." + "\r\n";
 
@@ -244,12 +247,12 @@ namespace websocket_reader
         }
         static async void ProcessWebSocketRequest(HttpListenerContext context,Form1 form)
         {
+            //MessageBox.Show("TEST");
             //This Tls applies to versions of Windows 10 
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             HttpListenerWebSocketContext webSocketContext = await context.AcceptWebSocketAsync(null);
             WebSocket webSocket = webSocketContext.WebSocket;
-            //MessageBox.Show("TEST");
             try
             {
                 byte[] buffer = new byte[10485760];
@@ -532,7 +535,28 @@ namespace websocket_reader
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("TEST");
+            //MessageBox.Show("TEST");
+
+
+            // آدرس و پورت مقصد
+            string serverAddress = "127.0.0.1";
+            int port = 1988;
+
+
+            // ایجاد یک اتصال TCP
+            using (TcpClient client = new TcpClient(serverAddress, port))
+            {
+                // ارسال رشته به سرور
+                string messageToSend = "salam";
+                byte[] data = Encoding.UTF8.GetBytes(messageToSend);
+                using (NetworkStream stream = client.GetStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                    Console.WriteLine("Message sent to server: " + messageToSend);
+                }
+            }
+            
+            
         }
 
         private void button6_Click_1(object sender, EventArgs e)

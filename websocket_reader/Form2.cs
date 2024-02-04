@@ -32,6 +32,7 @@ namespace websocket_reader
             DialogResult result = MessageBox.Show("بعد از انجام تنظیمات برنامه راه اندازی مجدد می شود، ادامه می دهید؟", "تأیید ", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
+                
                 Form1 form1 = new Form1();
                 IniFile iniFile = new IniFile(form1.strConfigFile);
                 iniFile.SetValue("Settings", "server", textserver.Text);
