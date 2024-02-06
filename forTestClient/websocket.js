@@ -43,7 +43,7 @@ function printer_socket(print_setting,data,serverAddress,rootPath,closewindow) {
     
 	var arrbuf=new ArrayBuffer(10485760,{maxByteLength:104857600});
 	arrbuf=JSON.stringify(Data_For_Print);
-    var ws = new WebSocket("ws://localhost:1988");
+    var ws = new WebSocket("ws://127.0.0.1:1988");
 	ws.binaryType="arraybuffer";
     ws.onopen = function () {
         //console.log(arrbuf);

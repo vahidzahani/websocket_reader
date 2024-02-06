@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Runtime.InteropServices;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace websocket_reader
 {
@@ -118,20 +119,115 @@ namespace websocket_reader
         }
 
 
+        
+        static readonly Mutex mutex = new Mutex(true, "c676b1d7-c868-4e9a-8409-135cec4dff43");
+        
+        
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            if (!mutex.WaitOne(TimeSpan.Zero, true))
+            {
+                MessageBox.Show("this program already running.");
+                Application.Exit();
+            }
+
+
+
+            try
+            {
+                if (File.Exists("tmpupdate.exe"))
+                {
+                    File.Delete("tmpupdate.exe");
+                }
+                textBox1.Text = "";
+                textBox1.Text += "ver : " + Application.ProductVersion + "\r\n"; 
+                myversion();
+                //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
+
+                HttpListener listener = new HttpListener();
+                int port = 1988;
+                port = Getport2();
+                listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
+                listener.Start();
+
+                Console.WriteLine("Listening connections [" + port + "] ...");
+                textBox1.Text += "Listening connections [" + port + "] ..." + "\r\n";
+
+                ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
+                //ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
+                
+                HideMainForm(true);//true is hide my form
+                label1.Text = "ver : " + Application.ProductVersion;
+
+                SetStartup();
+
+                this.TopMost = true;
+
+
+            }
+            catch (Exception ex)
+            {
+                fnErrorToFile(ex.Message);
+            }
+
+        }
+
+        static void StartListener()
+        {
+            {
+                HttpListener listener = new HttpListener();
+                listener.Prefixes.Add("http://127.0.0.1:1988/");
+                listener.Start();
+                Console.WriteLine("Listening for requests...");
+
+                while (true)
+                {
+                    HttpListenerContext context = listener.GetContext();
+                    HttpListenerRequest request = context.Request;
+                    HttpListenerResponse response = context.Response;
+
+                    if (request.HttpMethod == "POST")
+                    {
+                        using (StreamReader reader = new StreamReader(request.InputStream, request.ContentEncoding))
+                        {
+                            string requestBody = reader.ReadToEnd();
+                            dynamic requestData = JsonConvert.DeserializeObject(requestBody);
+
+                            // اطلاعات دریافتی از PHP
+                            string printSettingId = requestData.print_setting.id;
+                            string printerName = requestData.print_setting.printer_name;
+                            string visibleContent = requestData.visibleContent;
+
+                            // انجام عملیات مورد نیاز با اطلاعات دریافتی
+
+                            // ارسال پاسخ به PHP
+                            string responseString = "Data received successfully!" + requestData;
+                            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+                            response.ContentLength64 = buffer.Length;
+                            Stream output = response.OutputStream;
+                            output.Write(buffer, 0, buffer.Length);
+                            output.Close();
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void SetStartup()
         {
             try
             {
-                string keys =@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run";
+                string keys = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run";
                 string value = "websocket";
 
                 if (Registry.GetValue(keys, value, null) == null)
                 {
                     // if key doesn't exist
-                    using (RegistryKey key =Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
                     {
-                        key.SetValue("websocket", Path.GetDirectoryName(Application.ExecutablePath)+"\\"+Path.GetFileName(Application.ExecutablePath));
+                        key.SetValue("websocket", Path.GetDirectoryName(Application.ExecutablePath) + "\\" + Path.GetFileName(Application.ExecutablePath));
                         key.Dispose();
                         key.Flush();
                     }
@@ -151,54 +247,7 @@ namespace websocket_reader
                 Console.WriteLine(e.Message);
             }
         }
-        static readonly Mutex mutex = new Mutex(true, "c676b1d7-c868-4e9a-8409-135cec4dff43");
 
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            if (!mutex.WaitOne(TimeSpan.Zero, true))
-            {
-                MessageBox.Show("this program already running.");
-                Application.Exit();
-            }
-
-            try
-            {
-                if (File.Exists("tmpupdate.exe"))
-                {
-                    File.Delete("tmpupdate.exe");
-                }
-                textBox1.Text = "";
-                textBox1.Text += "ver : " + Application.ProductVersion + "\r\n"; 
-                myversion();
-                //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
-                HttpListener listener = new HttpListener();
-                int port = 1988;
-                port = Getport2();
-                listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
-                listener.Start();
-                
-                Console.WriteLine("Listening connections [" + port + "] ...");
-                textBox1.Text += "Listening connections [" + port + "] ..." + "\r\n";
-
-                ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
-
-                HideMainForm(true);//true is hide my form
-                label1.Text = "ver : " + Application.ProductVersion;
-
-                SetStartup();
-
-                this.TopMost = true;
-
-
-            }
-            catch (Exception ex)
-            {
-                fnErrorToFile(ex.Message);
-            }
-
-        }
-        
         private void HideMainForm(bool mode)
         {
             if (mode)
@@ -271,8 +320,6 @@ namespace websocket_reader
 
                 form.Invoke(new Action(() =>
                 {
-                    
-                    
 
                     // خواندن JSON
                     try
@@ -318,7 +365,6 @@ namespace websocket_reader
                         SetHeaderFooter("margin_top", printsetting.margin_top);
                         SetHeaderFooter("Print_Background", "no");
                         SetHeaderFooter("Shrink_To_Fit", "yes");
-                        
                         
                         
                         data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");

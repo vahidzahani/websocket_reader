@@ -80,7 +80,7 @@
             this.button1.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
             this.button1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button1.Location = new System.Drawing.Point(136, 12);
+            this.button1.Location = new System.Drawing.Point(136, 13);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(56, 48);
             this.button1.TabIndex = 2;
@@ -102,7 +102,7 @@
             this.button3.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button3.Image = ((System.Drawing.Image)(resources.GetObject("button3.Image")));
             this.button3.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button3.Location = new System.Drawing.Point(77, 12);
+            this.button3.Location = new System.Drawing.Point(77, 13);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(53, 48);
             this.button3.TabIndex = 4;
@@ -130,7 +130,7 @@
             this.btnClear.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnClear.Image = ((System.Drawing.Image)(resources.GetObject("btnClear.Image")));
             this.btnClear.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnClear.Location = new System.Drawing.Point(15, 12);
+            this.btnClear.Location = new System.Drawing.Point(15, 13);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(56, 48);
             this.btnClear.TabIndex = 4;
@@ -162,7 +162,7 @@
             this.button2.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button2.Image = ((System.Drawing.Image)(resources.GetObject("button2.Image")));
             this.button2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button2.Location = new System.Drawing.Point(260, 12);
+            this.button2.Location = new System.Drawing.Point(260, 13);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(56, 48);
             this.button2.TabIndex = 4;
@@ -177,7 +177,7 @@
             this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button5.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button5.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button5.Location = new System.Drawing.Point(179, 259);
+            this.button5.Location = new System.Drawing.Point(161, 228);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(56, 48);
             this.button5.TabIndex = 4;
@@ -218,7 +218,7 @@
             this.button6.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button6.Image = ((System.Drawing.Image)(resources.GetObject("button6.Image")));
             this.button6.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button6.Location = new System.Drawing.Point(322, 12);
+            this.button6.Location = new System.Drawing.Point(322, 13);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(56, 48);
             this.button6.TabIndex = 4;
