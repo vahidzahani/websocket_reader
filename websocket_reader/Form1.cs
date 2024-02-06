@@ -20,6 +20,7 @@ namespace websocket_reader
     {
         private bool isDragging = false;
         private Point offset;
+        //private NotifyIcon notifyIcon;
 
         private static Form1 instance;
         private static bool isDirect=false;
@@ -85,12 +86,30 @@ namespace websocket_reader
         public Form1()
         {
             InitializeComponent();
+            InitializeNotifyIcon();
             instance = this;
 
             this.MouseDown += Form_MouseDown;
             this.MouseMove += Form_MouseMove;
             this.MouseUp += Form_MouseUp;
 
+        }
+        private void InitializeNotifyIcon()
+        {
+            //notifyIcon = new NotifyIcon();
+            //notifyIcon.Icon = new System.Drawing.Icon("icon.ico"); // آیکونی که می‌خواهید نمایش داده شود
+            //notifyIcon.Text = "My Program"; // متن ToolTip
+            //notifyIcon.Visible = true;
+
+            // اضافه کردن رویداد برای نمایش منوی راست‌کلیک
+            notifyIcon1.ContextMenuStrip = new ContextMenuStrip();
+            notifyIcon1.ContextMenuStrip.Items.Add("Exit", null, ExitMenuItem_Click);
+        }
+
+        private void ExitMenuItem_Click(object sender, EventArgs e)
+        {
+            // عملکرد خروج از برنامه
+            Application.Exit();
         }
 
         private void Form_MouseDown(object sender, MouseEventArgs e)
@@ -132,8 +151,6 @@ namespace websocket_reader
                 Application.Exit();
             }
 
-
-
             try
             {
                 if (File.Exists("tmpupdate.exe"))
@@ -145,16 +162,18 @@ namespace websocket_reader
                 myversion();
                 //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
 
-                HttpListener listener = new HttpListener();
-                int port = 1988;
-                port = Getport2();
-                listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
-                listener.Start();
+                //HttpListener listener = new HttpListener();
+                //int port = 1988;
+                //port = Getport2();
 
-                Console.WriteLine("Listening connections [" + port + "] ...");
-                textBox1.Text += "Listening connections [" + port + "] ..." + "\r\n";
+                //listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
+                //listener.Start();
 
-                ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
+                //Console.WriteLine("Listening connections [" + port + "] ...");
+                //textBox1.Text += "Listening connections [" + port + "] ..." + "\r\n";
+
+                //ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
+                StartListener();
                 //ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
                 
                 HideMainForm(true);//true is hide my form
@@ -169,50 +188,60 @@ namespace websocket_reader
             catch (Exception ex)
             {
                 fnErrorToFile(ex.Message);
+                throw ex;
             }
 
         }
 
         static void StartListener()
         {
+            HttpListener listener = new HttpListener();
+            listener.Prefixes.Add("http://127.0.0.1:1988/");
+            listener.Start();
+            Console.WriteLine("Listening for requests...");
+
+            // برای شروع گوش دادن به درخواست‌ها از یک رویداد متغیر استفاده می‌کنیم
+            listener.BeginGetContext(ListenerCallback, listener);
+        }
+
+
+        static void ListenerCallback(IAsyncResult result)
+        {
+            HttpListener listener = (HttpListener)result.AsyncState;
+
+            // دریافت درخواست و ادامه گوش دادن به درخواست‌های جدید
+            HttpListenerContext context = listener.EndGetContext(result);
+            HttpListenerRequest request = context.Request;
+            HttpListenerResponse response = context.Response;
+
+            if (request.HttpMethod == "POST")
             {
-                HttpListener listener = new HttpListener();
-                listener.Prefixes.Add("http://127.0.0.1:1988/");
-                listener.Start();
-                Console.WriteLine("Listening for requests...");
-
-                while (true)
+                using (StreamReader reader = new StreamReader(request.InputStream, request.ContentEncoding))
                 {
-                    HttpListenerContext context = listener.GetContext();
-                    HttpListenerRequest request = context.Request;
-                    HttpListenerResponse response = context.Response;
+                    string requestBody = reader.ReadToEnd();
+                    dynamic requestData = JsonConvert.DeserializeObject(requestBody);
 
-                    if (request.HttpMethod == "POST")
-                    {
-                        using (StreamReader reader = new StreamReader(request.InputStream, request.ContentEncoding))
-                        {
-                            string requestBody = reader.ReadToEnd();
-                            dynamic requestData = JsonConvert.DeserializeObject(requestBody);
+                    // اطلاعات دریافتی از PHP
+                    string printSettingId = requestData.print_setting.id;
+                    string printerName = requestData.print_setting.printer_name;
+                    string visibleContent = requestData.visibleContent;
 
-                            // اطلاعات دریافتی از PHP
-                            string printSettingId = requestData.print_setting.id;
-                            string printerName = requestData.print_setting.printer_name;
-                            string visibleContent = requestData.visibleContent;
+                    // انجام عملیات مورد نیاز با اطلاعات دریافتی
 
-                            // انجام عملیات مورد نیاز با اطلاعات دریافتی
-
-                            // ارسال پاسخ به PHP
-                            string responseString = "Data received successfully!" + requestData;
-                            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-                            response.ContentLength64 = buffer.Length;
-                            Stream output = response.OutputStream;
-                            output.Write(buffer, 0, buffer.Length);
-                            output.Close();
-                        }
-                    }
+                    // ارسال پاسخ به PHP
+                    string responseString = "Data received successfully!" + requestData;
+                    byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+                    response.ContentLength64 = buffer.Length;
+                    Stream output = response.OutputStream;
+                    output.Write(buffer, 0, buffer.Length);
+                    output.Close();
                 }
             }
+
+            // شروع گوش دادن به درخواست‌های جدید
+            listener.BeginGetContext(ListenerCallback, listener);
         }
+
 
 
         private void SetStartup()
@@ -610,6 +639,12 @@ namespace websocket_reader
             form_config frm = new form_config();
             frm.TopMost = true;
             frm.ShowDialog();
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            Form1 frm = new Form1();
+            frm.Show();
         }
     }
 
