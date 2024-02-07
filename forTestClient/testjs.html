@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ارسال اطلاعات به برنامه C# با JavaScript</title>
+</head>
+<body>
+    <h1>HI</h1>
+    <script>
+        const url = 'http://127.0.0.1:1988'; // آدرس برنامه C#
+        const data = {
+            print_setting: {
+                id: '1',
+                printer_name: 'MyPrinter',
+                // دیگر فیلدها
+            },
+            visibleContent: '<html><body><h1>Hello from JavaScript!</h1></body></html>',
+            // سایر اطلاعات
+        };
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        };
+
+        fetch(url, options)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Error sending data to C# program.');
+                }
+                return response.text();
+            })
+            .then((result) => {
+                console.log(result);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    </script>
+</body>
+</html

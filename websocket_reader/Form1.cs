@@ -202,11 +202,15 @@ namespace websocket_reader
 
             // برای شروع گوش دادن به درخواست‌ها از یک رویداد متغیر استفاده می‌کنیم
             listener.BeginGetContext(ListenerCallback, listener);
+            
         }
 
 
         static void ListenerCallback(IAsyncResult result)
         {
+            //Form1 frm = new Form1();
+            //frm.textBox1.Text += "ListenerCallback";
+
             HttpListener listener = (HttpListener)result.AsyncState;
 
             // دریافت درخواست و ادامه گوش دادن به درخواست‌های جدید
@@ -214,12 +218,16 @@ namespace websocket_reader
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
 
+            Console.WriteLine("request.HttpMethod:"+request.HttpMethod);
+
+            //if (request.HttpMethod == "POST" || request.HttpMethod == "OPTIONS")
             if (request.HttpMethod == "POST")
             {
                 using (StreamReader reader = new StreamReader(request.InputStream, request.ContentEncoding))
                 {
                     string requestBody = reader.ReadToEnd();
                     dynamic requestData = JsonConvert.DeserializeObject(requestBody);
+                    Console.WriteLine(requestBody);
 
                     // اطلاعات دریافتی از PHP
                     string printSettingId = requestData.print_setting.id;
@@ -536,11 +544,6 @@ namespace websocket_reader
         }
 
       
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void btnClear_Click(object sender, EventArgs e)
         {
