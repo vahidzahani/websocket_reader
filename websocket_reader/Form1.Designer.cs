@@ -52,13 +52,13 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.BackColor = System.Drawing.Color.Black;
-            this.textBox1.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.ForeColor = System.Drawing.Color.Gainsboro;
             this.textBox1.Location = new System.Drawing.Point(-2, 71);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(717, 647);
+            this.textBox1.Size = new System.Drawing.Size(522, 319);
             this.textBox1.TabIndex = 0;
             this.textBox1.Text = "LOG";
             // 
@@ -67,10 +67,10 @@
             this.webBrowser1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.webBrowser1.Location = new System.Drawing.Point(587, 12);
+            this.webBrowser1.Location = new System.Drawing.Point(266, 140);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(20, 20);
+            this.webBrowser1.Size = new System.Drawing.Size(64, 63);
             this.webBrowser1.TabIndex = 1;
             this.webBrowser1.Visible = false;
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
@@ -82,7 +82,7 @@
             this.button1.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
             this.button1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button1.Location = new System.Drawing.Point(133, 13);
+            this.button1.Location = new System.Drawing.Point(12, 12);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(56, 48);
             this.button1.TabIndex = 2;
@@ -100,11 +100,12 @@
             // button3
             // 
             this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.button3.Enabled = false;
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button3.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button3.Image = ((System.Drawing.Image)(resources.GetObject("button3.Image")));
             this.button3.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button3.Location = new System.Drawing.Point(74, 13);
+            this.button3.Location = new System.Drawing.Point(264, 12);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(53, 48);
             this.button3.TabIndex = 4;
@@ -116,11 +117,12 @@
             // btnClear
             // 
             this.btnClear.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnClear.Enabled = false;
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClear.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnClear.Image = ((System.Drawing.Image)(resources.GetObject("btnClear.Image")));
             this.btnClear.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnClear.Location = new System.Drawing.Point(12, 13);
+            this.btnClear.Location = new System.Drawing.Point(324, 12);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(56, 48);
             this.btnClear.TabIndex = 4;
@@ -136,7 +138,7 @@
             this.button4.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button4.Image = ((System.Drawing.Image)(resources.GetObject("button4.Image")));
             this.button4.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button4.Location = new System.Drawing.Point(195, 13);
+            this.button4.Location = new System.Drawing.Point(75, 12);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(56, 48);
             this.button4.TabIndex = 6;
@@ -152,7 +154,7 @@
             this.button2.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button2.Image = ((System.Drawing.Image)(resources.GetObject("button2.Image")));
             this.button2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button2.Location = new System.Drawing.Point(257, 13);
+            this.button2.Location = new System.Drawing.Point(201, 12);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(56, 48);
             this.button2.TabIndex = 4;
@@ -166,15 +168,15 @@
             this.button5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button5.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button5.Image = ((System.Drawing.Image)(resources.GetObject("button5.Image")));
             this.button5.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button5.Location = new System.Drawing.Point(443, 13);
+            this.button5.Location = new System.Drawing.Point(450, 12);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(56, 48);
             this.button5.TabIndex = 4;
-            this.button5.Text = "< - Test";
+            this.button5.Text = "Admin";
             this.button5.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.button5.UseVisualStyleBackColor = false;
-            this.button5.Visible = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // panel1
@@ -185,7 +187,7 @@
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Location = new System.Drawing.Point(12, 95);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(690, 250);
+            this.panel1.Size = new System.Drawing.Size(495, 0);
             this.panel1.TabIndex = 7;
             this.panel1.Visible = false;
             // 
@@ -193,22 +195,24 @@
             // 
             this.btnTest.BackColor = System.Drawing.Color.Red;
             this.btnTest.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.btnTest.Location = new System.Drawing.Point(475, 525);
+            this.btnTest.Location = new System.Drawing.Point(176, 71);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(199, 34);
             this.btnTest.TabIndex = 8;
             this.btnTest.Text = "TEST";
             this.btnTest.UseVisualStyleBackColor = false;
+            this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // button6
             // 
             this.button6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.button6.Enabled = false;
             this.button6.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button6.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button6.Image = ((System.Drawing.Image)(resources.GetObject("button6.Image")));
             this.button6.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button6.Location = new System.Drawing.Point(319, 13);
+            this.button6.Location = new System.Drawing.Point(387, 12);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(56, 48);
             this.button6.TabIndex = 4;
@@ -231,7 +235,7 @@
             this.button7.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button7.Image = ((System.Drawing.Image)(resources.GetObject("button7.Image")));
             this.button7.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.button7.Location = new System.Drawing.Point(381, 13);
+            this.button7.Location = new System.Drawing.Point(138, 12);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(56, 48);
             this.button7.TabIndex = 4;
@@ -244,10 +248,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(714, 718);
+            this.ClientSize = new System.Drawing.Size(519, 390);
             this.ControlBox = false;
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.btnTest);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button5);
@@ -263,6 +267,7 @@
             this.Name = "Form1";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             this.ResumeLayout(false);

@@ -12,6 +12,7 @@ using System.Drawing.Printing;
 using System.Runtime.InteropServices;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace websocket_reader
 {
@@ -22,7 +23,7 @@ namespace websocket_reader
         private Point offset;
         //private NotifyIcon notifyIcon;
         private form_config frmConfigInstance;
-
+        public static Boolean adminpass=false;
 
         public static Form1 instance;
         private static bool isDirect=false;
@@ -31,17 +32,28 @@ namespace websocket_reader
 
         public string defaultPrinterName;
         //public Form mainForm = Application.OpenForms["Form1"];
-       public void vahidConsole(string str)
+       public void vahidConsole(string str,bool cls =false,bool showTime =false)
         {
             //this.textBox1.Text+= str + "\r\n";
             // ارسال داده به کنترل textBox1 از طریق Invoke
-            if (textBox1.IsHandleCreated)
-            {
-                // ارسال داده به کنترل textBox1 از طریق Invoke
+            
+            //if (textBox1.IsHandleCreated)
+            //{
+            // ارسال داده به کنترل textBox1 از طریق Invoke
+           
                 textBox1.BeginInvoke((MethodInvoker)delegate {
+                    if (cls)
+                    {
+                        textBox1.Clear();
+                        textBox1.Text = "ver : "+ Application.ProductVersion + "\r\n";
+                    }
+                    if (showTime)
+                    {
+                        textBox1.Text += DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+ " "; 
+                    }
                     textBox1.Text += $"{str}\r\n";
                 });
-            }
+           // }
 
             //textBox1.Invoke((MethodInvoker)delegate {
             //    textBox1.Text += $"{str}\r\n";
@@ -250,22 +262,107 @@ namespace websocket_reader
 
                 if (request.HttpMethod == "POST")
                 {
-                    using (StreamReader reader = new StreamReader(request.InputStream, request.ContentEncoding))
+                    using (StreamReader reader = new StreamReader(request.InputStream,  Encoding.UTF8))
                     {
                         string requestBody = reader.ReadToEnd();
-                        dynamic requestData = JsonConvert.DeserializeObject(requestBody);
-                        Console.WriteLine(requestBody);
-                        instance.vahidConsole(requestBody);
+                        //dynamic requestData = JsonConvert.DeserializeObject(requestBody);
+                        //var data = JsonConvert.DeserializeObject<Data_For_Print>(requestBody);
+
+                        //***************************************************************
+
+
+                        //try
+                        //{
+                       
+
+                        var data = JsonConvert.DeserializeObject<Data_For_Print>(requestBody);
+                            var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
+
+                            if (data.rootPath == null) data.rootPath = "nullnull";
+                            if (data.serverAddress == null)
+                            {
+                                data.serverAddress = "nullnull";
+                            }
+                            else
+                            {
+                                string fileServertxt = data.serverAddress;
+                                string executablePath = AppDomain.CurrentDomain.BaseDirectory;
+
+                                //string fileServer = ;
+
+
+                                File.WriteAllText(Path.Combine(executablePath, "server.txt"), fileServertxt);
+
+
+                                //int intDefaultPort = 1988;
+                                IniFile iniFile = new IniFile(strConfigFile);
+                                iniFile.SetValue("Settings", "server", fileServertxt);
+
+
+                            }
+
+                            isDirect = printsetting.is_direct == "1";//true for 1 and false for 0
+
+
+                            string printername = printsetting.printer_name;
+
+                            MyPrinters.SetDefaultPrinter(printername);
+
+
+                            SetHeaderFooter("footer", printsetting.footer);
+                            SetHeaderFooter("header", printsetting.header);
+                            SetHeaderFooter("margin_bottom", printsetting.margin_bottom);
+                            SetHeaderFooter("margin_left", printsetting.margin_left);
+                            SetHeaderFooter("margin_right", printsetting.margin_right);
+                            SetHeaderFooter("margin_top", printsetting.margin_top);
+                            SetHeaderFooter("Print_Background", "no");
+                            SetHeaderFooter("Shrink_To_Fit", "yes");
+
+
+                            data.visibleContent = instance.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
+
+
+                            instance.vahidConsole( " > print to : " + printername, showTime: true);
+
+
+
+                            instance.Invoke((MethodInvoker)delegate
+                            {
+                                WebBrowser WBB = new WebBrowser();
+                                WBB.DocumentCompleted += WebBrowser1_DocumentCompleted;
+                                WBB.Dock = DockStyle.Fill;
+                                instance.panel1.Controls.Add(WBB);
+                                WBB.DocumentText = data.visibleContent;
+                                instance.webBrowser1.DocumentText = data.visibleContent;
+                                //instance.vahidConsole(data.visibleContent);
+                            });
+
+
+
+                        //}
+                        //catch (WebSocketException ex)
+                        //{
+                        //    Console.WriteLine("WebSocket exception: " + ex.Message);
+                        //    fnErrorToFile(ex.Message);
+                        //}
+
+
+                        //***************************************************************
+
+
+                        
+                        //Console.WriteLine(requestBody);
+                        //instance.vahidConsole(printsetting.printer_name.ToString());
 
                         // اطلاعات دریافتی از PHP
-                        string printSettingId = requestData.print_setting.id;
-                        string printerName = requestData.print_setting.printer_name;
-                        string visibleContent = requestData.visibleContent;
+                        //string printSettingId = requestData.print_setting.id;
+                        //string printerName = requestData.print_setting.printer_name;
+                        //string visibleContent = data.visibleContent;
 
                         // انجام عملیات مورد نیاز با اطلاعات دریافتی
 
                         // ارسال پاسخ به PHP
-                        string responseString = "Data received successfully!" + requestData;
+                        string responseString = "200";//Data received successfully!
                         byte[] buffer = Encoding.UTF8.GetBytes(responseString);
                         response.ContentLength64 = buffer.Length;
                         Stream output = response.OutputStream;
@@ -585,8 +682,8 @@ namespace websocket_reader
 
         private void btnClear_Click(object sender, EventArgs e)
         {
-            //webBrowser1.DocumentText = "";
-            vahidConsole("");
+            //MessageBox.Show("");//webBrowser1.DocumentText = "";
+            vahidConsole("",true);
         }
 
         public static int Getport2()
@@ -633,7 +730,14 @@ namespace websocket_reader
         }
         private void button5_Click(object sender, EventArgs e)
         {
-            webBrowser1.DocumentText = "<h2>thi is test.</h2><h4>this is Ttext.</h4>";
+            adminpass = false;
+            Form_lock form_Lock = new Form_lock();  
+            form_Lock.ShowDialog();
+            //MessageBox.Show(adminpass.ToString());
+            button3.Enabled = adminpass;
+            btnClear.Enabled = adminpass;
+            button6.Enabled = adminpass;
+            
         }
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
@@ -650,29 +754,30 @@ namespace websocket_reader
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            vahidConsole("hello");
-            return;
-            //MessageBox.Show("TEST");
+            Console.WriteLine(">>>>>>>>>> " + get_full_printer("   xps         "));
+        }
+        private string get_full_printer(string printername)
+        {
 
+            List<string> installedPrinters = PrinterManager.GetInstalledPrinters();
 
-            // آدرس و پورت مقصد
-            string serverAddress = "127.0.0.1";
-            int port = 1988;
-
-
-            // ایجاد یک اتصال TCP
-            using (TcpClient client = new TcpClient(serverAddress, port))
+            foreach (string printer in installedPrinters)
             {
-                // ارسال رشته به سرور
-                string messageToSend = "salam";
-                byte[] data = Encoding.UTF8.GetBytes(messageToSend);
-                using (NetworkStream stream = client.GetStream())
-                {
-                    stream.Write(data, 0, data.Length);
-                    Console.WriteLine("Message sent to server: " + messageToSend);
-                }
+                Console.WriteLine(printer);
+                if (printername.ToLower().Trim()== printer.ToLower().Trim())
+                    return printer;
             }
-            
+
+            foreach (string printer in installedPrinters)
+            {
+                Console.WriteLine(printer);
+                if (printer.ToLower().Trim().Contains(printername.ToLower().Trim()))
+                    return printer;
+            }
+
+
+            return printername;
+
         }
 
         private void button6_Click_1(object sender, EventArgs e)

@@ -19,11 +19,14 @@ function convertDigitsToPersian(text) {
  
 function printer_socket(print_setting,data,serverAddress,rootPath,closewindow) {
     var parser = new DOMParser();
+	var scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+	var htmlDoc = data.replace(scriptRegex, "");
     var htmlDoc = parser.parseFromString(data, 'text/html');
     // حذف تگ‌های غیرنمایشی مانند <script>
+	
     var scriptTags = htmlDoc.querySelectorAll('script');
     scriptTags.forEach(function(scriptTag) {
-        scriptTag.remove();
+        try	{scriptTag.remove();}catch{}
     });
     
 	if(print_setting=='')
@@ -41,25 +44,26 @@ function printer_socket(print_setting,data,serverAddress,rootPath,closewindow) {
     Data_For_Print.serverAddress=serverAddress;
     Data_For_Print.rootPath=rootPath;
     
-	var arrbuf=new ArrayBuffer(10485760,{maxByteLength:104857600});
-	arrbuf=JSON.stringify(Data_For_Print);
-    var ws = new WebSocket("ws://127.0.0.1:1988");
-	ws.binaryType="arraybuffer";
-    ws.onopen = function () {
-        //console.log(arrbuf);
-        ws.send(arrbuf); // I WANT TO SEND THIS MESSAGE TO THE SERVER!!!!!!!!
-		if(closewindow==1)
-			setTimeout(function (){window.close();},300);
-    };
-
-    ws.onmessage = function (evt) {
-        var received_msg = evt.data;
-    };
-    ws.onclose = function () {
-        // websocket is closed.
-        alert("Connection is closed...");
-        window.print();
-		if(closewindow==1)
-			window.close();
-    };
-};
+	var Action ='test';
+	rootpath='../../../';
+	// alert(rootpath);
+	const url = 'http://127.0.0.1:1988'; // آدرس برنامه C#
+	var data=JSON.stringify(Data_For_Print);
+	$.ajax({
+		url: url,
+		type: 'POST',
+		contentType: 'application/json',
+		data: data,
+		success: function(result) {
+			if(closewindow==1)
+				setTimeout(function (){window.close();},300);
+			console.log(result);
+		},
+		error: function(error) {
+			alert(error);
+			window.print();
+			if(closewindow==1)
+				window.close();
+		}
+	});
+}

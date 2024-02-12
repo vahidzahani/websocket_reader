@@ -100,7 +100,7 @@ start """" ""%targetFile%""
             }
             catch (Exception ex)
             {
-                //Console.WriteLine($"خطا در نوشتن محتوای فایل bat: {ex.Message}");
+                Console.WriteLine($"خطا در نوشتن محتوای فایل bat: {ex.Message}");
             }
         }
 
