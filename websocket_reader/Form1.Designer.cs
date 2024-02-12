@@ -67,7 +67,7 @@
             this.webBrowser1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.webBrowser1.Location = new System.Drawing.Point(266, 140);
+            this.webBrowser1.Location = new System.Drawing.Point(226, 146);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.Size = new System.Drawing.Size(64, 63);
@@ -195,7 +195,7 @@
             // 
             this.btnTest.BackColor = System.Drawing.Color.Red;
             this.btnTest.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.btnTest.Location = new System.Drawing.Point(176, 71);
+            this.btnTest.Location = new System.Drawing.Point(166, 95);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(199, 34);
             this.btnTest.TabIndex = 8;

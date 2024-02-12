@@ -34,30 +34,17 @@ namespace websocket_reader
         //public Form mainForm = Application.OpenForms["Form1"];
        public void vahidConsole(string str,bool cls =false,bool showTime =false)
         {
-            //this.textBox1.Text+= str + "\r\n";
-            // ارسال داده به کنترل textBox1 از طریق Invoke
-            
-            //if (textBox1.IsHandleCreated)
-            //{
-            // ارسال داده به کنترل textBox1 از طریق Invoke
-           
-                textBox1.BeginInvoke((MethodInvoker)delegate {
-                    if (cls)
-                    {
-                        textBox1.Clear();
-                        textBox1.Text = "ver : "+ Application.ProductVersion + "\r\n";
-                    }
-                    if (showTime)
-                    {
-                        textBox1.Text += DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+ " "; 
-                    }
-                    textBox1.Text += $"{str}\r\n";
-                });
-           // }
 
-            //textBox1.Invoke((MethodInvoker)delegate {
-            //    textBox1.Text += $"{str}\r\n";
-            //});
+            if (showTime)
+            {
+                str = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+ " " +str; 
+            }
+            textBox1.BeginInvoke((MethodInvoker)delegate {
+                if (cls)
+                    textBox1.Text = "ver : "+ Application.ProductVersion + "\r\n";
+                textBox1.Text += $"{str}\r\n";
+            });
+            saveLog(str);
         }
 
         public static void SetDefaultPrinter(string printerName)
@@ -271,11 +258,11 @@ namespace websocket_reader
                         //***************************************************************
 
 
-                        //try
-                        //{
-                       
+                        try
+                        {
 
-                        var data = JsonConvert.DeserializeObject<Data_For_Print>(requestBody);
+
+                            var data = JsonConvert.DeserializeObject<Data_For_Print>(requestBody);
                             var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
 
                             if (data.rootPath == null) data.rootPath = "nullnull";
@@ -305,6 +292,8 @@ namespace websocket_reader
 
 
                             string printername = printsetting.printer_name;
+                            printername = instance.get_full_printer(printername);
+
 
                             MyPrinters.SetDefaultPrinter(printername);
 
@@ -339,18 +328,18 @@ namespace websocket_reader
 
 
 
-                        //}
-                        //catch (WebSocketException ex)
-                        //{
-                        //    Console.WriteLine("WebSocket exception: " + ex.Message);
-                        //    fnErrorToFile(ex.Message);
-                        //}
+                        }
+                        catch (WebSocketException ex)
+                        {
+                            Console.WriteLine("WebSocket exception: " + ex.Message);
+                            fnErrorToFile(ex.Message);
+                        }
 
 
                         //***************************************************************
 
 
-                        
+
                         //Console.WriteLine(requestBody);
                         //instance.vahidConsole(printsetting.printer_name.ToString());
 
@@ -614,7 +603,28 @@ namespace websocket_reader
 
             }
         }
-        
+        private static void saveLog(string content)
+        {
+            try
+            {
+                string filePath = Path.GetDirectoryName(Application.ExecutablePath) + "\\log.txt";
+
+                // خواندن محتوای فایل موجود
+                string existingContent = File.ReadAllText(filePath);
+
+                // اضافه کردن محتوای جدید به محتوای قبلی
+                string newContent = existingContent + Environment.NewLine + content;
+
+                // نوشتن محتوای جدید به فایل
+                File.WriteAllText(filePath, newContent);
+            }
+            catch (Exception ex)
+            {
+                string er = $"Error while appending to log file: {ex.Message}";
+                Console.WriteLine(er);
+            }
+        }
+
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             
@@ -702,7 +712,9 @@ namespace websocket_reader
         private void button4_Click_2(object sender, EventArgs e)
         {
             
-            textBox1.Text += "Checking for updates . . ." + "\r\n";
+            //textBox1.Text += "Checking for updates . . ." + "\r\n";
+            vahidConsole("Checking for updates",showTime:true);
+            Application.DoEvents();
             button4.Enabled = false;
 
             Updater updater = new Updater();
@@ -710,15 +722,16 @@ namespace websocket_reader
             if (s == "notfoundnewversion")
             {
                 MessageBox.Show("نسخه جدید جهت بروز رسانی یافت نشد");
-                textBox1.Text += "new version not found" + "\r\n";
+                vahidConsole("new version not found",showTime:true);
             }
                 
             if (s == "isupdate")
                 {
                 MessageBox.Show("برنامه آخرین نسخه فعال است");
-                textBox1.Text += "\nlast update is using" + "\r\n";
+                //textBox1.Text += "\nlast update is using" + "\r\n";
+                vahidConsole("last update is using", showTime: true);
             }
-            
+
             button4.Enabled = true;
 
         }
@@ -754,23 +767,23 @@ namespace websocket_reader
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            Console.WriteLine(">>>>>>>>>> " + get_full_printer("   xps         "));
+            
+            Console.WriteLine("Printer select >>>>>>>>>> " + get_full_printer("   hp       "));
         }
         private string get_full_printer(string printername)
         {
 
             List<string> installedPrinters = PrinterManager.GetInstalledPrinters();
 
+           
             foreach (string printer in installedPrinters)
             {
-                Console.WriteLine(printer);
                 if (printername.ToLower().Trim()== printer.ToLower().Trim())
                     return printer;
             }
 
             foreach (string printer in installedPrinters)
             {
-                Console.WriteLine(printer);
                 if (printer.ToLower().Trim().Contains(printername.ToLower().Trim()))
                     return printer;
             }
