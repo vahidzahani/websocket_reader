@@ -15,8 +15,8 @@ namespace websocket_reader
         private const string UpdaterBatPath = "updater.bat";
         public string serverAddress = "http://192.168.1.200/care2";//is Default
         public string GetServerAddress() {
-            Form1 form1 = new Form1();
-            IniFile iniFile = new IniFile(form1.strConfigFile);
+            //Form1 form1 = new Form1();
+            IniFile iniFile = new IniFile(Form1.strConfigFile);
             string tmp = iniFile.GetValue("Settings", "server");
             if (tmp == null)
                 iniFile.SetValue("Settings", "server", serverAddress);

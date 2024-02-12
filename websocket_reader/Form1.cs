@@ -21,15 +21,32 @@ namespace websocket_reader
         private bool isDragging = false;
         private Point offset;
         //private NotifyIcon notifyIcon;
+        private form_config frmConfigInstance;
 
-        private static Form1 instance;
+
+        public static Form1 instance;
         private static bool isDirect=false;
 
-        public string strConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\config.ini";
+        public static string strConfigFile = Path.GetDirectoryName(Application.ExecutablePath) + "\\config.ini";
 
         public string defaultPrinterName;
         //public Form mainForm = Application.OpenForms["Form1"];
-       
+       public void vahidConsole(string str)
+        {
+            //this.textBox1.Text+= str + "\r\n";
+            // ارسال داده به کنترل textBox1 از طریق Invoke
+            if (textBox1.IsHandleCreated)
+            {
+                // ارسال داده به کنترل textBox1 از طریق Invoke
+                textBox1.BeginInvoke((MethodInvoker)delegate {
+                    textBox1.Text += $"{str}\r\n";
+                });
+            }
+
+            //textBox1.Invoke((MethodInvoker)delegate {
+            //    textBox1.Text += $"{str}\r\n";
+            //});
+        }
 
         public static void SetDefaultPrinter(string printerName)
         {
@@ -87,6 +104,7 @@ namespace websocket_reader
         {
             InitializeComponent();
             InitializeNotifyIcon();
+
             instance = this;
 
             this.MouseDown += Form_MouseDown;
@@ -96,14 +114,15 @@ namespace websocket_reader
         }
         private void InitializeNotifyIcon()
         {
+            notifyIcon1.Text=Application.ProductName + " ver : " + Application.ProductVersion;
             //notifyIcon = new NotifyIcon();
             //notifyIcon.Icon = new System.Drawing.Icon("icon.ico"); // آیکونی که می‌خواهید نمایش داده شود
             //notifyIcon.Text = "My Program"; // متن ToolTip
             //notifyIcon.Visible = true;
 
             // اضافه کردن رویداد برای نمایش منوی راست‌کلیک
-            notifyIcon1.ContextMenuStrip = new ContextMenuStrip();
-            notifyIcon1.ContextMenuStrip.Items.Add("Exit", null, ExitMenuItem_Click);
+            //notifyIcon1.ContextMenuStrip = new ContextMenuStrip();
+            //notifyIcon1.ContextMenuStrip.Items.Add("Exit", null, ExitMenuItem_Click);
         }
 
         private void ExitMenuItem_Click(object sender, EventArgs e)
@@ -151,15 +170,17 @@ namespace websocket_reader
                 Application.Exit();
             }
 
-            try
-            {
-                if (File.Exists("tmpupdate.exe"))
+            //try
+            //{
+            if (File.Exists("tmpupdate.exe"))
                 {
                     File.Delete("tmpupdate.exe");
                 }
                 textBox1.Text = "";
-                textBox1.Text += "ver : " + Application.ProductVersion + "\r\n"; 
+                vahidConsole($"ver : {Application.ProductVersion}");
                 myversion();
+                
+
                 //#showprintersocket   "Copy this phrase to the clipboard when the app is running."
 
                 //HttpListener listener = new HttpListener();
@@ -177,28 +198,31 @@ namespace websocket_reader
                 //ThreadPool.QueueUserWorkItem(ProcessWebSocketRequests, listener);
                 
                 HideMainForm(true);//true is hide my form
-                label1.Text = "ver : " + Application.ProductVersion;
+                                   //textBox1.Text = "ver : " + Application.ProductVersion;
 
                 SetStartup();
 
                 this.TopMost = true;
 
 
-            }
-            catch (Exception ex)
-            {
-                fnErrorToFile(ex.Message);
-                throw ex;
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    fnErrorToFile(ex.Message);
+            //    throw ex;
+            //}
 
         }
 
         static void StartListener()
         {
             HttpListener listener = new HttpListener();
-            listener.Prefixes.Add("http://127.0.0.1:1988/");
+            int port = 1988;
+            port = Getport2();
+            listener.Prefixes.Add($"http://127.0.0.1:{port}/");
             listener.Start();
             Console.WriteLine("Listening for requests...");
+            instance.vahidConsole($"Listening for {port} ");
 
             // برای شروع گوش دادن به درخواست‌ها از یک رویداد متغیر استفاده می‌کنیم
             listener.BeginGetContext(ListenerCallback, listener);
@@ -217,33 +241,49 @@ namespace websocket_reader
             HttpListenerContext context = listener.EndGetContext(result);
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
-
+            
             Console.WriteLine("request.HttpMethod:"+request.HttpMethod);
 
             //if (request.HttpMethod == "POST" || request.HttpMethod == "OPTIONS")
-            if (request.HttpMethod == "POST")
+            if (request.HttpMethod == "POST" || request.HttpMethod == "OPTIONS")
             {
-                using (StreamReader reader = new StreamReader(request.InputStream, request.ContentEncoding))
+
+                if (request.HttpMethod == "POST")
                 {
-                    string requestBody = reader.ReadToEnd();
-                    dynamic requestData = JsonConvert.DeserializeObject(requestBody);
-                    Console.WriteLine(requestBody);
+                    using (StreamReader reader = new StreamReader(request.InputStream, request.ContentEncoding))
+                    {
+                        string requestBody = reader.ReadToEnd();
+                        dynamic requestData = JsonConvert.DeserializeObject(requestBody);
+                        Console.WriteLine(requestBody);
+                        instance.vahidConsole(requestBody);
 
-                    // اطلاعات دریافتی از PHP
-                    string printSettingId = requestData.print_setting.id;
-                    string printerName = requestData.print_setting.printer_name;
-                    string visibleContent = requestData.visibleContent;
+                        // اطلاعات دریافتی از PHP
+                        string printSettingId = requestData.print_setting.id;
+                        string printerName = requestData.print_setting.printer_name;
+                        string visibleContent = requestData.visibleContent;
 
-                    // انجام عملیات مورد نیاز با اطلاعات دریافتی
+                        // انجام عملیات مورد نیاز با اطلاعات دریافتی
 
-                    // ارسال پاسخ به PHP
-                    string responseString = "Data received successfully!" + requestData;
-                    byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-                    response.ContentLength64 = buffer.Length;
-                    Stream output = response.OutputStream;
-                    output.Write(buffer, 0, buffer.Length);
-                    output.Close();
+                        // ارسال پاسخ به PHP
+                        string responseString = "Data received successfully!" + requestData;
+                        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+                        response.ContentLength64 = buffer.Length;
+                        Stream output = response.OutputStream;
+                        output.Write(buffer, 0, buffer.Length);
+                        output.Close();
+                    }
                 }
+                else if (request.HttpMethod == "OPTIONS")
+                {
+                    // تنظیمات مربوط به درخواست OPTIONS
+                    response.StatusCode = 200; // موفقیت‌آمیز
+                    response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
+                    response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+                    response.OutputStream.Close(); // بستن جریان خروجی
+                    //return; // خروج از تابع
+                }
+
             }
 
             // شروع گوش دادن به درخواست‌های جدید
@@ -380,7 +420,7 @@ namespace websocket_reader
 
 
                             //int intDefaultPort = 1988;
-                            IniFile iniFile = new IniFile(form.strConfigFile);
+                            IniFile iniFile = new IniFile(strConfigFile);
                             iniFile.SetValue("Settings", "server",fileServertxt);
                             
 
@@ -543,16 +583,13 @@ namespace websocket_reader
             }
         }
 
-      
-
         private void btnClear_Click(object sender, EventArgs e)
         {
-            webBrowser1.DocumentText = "";
+            //webBrowser1.DocumentText = "";
+            vahidConsole("");
         }
 
-       
-
-        public int Getport2()
+        public static int Getport2()
         {
             int intDefaultPort =1988;
             IniFile iniFile = new IniFile(strConfigFile);
@@ -613,6 +650,8 @@ namespace websocket_reader
 
         private void btnTest_Click(object sender, EventArgs e)
         {
+            vahidConsole("hello");
+            return;
             //MessageBox.Show("TEST");
 
 
@@ -634,20 +673,44 @@ namespace websocket_reader
                 }
             }
             
-            
         }
 
         private void button6_Click_1(object sender, EventArgs e)
         {
-            form_config frm = new form_config();
-            frm.TopMost = true;
-            frm.ShowDialog();
+            if (frmConfigInstance == null || frmConfigInstance.IsDisposed)
+            {
+                frmConfigInstance = new form_config();
+            }
+
+            // نمایش یا مخفی کردن فرم
+            frmConfigInstance.TopMost = true;
+            frmConfigInstance.ShowDialog();
+
         }
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            Form1 frm = new Form1();
-            frm.Show();
+            HideMainForm(false);//true is hide my form
+            
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+
+            if (!panel1.Visible)
+            {
+                panel1.Visible = true;
+                panel1.Width = textBox1.Width = this.Width / 2;
+                panel1.Height = textBox1.Height;
+                panel1.Top= textBox1.Top;
+                panel1.Left = textBox1.Right;
+            }
+            else
+            {
+                panel1.Visible = false;
+                textBox1.Width = this.Width;
+            }
+
         }
     }
 

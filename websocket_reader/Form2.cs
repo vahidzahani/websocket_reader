@@ -19,8 +19,9 @@ namespace websocket_reader
 
         private void form_config_Load(object sender, EventArgs e)
         {
-            Form1 form1 = new Form1();
-            textport.Text= form1.Getport2().ToString();
+            //Form1 form1 = new Form1();
+            
+            textport.Text= Form1.Getport2().ToString();
             Updater up = new Updater();
             textserver.Text=up.GetServerAddress().ToString();
 
@@ -33,8 +34,8 @@ namespace websocket_reader
             if (result == DialogResult.Yes)
             {
                 
-                Form1 form1 = new Form1();
-                IniFile iniFile = new IniFile(form1.strConfigFile);
+                //Form1 form1 = new Form1();
+                IniFile iniFile = new IniFile(Form1.strConfigFile);
                 iniFile.SetValue("Settings", "server", textserver.Text);
                 iniFile.SetValue("Settings", "port", textport.Text);
             
