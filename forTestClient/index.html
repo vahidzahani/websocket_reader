@@ -26,17 +26,7 @@
 		document.getElementById("btnClick2").addEventListener("click",printOut2);
 		//document.getElementById("btnClick3").addEventListener("click",printOut3);
 		
-		$(document).ready(function() {            
-            $.ajax({
-                type: "POST",
-                url: "/{controller}/{action}/",
-                data: { clientToken: '{token}', foo: 'bar',
-                success: function (data, text) {
-                        //APPEND YOUR PAGE WITH YOUR PARSED XML DATA
-                        //NOTE: 'data' WILL CONTAIN YOUR RETURNED RESULT
-                }
-            });
-        });
+		
 
 		function printOut()
 		{

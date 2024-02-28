@@ -49,21 +49,24 @@ function printer_socket(print_setting,data,serverAddress,rootPath,closewindow) {
 	// alert(rootpath);
 	const url = 'http://127.0.0.1:1988'; // آدرس برنامه C#
 	var data=JSON.stringify(Data_For_Print);
-	$.ajax({
-		url: url,
-		type: 'POST',
-		contentType: 'application/json',
-		data: data,
-		success: function(result) {
-			if(closewindow==1)
-				setTimeout(function (){window.close();},300);
-			console.log(result);
-		},
-		error: function(error) {
-			alert(error);
-			window.print();
-			if(closewindow==1)
-				window.close();
-		}
-	});
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: data,
+    success: function(result) {
+      
+        if (closewindow == 1)
+            setTimeout(function() {
+                window.close();
+            }, 300);
+        //console.log(result);
+    },
+    error: function(error) {
+        //console.log(error);
+        window.print();
+        if (closewindow == 1)
+            window.close();
+    }
+});
 }

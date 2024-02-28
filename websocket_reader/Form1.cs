@@ -331,7 +331,7 @@ namespace websocket_reader
                         }
                         catch (WebSocketException ex)
                         {
-                            Console.WriteLine("WebSocket exception: " + ex.Message);
+                            //Console.WriteLine("WebSocket exception: " + ex.Message);
                             fnErrorToFile(ex.Message);
                         }
 
@@ -351,7 +351,7 @@ namespace websocket_reader
                         // انجام عملیات مورد نیاز با اطلاعات دریافتی
 
                         // ارسال پاسخ به PHP
-                        string responseString = "200";//Data received successfully!
+                        string responseString = "{\"status\": \"success\", \"message\": \"Data received successfully!\"}";
                         byte[] buffer = Encoding.UTF8.GetBytes(responseString);
                         response.ContentLength64 = buffer.Length;
                         Stream output = response.OutputStream;
