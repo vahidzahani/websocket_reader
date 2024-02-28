@@ -18,6 +18,7 @@ function convertDigitsToPersian(text) {
   }
  
 function printer_socket(print_setting,data,serverAddress,rootPath,closewindow) {
+    
     var parser = new DOMParser();
 	var scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
 	var htmlDoc = data.replace(scriptRegex, "");
@@ -55,15 +56,15 @@ function printer_socket(print_setting,data,serverAddress,rootPath,closewindow) {
     contentType: 'application/json',
     data: data,
     success: function(result) {
-      
+        console.log(JSON.parse(result));
+        
         if (closewindow == 1)
-            setTimeout(function() {
-                window.close();
+        setTimeout(function() {
+        window.close();
             }, 300);
-        //console.log(result);
     },
     error: function(error) {
-        //console.log(error);
+        console.log(error);
         window.print();
         if (closewindow == 1)
             window.close();

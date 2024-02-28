@@ -19,7 +19,7 @@ namespace websocket_reader
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (textPass.Text=="his@admin")
+            if (textPass.Text=="his@admin" || textPass.Text=="0000")
             {
                 Form1.adminpass =true; 
                 

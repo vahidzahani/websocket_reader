@@ -240,6 +240,8 @@ namespace websocket_reader
             HttpListenerContext context = listener.EndGetContext(result);
             HttpListenerRequest request = context.Request;
             HttpListenerResponse response = context.Response;
+
+                
             
             Console.WriteLine("request.HttpMethod:"+request.HttpMethod);
 
@@ -351,6 +353,10 @@ namespace websocket_reader
                         // انجام عملیات مورد نیاز با اطلاعات دریافتی
 
                         // ارسال پاسخ به PHP
+                        response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        response.Headers.Add("Access-Control-Allow-Methods", "GET, POST");
+                        response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
+
                         string responseString = "{\"status\": \"success\", \"message\": \"Data received successfully!\"}";
                         byte[] buffer = Encoding.UTF8.GetBytes(responseString);
                         response.ContentLength64 = buffer.Length;
@@ -363,9 +369,12 @@ namespace websocket_reader
                 {
                     // تنظیمات مربوط به درخواست OPTIONS
                     response.StatusCode = 200; // موفقیت‌آمیز
+                    //response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    //response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
+                    //response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
                     response.Headers.Add("Access-Control-Allow-Origin", "*");
-                    response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
-                    response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+                    response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
+                    response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
                     response.OutputStream.Close(); // بستن جریان خروجی
                     //return; // خروج از تابع
                 }
