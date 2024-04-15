@@ -4,7 +4,7 @@
   <description asmv2:iconFile="print.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="websocketprinter" version="1.4.6.0" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="websocketprinter" version="1.4.7.0" language="neutral" processorArchitecture="msil" />
     <commandLine file="websocketprinter.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="websocketprinter.exe" size="212464">
-      <assemblyIdentity name="websocketprinter" version="1.4.6.0" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="websocketprinter.exe" size="218096">
+      <assemblyIdentity name="websocketprinter" version="1.4.7.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>QifMU/E7TLQ1tuoeNMpG4lwBmq/tIfnuNScSNCYKqhA=</dsig:DigestValue>
+        <dsig:DigestValue>8qH0dZqLPdmOhsAH1n9IJ5076bI/IEIc7lDKtfA1oXM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -21,9 +21,9 @@ namespace websocket_reader
             Application.Run(new Form1());
         }
     }
+   
 
-
-public class PrinterManager
+    public class PrinterManager
     {
         public static List<string> GetInstalledPrinters()
         {

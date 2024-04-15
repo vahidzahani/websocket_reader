@@ -7,13 +7,47 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Security.Principal;
+using System.Drawing.Text;
+using System.Runtime.InteropServices;
 
 namespace websocket_reader
 {
     internal class Updater
     {
+        // Import the AddFontResourceEx function from the gdi32.dll
+        [DllImport("gdi32.dll")]
+        private static extern int AddFontResourceEx(string lpszFilename, uint fl, IntPtr pdv);
+
         private const string UpdaterBatPath = "updater.bat";
         public string serverAddress = "http://192.168.1.200/care2";//is Default
+
+
+
+
+        static void InstallFont(string fontFilePath)
+        {
+            // Add the font file to the system font collection
+            PrivateFontCollection fontCollection = new PrivateFontCollection();
+            fontCollection.AddFontFile(fontFilePath);
+
+            // Install the font file
+            int result = AddFontResourceEx(fontFilePath, 0, IntPtr.Zero);
+            Console.WriteLine(fontFilePath);
+            if (result != 0)
+            {
+                Console.WriteLine("Font installed successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Failed to install the font.");
+            }
+        }
+
+
+
+
         public string GetServerAddress() {
             //Form1 form1 = new Form1();
             IniFile iniFile = new IniFile(Form1.strConfigFile);
@@ -27,8 +61,81 @@ namespace websocket_reader
             return serverAddress;
         }
 
+
+
+        static string[] ExtractTTFFiles(string htmlContent)
+        {
+            // Regular expression pattern to match .ttf file links
+            string pattern = @"<a\s+(?:[^>]*?\s+)?href=([""'])(.*?)\1";
+
+            // Match the pattern against the HTML content
+            MatchCollection matches = Regex.Matches(htmlContent, pattern);
+
+            // Extract .ttf file names from matches
+            List<string> ttfFiles = new List<string>();
+            foreach (Match match in matches)
+            {
+                string link = match.Groups[2].Value;
+                if (link.EndsWith(".ttf"))
+                {
+                    // Remove any directory paths from the link
+                    string fileName = link.Split('/').Last();
+                    ttfFiles.Add(fileName);
+                }
+            }
+
+            return ttfFiles.ToArray();
+        }
+        public  bool IsUserAdmin()
+        {
+            WindowsIdentity currentUser = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(currentUser);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
         public string CheckAndUpdate()
         {
+           
+            serverAddress = GetServerAddress();
+
+
+            string url = serverAddress+ "/printsoft/fonts/";
+
+            // Directory to save the downloaded font files
+            string downloadDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "DownloadedFonts");
+
+            // Create the directory if it doesn't exist
+            Directory.CreateDirectory(downloadDirectory);
+
+            using (WebClient client = new WebClient())
+            {
+                // Download the HTML content of the directory
+                string htmlContent = client.DownloadString(url);
+                string[] ttfFiles = ExtractTTFFiles(htmlContent);
+                // Download and copy each .ttf file
+                foreach (string ttfFile in ttfFiles)
+                {
+                    try
+                    {
+                        string ttfUrl = url + ttfFile;
+                        string downloadedFilePath = Path.Combine(downloadDirectory, ttfFile);
+                        client.DownloadFile(ttfUrl, downloadedFilePath);
+                        string fontsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), ttfFile);
+                        //File.Copy(downloadedFilePath, fontsDirectory,false);
+                        InstallFont(downloadedFilePath);
+                    }
+                    catch (IOException ex) {
+                        Console.WriteLine(ex.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            }
+
+
+
+
             string localVerFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ver.txt");
 
 
@@ -47,7 +154,8 @@ namespace websocket_reader
             //else
             //    serverAddress = tmp;
 
-            serverAddress = GetServerAddress();
+
+
 
             string webVerFilePath = serverAddress + "/printsoft/ver.txt";
             string setupExeUrl = serverAddress + "/printsoft/websocketprinter.exe";
@@ -124,7 +232,6 @@ start """" ""%targetFile%""
             }
             catch (Exception)
             {
-
                 return "notfoundnewversion";
             }
         }

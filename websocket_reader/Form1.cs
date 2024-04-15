@@ -13,6 +13,9 @@ using System.Runtime.InteropServices;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Principal;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace websocket_reader
 {
@@ -32,7 +35,8 @@ namespace websocket_reader
 
         public string defaultPrinterName;
         //public Form mainForm = Application.OpenForms["Form1"];
-       public void vahidConsole(string str,bool cls =false,bool showTime =false)
+       
+        public void vahidConsole(string str,bool cls =false,bool showTime =false)
         {
 
             if (showTime)
@@ -46,6 +50,8 @@ namespace websocket_reader
             });
             saveLog(str);
         }
+
+
 
         public static void SetDefaultPrinter(string printerName)
         {
@@ -158,8 +164,10 @@ namespace websocket_reader
 
         
         static readonly Mutex mutex = new Mutex(true, "c676b1d7-c868-4e9a-8409-135cec4dff43");
-        
-        
+
+
+
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -168,6 +176,13 @@ namespace websocket_reader
                 MessageBox.Show("this program already running.");
                 Application.Exit();
             }
+
+
+
+
+
+
+            //Console.WriteLine("ADMIN?:"+IsUserAdmin().ToString());
 
             //try
             //{
@@ -257,36 +272,25 @@ namespace websocket_reader
                         //dynamic requestData = JsonConvert.DeserializeObject(requestBody);
                         //var data = JsonConvert.DeserializeObject<Data_For_Print>(requestBody);
 
-                        //***************************************************************
-
-
                         try
                         {
-
 
                             var data = JsonConvert.DeserializeObject<Data_For_Print>(requestBody);
                             var printsetting = JsonConvert.DeserializeObject<print_setting>(data.print_setting);
 
                             if (data.rootPath == null) data.rootPath = "nullnull";
-                            if (data.serverAddress == null)
-                            {
+                            if (data.serverAddress == null){
                                 data.serverAddress = "nullnull";
-                            }
-                            else
+                            }else
                             {
                                 string fileServertxt = data.serverAddress;
                                 string executablePath = AppDomain.CurrentDomain.BaseDirectory;
 
-                                //string fileServer = ;
-
-
-                                File.WriteAllText(Path.Combine(executablePath, "server.txt"), fileServertxt);
-
+                                //File.WriteAllText(Path.Combine(executablePath, "server.txt"), fileServertxt);
 
                                 //int intDefaultPort = 1988;
                                 IniFile iniFile = new IniFile(strConfigFile);
                                 iniFile.SetValue("Settings", "server", fileServertxt);
-
 
                             }
 
@@ -296,9 +300,7 @@ namespace websocket_reader
                             string printername = printsetting.printer_name;
                             printername = instance.get_full_printer(printername);
 
-
                             MyPrinters.SetDefaultPrinter(printername);
-
 
                             SetHeaderFooter("footer", printsetting.footer);
                             SetHeaderFooter("header", printsetting.header);
@@ -310,11 +312,26 @@ namespace websocket_reader
                             SetHeaderFooter("Shrink_To_Fit", "yes");
 
 
-                            data.visibleContent = instance.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
+
+                            string pattern = @"(\.\.\/)+";
+                            data.visibleContent = Regex.Replace(data.visibleContent, pattern, match =>
+                            {
+                                if (match.Value == data.rootPath)//"../../"
+                                {
+                                    return data.serverAddress + "/";
+                                }
+                                else
+                                {
+                                    return  get_IPaddress( data.serverAddress )+ "/";
+                                }
+                            });
+                            
+
+                            //MessageBox.Show(data.rootPath);
+                            //data.visibleContent = instance.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
 
 
                             instance.vahidConsole( " > print to : " + printername, showTime: true);
-
 
 
                             instance.Invoke((MethodInvoker)delegate
@@ -326,6 +343,21 @@ namespace websocket_reader
                                 WBB.DocumentText = data.visibleContent;
                                 instance.webBrowser1.DocumentText = data.visibleContent;
                                 //instance.vahidConsole(data.visibleContent);
+
+
+                                //MessageBox.Show("@ISBACKTO JAVASCRIPT");
+                                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                                response.Headers.Add("Access-Control-Allow-Methods", "GET, POST");
+                                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
+
+                                string responseString = "{\"status\": \"success\", \"message\": \"Data received successfully!\"}";
+                                byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+                                response.ContentLength64 = buffer.Length;
+                                Stream output = response.OutputStream;
+                                output.Write(buffer, 0, buffer.Length);
+                                output.Close();
+
+
                             });
 
 
@@ -338,47 +370,17 @@ namespace websocket_reader
                         }
 
 
-                        //***************************************************************
-
-
-
-                        //Console.WriteLine(requestBody);
-                        //instance.vahidConsole(printsetting.printer_name.ToString());
-
-                        // اطلاعات دریافتی از PHP
-                        //string printSettingId = requestData.print_setting.id;
-                        //string printerName = requestData.print_setting.printer_name;
-                        //string visibleContent = data.visibleContent;
-
-                        // انجام عملیات مورد نیاز با اطلاعات دریافتی
-
-                        // ارسال پاسخ به PHP
-                        response.Headers.Add("Access-Control-Allow-Origin", "*");
-                        response.Headers.Add("Access-Control-Allow-Methods", "GET, POST");
-                        response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
-
-                        string responseString = "{\"status\": \"success\", \"message\": \"Data received successfully!\"}";
-                        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-                        response.ContentLength64 = buffer.Length;
-                        Stream output = response.OutputStream;
-                        output.Write(buffer, 0, buffer.Length);
-                        output.Close();
                     }
                 }
                 else if (request.HttpMethod == "OPTIONS")
                 {
-                    // تنظیمات مربوط به درخواست OPTIONS
                     response.StatusCode = 200; // موفقیت‌آمیز
-                    //response.Headers.Add("Access-Control-Allow-Origin", "*");
-                    //response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
-                    //response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
                     response.Headers.Add("Access-Control-Allow-Origin", "*");
                     response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
                     response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
                     response.OutputStream.Close(); // بستن جریان خروجی
                     //return; // خروج از تابع
                 }
-
             }
 
             // شروع گوش دادن به درخواست‌های جدید
@@ -386,7 +388,18 @@ namespace websocket_reader
         }
 
 
+       
+        private static string get_IPaddress(string serveraddress)
+        {
+            string pattern = @"^(http://[\d\.]+)";
+            Match match = Regex.Match(serveraddress, pattern);
+            if (match.Success)
+                return match.Groups[1].Value;
+            
+            return "";
 
+
+        }
         private void SetStartup()
         {
             try
@@ -435,6 +448,7 @@ namespace websocket_reader
 
             }
         }
+       
         static void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             
@@ -450,7 +464,23 @@ namespace websocket_reader
             }
             else
             {
-                webTMP.ShowPrintDialog();
+                form_mydialogshow m = new form_mydialogshow();
+                m.ShowDialog();
+                
+                if(m.printername == "##SHOWDIALOG##")
+                {
+                    webTMP.ShowPrintDialog();
+                }else if (m.printername == "")
+                {
+                    return;
+                }
+                else
+                {
+                    //MessageBox.Show(instance.defaultPrinterName);
+                    SetDefaultPrinter(m.printername);
+                    webTMP.Print();
+                }
+
             }
 
         }
@@ -468,6 +498,7 @@ namespace websocket_reader
         }
         static async void ProcessWebSocketRequest(HttpListenerContext context,Form1 form)
         {
+            
             //MessageBox.Show("TEST");
             //This Tls applies to versions of Windows 10 
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -511,7 +542,7 @@ namespace websocket_reader
                             //string fileServer = ;
 
 
-                            File.WriteAllText(Path.Combine(executablePath, "server.txt"), fileServertxt);
+                            //File.WriteAllText(Path.Combine(executablePath, "server.txt"), fileServertxt);
 
 
                             //int intDefaultPort = 1988;
@@ -537,7 +568,7 @@ namespace websocket_reader
                         SetHeaderFooter("margin_top", printsetting.margin_top);
                         SetHeaderFooter("Print_Background", "no");
                         SetHeaderFooter("Shrink_To_Fit", "yes");
-                        
+
                         
                         data.visibleContent = form.ReplaceAllOccurrences(data.visibleContent, data.rootPath, data.serverAddress + "/");
                         
@@ -596,6 +627,10 @@ namespace websocket_reader
             }
 
             return input;
+
+
+
+           
         }
         private static void fnErrorToFile(string content)
         {
@@ -724,23 +759,33 @@ namespace websocket_reader
             //textBox1.Text += "Checking for updates . . ." + "\r\n";
             vahidConsole("Checking for updates",showTime:true);
             Application.DoEvents();
+            Updater updater = new Updater();
+            
+            if (updater.IsUserAdmin()==false)
+            {
+                MessageBox.Show("دسترسی سطح ادمین نیاز است");
+                vahidConsole("access denied", showTime: true);
+                return;
+            }
+            
             button4.Enabled = false;
 
-            Updater updater = new Updater();
+            
+
+
             string s=updater.CheckAndUpdate();
             if (s == "notfoundnewversion")
             {
                 MessageBox.Show("نسخه جدید جهت بروز رسانی یافت نشد");
                 vahidConsole("new version not found",showTime:true);
             }
-                
+
             if (s == "isupdate")
-                {
+            {
                 MessageBox.Show("برنامه آخرین نسخه فعال است");
                 //textBox1.Text += "\nlast update is using" + "\r\n";
                 vahidConsole("last update is using", showTime: true);
             }
-
             button4.Enabled = true;
 
         }
@@ -776,8 +821,12 @@ namespace websocket_reader
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            
-            Console.WriteLine("Printer select >>>>>>>>>> " + get_full_printer("   hp       "));
+
+            form_mydialogshow m = new form_mydialogshow();
+            m.ShowDialog();
+            defaultPrinterName = m.printername;
+            MessageBox.Show(m.printername);
+            //Console.WriteLine("Printer select >>>>>>>>>> " + get_full_printer("   hp       "));
         }
         private string get_full_printer(string printername)
         {
