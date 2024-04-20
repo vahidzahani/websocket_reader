@@ -134,3 +134,4 @@ $RECYCLE.BIN/
 _NCrunch*
 
 websocket_reader/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+.vs/websocket_reader/v17/.suo

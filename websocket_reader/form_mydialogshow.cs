@@ -4,40 +4,65 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace websocket_reader
 {
+    
     public partial class form_mydialogshow : Form
     {
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
         public form_mydialogshow()
         {
             InitializeComponent();
         }
         public string printername { get; set; }
+        public string defaultPrintername { get; set; }
 
         private void form_mydialogshow_Load(object sender, EventArgs e)
         {
             //MessageBox.Show("asasa");
             printername = "";
             List<string> installedPrinters = PrinterManager.GetInstalledPrinters();
+            
             foreach (string printer in installedPrinters)
             {
                 listBox1.Items.Add(printer);
+                //dataGridView1.Rows.Add(printer);
             }
-            if(listBox1.Items.Count > 0)
+
+            int index = listBox1.FindStringExact(defaultPrintername);
+            if (listBox1.Items.Count > 0)
             {
                 listBox1.SelectedIndex = 0;
             }
+
+            if (index != -1)
+            {
+                listBox1.SelectedIndex = index;
+            }
+
+            SetForegroundWindow(this.Handle);
             listBox1.Focus();
-        
+
+            /////////////////////////////////////////////////////////
+
+
+
+
+
+
+
         }
 
         private void btn_ok_Click(object sender, EventArgs e)
         {
-            printername= listBox1.SelectedItem.ToString();
+            printername = listBox1.SelectedItem.ToString();
+            //MyPrinters.SetDefaultPrinter(printername);
             this.Close();
         }
         private void listBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -62,6 +87,9 @@ namespace websocket_reader
 
         private void btn_showdialog_Click(object sender, EventArgs e)
         {
+            printername = listBox1.SelectedItem.ToString();
+            MyPrinters.SetDefaultPrinter(printername);
+
             printername = "##SHOWDIALOG##";//run webbrowser printdialog
             this.Close();
         }

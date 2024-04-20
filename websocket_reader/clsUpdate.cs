@@ -94,14 +94,14 @@ namespace websocket_reader
         }
         public string CheckAndUpdate()
         {
-           
             serverAddress = GetServerAddress();
 
 
             string url = serverAddress+ "/printsoft/fonts/";
 
             // Directory to save the downloaded font files
-            string downloadDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "DownloadedFonts");
+            string downloadDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DownloadedFonts");
+            
 
             // Create the directory if it doesn't exist
             Directory.CreateDirectory(downloadDirectory);
@@ -118,9 +118,12 @@ namespace websocket_reader
                     {
                         string ttfUrl = url + ttfFile;
                         string downloadedFilePath = Path.Combine(downloadDirectory, ttfFile);
-                        client.DownloadFile(ttfUrl, downloadedFilePath);
-                        string fontsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), ttfFile);
-                        //File.Copy(downloadedFilePath, fontsDirectory,false);
+                        if (File.Exists(downloadedFilePath) == false)
+                        {
+                            client.DownloadFile(ttfUrl, downloadedFilePath);
+                            string fontsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), ttfFile);
+                            //File.Copy(downloadedFilePath, fontsDirectory,false);
+                        }
                         InstallFont(downloadedFilePath);
                     }
                     catch (IOException ex) {

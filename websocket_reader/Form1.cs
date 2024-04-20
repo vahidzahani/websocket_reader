@@ -52,7 +52,6 @@ namespace websocket_reader
         }
 
 
-
         public static void SetDefaultPrinter(string printerName)
         {
             const string printerRegKey = @"Software\Microsoft\Windows NT\CurrentVersion\Windows";
@@ -448,7 +447,12 @@ namespace websocket_reader
 
             }
         }
-       
+        static string GetDefaultPrinterName()
+        {
+            PrinterSettings settings = new PrinterSettings();
+            string defaultPrinterName = settings.PrinterName;
+            return defaultPrinterName;
+        }
         static void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             
@@ -465,7 +469,9 @@ namespace websocket_reader
             else
             {
                 form_mydialogshow m = new form_mydialogshow();
+                m.defaultPrintername = GetDefaultPrinterName();
                 m.ShowDialog();
+                m.Activate();
                 
                 if(m.printername == "##SHOWDIALOG##")
                 {
@@ -760,14 +766,15 @@ namespace websocket_reader
             vahidConsole("Checking for updates",showTime:true);
             Application.DoEvents();
             Updater updater = new Updater();
-            
-            if (updater.IsUserAdmin()==false)
+
+            if (updater.IsUserAdmin() == false)
             {
                 MessageBox.Show("دسترسی سطح ادمین نیاز است");
                 vahidConsole("access denied", showTime: true);
                 return;
             }
-            
+
+
             button4.Enabled = false;
 
             
@@ -823,9 +830,7 @@ namespace websocket_reader
         {
 
             form_mydialogshow m = new form_mydialogshow();
-            m.ShowDialog();
-            defaultPrinterName = m.printername;
-            MessageBox.Show(m.printername);
+            m.Show();
             //Console.WriteLine("Printer select >>>>>>>>>> " + get_full_printer("   hp       "));
         }
         private string get_full_printer(string printername)
