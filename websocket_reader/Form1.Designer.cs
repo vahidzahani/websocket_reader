@@ -44,6 +44,8 @@
             this.button6 = new System.Windows.Forms.Button();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.button7 = new System.Windows.Forms.Button();
+            this.pic_super = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pic_super)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox1
@@ -73,7 +75,6 @@
             this.webBrowser1.Size = new System.Drawing.Size(64, 63);
             this.webBrowser1.TabIndex = 1;
             this.webBrowser1.Visible = false;
-            this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             // 
             // button1
             // 
@@ -244,12 +245,25 @@
             this.button7.UseVisualStyleBackColor = false;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
+            // pic_super
+            // 
+            this.pic_super.BackColor = System.Drawing.Color.Black;
+            this.pic_super.Image = ((System.Drawing.Image)(resources.GetObject("pic_super.Image")));
+            this.pic_super.Location = new System.Drawing.Point(470, 341);
+            this.pic_super.Name = "pic_super";
+            this.pic_super.Size = new System.Drawing.Size(37, 37);
+            this.pic_super.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pic_super.TabIndex = 9;
+            this.pic_super.TabStop = false;
+            this.pic_super.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(519, 390);
             this.ControlBox = false;
+            this.Controls.Add(this.pic_super);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.webBrowser1);
@@ -270,6 +284,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
+            ((System.ComponentModel.ISupportInitialize)(this.pic_super)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -291,6 +306,7 @@
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.PictureBox pic_super;
     }
 }
 

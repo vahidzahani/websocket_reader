@@ -14,6 +14,7 @@ namespace websocket_reader
     
     public partial class form_mydialogshow : Form
     {
+        Timer mini_timer;
         [DllImport("user32.dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
         public form_mydialogshow()
@@ -26,6 +27,12 @@ namespace websocket_reader
         private void form_mydialogshow_Load(object sender, EventArgs e)
         {
             //MessageBox.Show("asasa");
+            
+            mini_timer = new Timer();
+            mini_timer.Interval = 1000;
+            mini_timer.Tick += Mini_timer_Tick1;
+            mini_timer.Start();
+
             printername = "";
             List<string> installedPrinters = PrinterManager.GetInstalledPrinters();
             
@@ -58,6 +65,14 @@ namespace websocket_reader
 
 
         }
+
+        private void Mini_timer_Tick1(object sender, EventArgs e)
+        {
+            this.Activate();
+            mini_timer.Stop();
+        }
+
+       
 
         private void btn_ok_Click(object sender, EventArgs e)
         {

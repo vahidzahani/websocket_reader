@@ -24,6 +24,7 @@ namespace websocket_reader
     {
         private bool isDragging = false;
         private Point offset;
+        private  HttpListenerContext context;
         //private NotifyIcon notifyIcon;
         private form_config frmConfigInstance;
         public static Boolean adminpass=false;
@@ -176,16 +177,20 @@ namespace websocket_reader
                 Application.Exit();
             }
 
+            Updater updater = new Updater();
+
+            if (updater.IsUserAdmin() == true)
+            {
+                pic_super.Visible = true;
+            }
 
 
 
+                //Console.WriteLine("ADMIN?:"+IsUserAdmin().ToString());
 
-
-            //Console.WriteLine("ADMIN?:"+IsUserAdmin().ToString());
-
-            //try
-            //{
-            if (File.Exists("tmpupdate.exe"))
+                //try
+                //{
+                if (File.Exists("tmpupdate.exe"))
                 {
                     File.Delete("tmpupdate.exe");
                 }
@@ -251,9 +256,8 @@ namespace websocket_reader
             HttpListener listener = (HttpListener)result.AsyncState;
 
             // دریافت درخواست و ادامه گوش دادن به درخواست‌های جدید
-            HttpListenerContext context = listener.EndGetContext(result);
-            HttpListenerRequest request = context.Request;
-            HttpListenerResponse response = context.Response;
+            instance.context = listener.EndGetContext(result);
+            HttpListenerRequest request = instance.context.Request;
 
                 
             
@@ -345,16 +349,6 @@ namespace websocket_reader
 
 
                                 //MessageBox.Show("@ISBACKTO JAVASCRIPT");
-                                response.Headers.Add("Access-Control-Allow-Origin", "*");
-                                response.Headers.Add("Access-Control-Allow-Methods", "GET, POST");
-                                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
-
-                                string responseString = "{\"status\": \"success\", \"message\": \"Data received successfully!\"}";
-                                byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-                                response.ContentLength64 = buffer.Length;
-                                Stream output = response.OutputStream;
-                                output.Write(buffer, 0, buffer.Length);
-                                output.Close();
 
 
                             });
@@ -373,6 +367,7 @@ namespace websocket_reader
                 }
                 else if (request.HttpMethod == "OPTIONS")
                 {
+                    HttpListenerResponse response =instance.context.Response;
                     response.StatusCode = 200; // موفقیت‌آمیز
                     response.Headers.Add("Access-Control-Allow-Origin", "*");
                     response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -385,7 +380,6 @@ namespace websocket_reader
             // شروع گوش دادن به درخواست‌های جدید
             listener.BeginGetContext(ListenerCallback, listener);
         }
-
 
        
         private static string get_IPaddress(string serveraddress)
@@ -458,6 +452,7 @@ namespace websocket_reader
             
             
             WebBrowser webTMP = (WebBrowser)sender;
+            string str_message = "Data received successfully!";
 
             if (webTMP.DocumentText == "") { return; }
             webTMP.Document.RightToLeft = true;
@@ -472,22 +467,41 @@ namespace websocket_reader
                 m.defaultPrintername = GetDefaultPrinterName();
                 m.ShowDialog();
                 m.Activate();
-                
+                                
                 if(m.printername == "##SHOWDIALOG##")
                 {
+                    str_message = "print preview";
                     webTMP.ShowPrintDialog();
                 }else if (m.printername == "")
                 {
-                    return;
+                    str_message = "cancel";
+
                 }
-                else
+                else if(m.printername !="")
                 {
+                    str_message = "print";
+
                     //MessageBox.Show(instance.defaultPrinterName);
                     SetDefaultPrinter(m.printername);
                     webTMP.Print();
                 }
 
             }
+
+
+
+            HttpListenerResponse response = instance.context.Response;
+
+            response.Headers.Add("Access-Control-Allow-Origin", "*");
+            response.Headers.Add("Access-Control-Allow-Methods", "GET, POST");
+            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
+            string responseString = "{\"status\": \"success\", \"message\": \""+str_message+"\"}";
+            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+            response.ContentLength64 = buffer.Length;
+            Stream output = response.OutputStream;
+            output.Write(buffer, 0, buffer.Length);
+            output.Close();
+
 
         }
         static void ProcessWebSocketRequests(object state)
@@ -675,32 +689,7 @@ namespace websocket_reader
             }
         }
 
-        private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            
-            /*
-            
-
-
-            if (webBrowser1.DocumentText == "") { return; }
-            webBrowser1.Document.RightToLeft = true;
-            //webBrowser1.Print();
-            if (isDirect)
-            {
-                webBrowser1.Print();
-            }
-            else
-            {
-                webBrowser1.ShowPrintDialog();
-            }
-             */
-  
-
-            //webBrowser1.Refresh();
-            //webBrowser1.ShowPrintPreviewDialog();
-           
-
-        }
+     
 
         static void myversion()
         {
