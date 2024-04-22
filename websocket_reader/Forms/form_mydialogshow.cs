@@ -34,7 +34,7 @@ namespace websocket_reader
             mini_timer.Start();
 
             printername = "";
-            List<string> installedPrinters = PrinterManager.GetInstalledPrinters();
+            List<string> installedPrinters = Printer.GetInstalledPrinters();
             
             foreach (string printer in installedPrinters)
             {
@@ -97,13 +97,14 @@ namespace websocket_reader
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
 
         }
 
         private void btn_showdialog_Click(object sender, EventArgs e)
         {
             printername = listBox1.SelectedItem.ToString();
-            MyPrinters.SetDefaultPrinter(printername);
+            Printer.SetDefaultPrinter(printername);
 
             printername = "##SHOWDIALOG##";//run webbrowser printdialog
             this.Close();

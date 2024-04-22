@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="websocketprinter.exe" size="224752">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="websocketprinter.exe" size="219632">
       <assemblyIdentity name="websocketprinter" version="1.4.8.2" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>pB+cJmEoPHiePrb9OluoKv7/DqaxQhifainsDvY4g6k=</dsig:DigestValue>
+        <dsig:DigestValue>T2rg/gqVFfAD3n3p9MGh/Lh8RRAhiiyCfjaKJ1bZ4EM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

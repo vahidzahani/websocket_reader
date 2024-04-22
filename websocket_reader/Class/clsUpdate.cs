@@ -46,8 +46,6 @@ namespace websocket_reader
         }
 
 
-
-
         public string GetServerAddress() {
             //Form1 form1 = new Form1();
             IniFile iniFile = new IniFile(Form1.strConfigFile);
@@ -56,8 +54,6 @@ namespace websocket_reader
                 iniFile.SetValue("Settings", "server", serverAddress);
             else
                 serverAddress = tmp;
-
-
             return serverAddress;
         }
 
@@ -67,10 +63,8 @@ namespace websocket_reader
         {
             // Regular expression pattern to match .ttf file links
             string pattern = @"<a\s+(?:[^>]*?\s+)?href=([""'])(.*?)\1";
-
             // Match the pattern against the HTML content
             MatchCollection matches = Regex.Matches(htmlContent, pattern);
-
             // Extract .ttf file names from matches
             List<string> ttfFiles = new List<string>();
             foreach (Match match in matches)
@@ -83,7 +77,6 @@ namespace websocket_reader
                     ttfFiles.Add(fileName);
                 }
             }
-
             return ttfFiles.ToArray();
         }
         public  bool IsUserAdmin()
