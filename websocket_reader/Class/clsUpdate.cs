@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Security.Principal;
 using System.Drawing.Text;
 using System.Runtime.InteropServices;
+using System.Drawing;
 
 namespace websocket_reader
 {
@@ -23,26 +24,33 @@ namespace websocket_reader
         private const string UpdaterBatPath = "updater.bat";
         public string serverAddress = "http://192.168.1.200/care2";//is Default
 
-
-
-
-        static void InstallFont(string fontFilePath)
+        static void InstallFont(string fontFileSource)
         {
-            // Add the font file to the system font collection
-            PrivateFontCollection fontCollection = new PrivateFontCollection();
-            fontCollection.AddFontFile(fontFilePath);
 
-            // Install the font file
-            int result = AddFontResourceEx(fontFilePath, 0, IntPtr.Zero);
-            Console.WriteLine(fontFilePath);
-            if (result != 0)
+           PrivateFontCollection fontCollection = new PrivateFontCollection();
+            fontCollection.AddFontFile(fontFileSource);
+
+            int result = AddFontResourceEx(fontFileSource, 0, IntPtr.Zero);
+            Console.WriteLine(fontFileSource);
+            if (fontCollection.Families.Length > 0)
             {
-                Console.WriteLine("Font installed successfully.");
+                //Console.WriteLine("FAMILI OKKKKKK");
+                byte[] fontData = File.ReadAllBytes(fontFileSource);
+                IntPtr fontPtr = Marshal.AllocCoTaskMem(fontData.Length);
+                Marshal.Copy(fontData, 0, fontPtr, fontData.Length);
+                fontCollection.AddMemoryFont(fontPtr, fontData.Length);
+                Marshal.FreeCoTaskMem(fontPtr);
             }
             else
             {
-                Console.WriteLine("Failed to install the font.");
+                //Console.WriteLine("FAMILI NOOOOOOO");
             }
+
+            string fileName = Path.GetFileName(fontFileSource);
+            string fontDestination = Environment.GetFolderPath(Environment.SpecialFolder.Fonts).ToString() + @"\" + fileName;
+            if (!File.Exists(fontDestination))
+                File.Copy(fontFileSource, fontDestination);
+
         }
 
 
@@ -85,20 +93,28 @@ namespace websocket_reader
             WindowsPrincipal principal = new WindowsPrincipal(currentUser);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
-        public string CheckAndUpdate()
+        public bool ExistUpdate()
+        {
+            string localVerFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ver.txt");
+
+            string localVersion = ReadVersion(localVerFilePath);
+            string webVersion = DownloadString(serverAddress + "/printsoft/ver.txt");
+
+            if (webVersion == localVersion || webVersion == "notfoundnewversion")  
+                return false;//application is Update or not found Update
+            else
+                return true;//application is Not Update and there is update
+
+
+        }
+        public void UpdateFonts()
         {
             serverAddress = GetServerAddress();
-
-
-            string url = serverAddress+ "/printsoft/fonts/";
-
+            string url = serverAddress + "/printsoft/fonts/";
             // Directory to save the downloaded font files
             string downloadDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DownloadedFonts");
-            
-
             // Create the directory if it doesn't exist
             Directory.CreateDirectory(downloadDirectory);
-
             using (WebClient client = new WebClient())
             {
                 // Download the HTML content of the directory
@@ -119,8 +135,10 @@ namespace websocket_reader
                         }
                         InstallFont(downloadedFilePath);
                     }
-                    catch (IOException ex) {
+                    catch (IOException ex)
+                    {
                         Console.WriteLine(ex.Message);
+                        Logger.SaveErrorLog(ex.Message);
                     }
                     catch (Exception e)
                     {
@@ -128,36 +146,17 @@ namespace websocket_reader
                     }
                 }
             }
-
-
-
-
+        }
+        public string GetUpdate()
+        {
+            
             string localVerFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ver.txt");
 
-
-
-            //string executablePath = AppDomain.CurrentDomain.BaseDirectory;
-            //string fileServer = Path.Combine(executablePath, "server.txt");
-            //if (File.Exists(fileServer)) {
-            //    serverAddress= File.ReadAllText(fileServer);
-            //}
-
-            //Form1 form1 = new Form1();
-            //IniFile iniFile = new IniFile(form1.strConfigFile);
-            //string tmp = iniFile.GetValue("Settings", "server");
-            //if (tmp == null)
-            //    iniFile.SetValue("Settings", "server", serverAddress);
-            //else
-            //    serverAddress = tmp;
-
-
-
-
-            string webVerFilePath = serverAddress + "/printsoft/ver.txt";
             string setupExeUrl = serverAddress + "/printsoft/websocketprinter.exe";
 
             string localVersion = ReadVersion(localVerFilePath);
-            string webVersion = DownloadString(webVerFilePath);
+            string webVersion = DownloadString(serverAddress + "/printsoft/ver.txt");
+
             if (webVersion== "notfoundnewversion") { return (webVersion); }
 
             if (CompareVersions(localVersion, webVersion) < 0)

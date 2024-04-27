@@ -9,6 +9,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Drawing;
 using System.Text.RegularExpressions;
+using System.Drawing.Text;
 
 namespace websocket_reader
 {
@@ -399,7 +400,8 @@ namespace websocket_reader
             vahidConsole("Checking for updates",showTime:true);
             Application.DoEvents();
             Updater updater = new Updater();
-            
+
+
 
             if (updater.IsUserAdmin() == false)
             {
@@ -409,20 +411,26 @@ namespace websocket_reader
             }
 
 
+
+
+
             button4.Enabled = false;
 
             
-            string s=updater.CheckAndUpdate();
-            if (s == "notfoundnewversion")
+
+            updater.UpdateFonts();
+            if (updater.ExistUpdate() == true)
+            {
+                MessageBox.Show(@"پس از بروز رسانی برنامه بارگزاری مجدد می شود");
+                string s = updater.GetUpdate();
+                //MessageBox.Show("نسخه جدید جهت بروز رسانی یافت نشد");
+                //vahidConsole("new version not found", showTime: true);
+            }
+            else
             {
                 MessageBox.Show("نسخه جدید جهت بروز رسانی یافت نشد");
-                vahidConsole("new version not found",showTime:true);
-            }
+                vahidConsole("new version not found", showTime: true);
 
-            if (s == "isupdate")
-            {
-                MessageBox.Show("شما در حال استفاده از آخرین نسخه از برنامه هستید");
-                vahidConsole("last update is using", showTime: true);
             }
 
             button4.Enabled = true;
@@ -500,7 +508,15 @@ namespace websocket_reader
 
         }
 
-       
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Updater UP = new Updater();
+
+            if (UP.ExistUpdate())
+            {
+                notifyIcon1.ShowBalloonTip(1000, "نسخه : " + Application.ProductVersion,"نسخه جدید یافت شد",ToolTipIcon.Info);
+            }
+        }
     }
 
     
