@@ -196,6 +196,12 @@ namespace websocket_reader
                             Printer.SetHeaderFooter("Shrink_To_Fit", "yes");
 
                             string pattern = @"(\.\.\/)+";
+
+
+                            string input = data.visibleContent;
+                            string pattern2 = @"<iframe\s+[^>]*>[\s\S]*?</iframe>";
+                            data.visibleContent = Regex.Replace(input, pattern2, "", RegexOptions.Multiline);
+
                             data.visibleContent = Regex.Replace(data.visibleContent, pattern, match =>
                             {
                                 if (match.Value == data.rootPath)//"../../"
