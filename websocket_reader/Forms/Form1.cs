@@ -343,9 +343,11 @@ namespace websocket_reader
                 {
                     str_message = "print";
 
-                    //MessageBox.Show(instance.defaultPrinterName);
                     Printer.SetDefaultPrinter(m.printername);
-                    webTMP.Print();
+                    for (int i = 0; i < m.numberOfPrint; i++)
+                    {
+                        webTMP.Print();
+                    }
                 }
 
             }

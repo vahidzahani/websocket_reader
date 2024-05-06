@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,6 +44,25 @@ namespace websocket_reader
                 Application.Restart();
             }
 
+
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string logfile_error = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "errorfilelog.txt");
+            if (File.Exists(logfile_error))
+                Process.Start("notepad.exe", logfile_error);
+            else
+                MessageBox.Show("فایل وجود ندارد");
+        }
+
+        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string logfile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
+            if (File.Exists(logfile))
+                Process.Start("notepad.exe", logfile);
+            else
+                MessageBox.Show("فایل وجود ندارد");
 
         }
     }

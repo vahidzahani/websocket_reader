@@ -22,6 +22,7 @@ namespace websocket_reader
             InitializeComponent();
         }
         public string printername { get; set; }
+        public int numberOfPrint{ get; set; }
         public string defaultPrintername { get; set; }
 
         private void form_mydialogshow_Load(object sender, EventArgs e)
@@ -34,6 +35,7 @@ namespace websocket_reader
             mini_timer.Start();
 
             printername = "";
+            numberOfPrint = 1;
             List<string> installedPrinters = Printer.GetInstalledPrinters();
             
             foreach (string printer in installedPrinters)
@@ -76,7 +78,12 @@ namespace websocket_reader
 
         private void btn_ok_Click(object sender, EventArgs e)
         {
+            if (numericUpDown1.Value < 1)
+            {
+                numericUpDown1.Value = 1;
+            }
             printername = listBox1.SelectedItem.ToString();
+            numberOfPrint = (int)numericUpDown1.Value;
             //MyPrinters.SetDefaultPrinter(printername);
             this.Close();
         }
@@ -118,6 +125,16 @@ namespace websocket_reader
         private void form_mydialogshow_FormClosing(object sender, FormClosingEventArgs e)
         {
 
+        }
+
+        private void numericUpDown1_Scroll(object sender, ScrollEventArgs e)
+        {
+            
+        }
+
+        private void numericUpDown1_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }
