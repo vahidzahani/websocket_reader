@@ -15,12 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_31AE893BC6B84B2EAC19F12550B521F7"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4AB22A7F6DBF441D9D282B1A9AD9CB89"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -70,6 +64,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EBA3A3B6D7D84C54A988DEA37A78B279"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F7D2BB616CDF4715BE0E21C6A8D92436"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -180,26 +180,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_31AE893BC6B84B2EAC19F12550B521F7"
-            {
-            "SourcePath" = "8:C:\\Windows\\Fonts\\BTitrBd.ttf"
-            "TargetName" = "8:BTitrBd.ttf"
-            "Tag" = "8:"
-            "Folder" = "8:_D7D06287E1C74D14B183EE42BCAC93F6"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:5"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4AB22A7F6DBF441D9D282B1A9AD9CB89"
             {
             "SourcePath" = "8:..\\websocket_reader\\bin\\Debug\\show.txt"
@@ -224,7 +204,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:websocketprinter, Version=1.4.8.3, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:websocketprinter, Version=1.4.8.6, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_69C05E54B14A4E2AA344E949A531A883"
@@ -398,6 +378,26 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F7D2BB616CDF4715BE0E21C6A8D92436"
+            {
+            "SourcePath" = "8:C:\\Windows\\Fonts\\TITRB.TTF"
+            "TargetName" = "8:TITRB.TTF"
+            "Tag" = "8:"
+            "Folder" = "8:_D7D06287E1C74D14B183EE42BCAC93F6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:5"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"

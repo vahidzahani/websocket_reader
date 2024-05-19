@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using websocket_reader.Class;
 
 namespace websocket_reader
 {
@@ -26,6 +27,7 @@ namespace websocket_reader
             textport.Text= Form1.Getport2().ToString();
             Updater up = new Updater();
             textserver.Text=up.GetServerAddress().ToString();
+
 
 
         }

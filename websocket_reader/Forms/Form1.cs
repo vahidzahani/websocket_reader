@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Drawing.Text;
+using System.Drawing.Printing;
+using websocket_reader.Class;
 
 namespace websocket_reader
 {
@@ -318,6 +320,16 @@ namespace websocket_reader
 
             if (webTMP.DocumentText == "") { return; }
             webTMP.Document.RightToLeft = true;
+
+            form_mydialogshow m = new form_mydialogshow();
+            m.defaultPrintername = Printer.GetDefaultPrinterName();
+
+            //MessageBox.Show(Printer.GetPrinterQueueStatus(m.defaultPrintername).ToString() + m.defaultPrintername);
+            while (Printer.GetPrinterQueueStatus(m.defaultPrintername) >= 5)
+            {
+                Application.DoEvents();
+            }
+
             //webBrowser1.Print();
             if (isDirect)
             {
@@ -325,8 +337,6 @@ namespace websocket_reader
             }
             else
             {
-                form_mydialogshow m = new form_mydialogshow();
-                m.defaultPrintername = Printer.GetDefaultPrinterName();
                 m.ShowDialog();
                 m.Activate();
                                 
@@ -343,30 +353,44 @@ namespace websocket_reader
                 {
                     str_message = "print";
 
-                    Printer.SetDefaultPrinter(m.printername);
+                    //Printer.SetDefaultPrinter(m.printername);
+                    Printer.SetDefaultPrinterWithCopies(m.printername,3);
+
+                                       
+
                     for (int i = 0; i < m.numberOfPrint; i++)
                     {
                         webTMP.Print();
+                        
                     }
+
                 }
 
             }
 
             HttpListenerResponse response = instance.context.Response;
 
-            response.Headers.Add("Access-Control-Allow-Origin", "*");
-            response.Headers.Add("Access-Control-Allow-Methods", "GET, POST");
-            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
-            string responseString = "{\"status\": \"success\", \"message\": \""+str_message+"\"}";
-            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-            response.ContentLength64 = buffer.Length;
-            Stream output = response.OutputStream;
-            output.Write(buffer, 0, buffer.Length);
-            output.Close();
+            try
+            {
+                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                response.Headers.Add("Access-Control-Allow-Methods", "GET, POST");
+                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
+                string responseString = "{\"status\": \"success\", \"message\": \"" + str_message + "\"}";
+                byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+                response.ContentLength64 = buffer.Length;
+                Stream output = response.OutputStream;
+                output.Write(buffer, 0, buffer.Length);
+                output.Close();
+            }
+            catch (Exception)
+            {
+
+            }
 
         }
-        
 
+
+       
         private void button1_Click_1(object sender, EventArgs e)
         {
             HideMainForm(true);
@@ -473,8 +497,19 @@ namespace websocket_reader
         private void btnTest_Click(object sender, EventArgs e)
         {
 
-            Logger.SaveErrorLog("vahidzahani");
+
+
+            //Logger.SaveErrorLog("vahidzahani");
             //Console.WriteLine("Printer select >>>>>>>>>> " + get_full_printer("   hp       "));
+
+            string printerName = "label"; // نام پرینتر خود را وارد کنید
+            int status = Printer.GetPrinterQueueStatus(printerName);
+            MessageBox.Show(status.ToString());
+
+            //string htmlContent = "<html><body><h1>Hello, World!</h1></body></html>";
+            //// فرض کنید تعداد کپی مورد نظر 3 است
+            //printer.PrintHTML(htmlContent, 3);
+
         }
      
 

@@ -190,7 +190,7 @@
             // 
             this.btnTest.BackColor = System.Drawing.Color.Red;
             this.btnTest.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.btnTest.Location = new System.Drawing.Point(167, 95);
+            this.btnTest.Location = new System.Drawing.Point(160, 95);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(199, 100);
             this.btnTest.TabIndex = 8;
