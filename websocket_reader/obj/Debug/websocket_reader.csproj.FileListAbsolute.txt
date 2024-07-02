@@ -67,8 +67,6 @@ C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_rea
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
 C:\Users\vahid\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.exe.config
-C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.exe.manifest
-C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.application
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.exe
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\websocketprinter.pdb
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\Newtonsoft.Json.dll
@@ -82,8 +80,7 @@ C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_r
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Properties.Resources.resources
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.GenerateResource.cache
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CoreCompileInputs.cache
-C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe.manifest
-C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.application
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CopyComplete
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Forms.AboutBox1.resources
