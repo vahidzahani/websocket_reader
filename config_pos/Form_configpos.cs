@@ -1,24 +1,35 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.ServiceProcess;
+using System.Windows.Forms;
+
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Text;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Microsoft.Win32;
 using POS_PC_v3;
-using System.ServiceProcess;
 using System.IO;
 using System.Security.Principal;
 using Newtonsoft.Json;
+using Commander.Bean;
+using Commander;
 
 namespace config_pos
 {
     public partial class Form_configpos : Form
     {
-        string serviceName = "vahidservice";
+        int posDefaultIndex = 0;
+        string serviceName = "WebServiceLoggerPOS";
+        string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configwebservice.ini");
+        int servicePort;
         public Form_configpos()
         {
             InitializeComponent();
@@ -73,15 +84,102 @@ namespace config_pos
                 MessageBox.Show($"خطا: {ex.Message}");
             }
         }
+        private int ReadPortFromConfig()
+        {
+            int port = 2024; // مقدار پیش‌فرض
+
+            if (File.Exists(configFilePath))
+            {
+                string[] lines = File.ReadAllLines(configFilePath);
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("port="))
+                    {
+                        string portValue = line.Substring("port=".Length);
+                        if (int.TryParse(portValue, out int parsedPort))
+                        {
+                            port = parsedPort;
+                        }
+                    }
+                }
+            }
+
+            return port;
+        }
+
 
         private void Form_configpos_Load(object sender, EventArgs e)
         {
+
+
+            servicePort = ReadPortFromConfig();
+            textBox1.Text = servicePort.ToString();
+           
             string[] args = Environment.GetCommandLineArgs();
-            //configpos.exe behpardakht 2000
+            
             if (args.Length > 1)
             {
-                MessageBox.Show(args.Length.ToString());
+                if (args[1] == "getAllDevices") {
+
+                    // مسیر فایل config.txt که در کنار برنامه قرار دارد
+                    string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+
+                    if (File.Exists(configFilePath))
+                    {
+                        // خواندن تمام خطوط فایل config.txt
+                        var lines = File.ReadAllLines(configFilePath);
+
+                        // لیستی برای ذخیره اطلاعات JSON
+                        var devices = new List<object>();
+
+                        foreach (var line in lines)
+                        {
+                            // جدا کردن مقادیر با استفاده از کاما
+                            var parts = line.Split(',');
+
+                            if (parts.Length == 5)
+                            {
+                                // اضافه کردن هر دستگاه به لیست
+                                devices.Add(new
+                                {
+                                    devicename = parts[0],
+                                    postype = parts[1],
+                                    ip = parts[2],
+                                    port = parts[3],
+                                    isDeafult = parts[4]
+                                });
+                            }
+                        }
+
+                        // تبدیل لیست به JSON
+                        string jsondata = JsonConvert.SerializeObject(devices, Formatting.Indented);
+
+                        // نوشتن JSON به فایل response.json
+                        string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        File.WriteAllText(responseFilePath, jsondata);
+                    }
+
+                }
+                if (args[1] == "fanava")//wan sie sprichen postype name
+                {
+                    List<string> deviceInfo = GetDeviceInfo("fanava");
+                    if (deviceInfo.Count > 0)
+                    {
+                        string ip = deviceInfo[0];
+                        string port = deviceInfo[1];
+                        string resJsonString = Fn_send_to_fanava(args[2], ip, int.Parse(port));
+                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        File.WriteAllText(filePath, resJsonString);
+                    }
+                    else
+                    {
+                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        File.WriteAllText(filePath, "\"Error\":\"Failed to get a valid response from the server.\"");
+                    }
+                }
+                Application.Exit();
             }
+
             btn_start_Click_1(sender, e);
             if (IsUserAdmin() == true)
             {
@@ -89,8 +187,9 @@ namespace config_pos
             }
             else
             {
-                MessageBox.Show("جهت اجرای صحیح برنامه نباز به دسترسی سطح کاربر مدیر می باشد");
+                //MessageBox.Show("جهت اجرای صحیح برنامه نباز به دسترسی سطح کاربر مدیر می باشد");
             }
+
 
         }
 
@@ -98,9 +197,99 @@ namespace config_pos
         {
             
         }
+        public void InstallService(string executablePath, string serviceName)
+        {
+            try
+            {
+                string installUtilPath = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\InstallUtil.exe";
+
+                if (File.Exists(installUtilPath))
+                {
+                    // اگر InstallUtil.exe وجود دارد، از آن برای نصب سرویس استفاده کنید
+                    InstallUsingInstallUtil(executablePath, installUtilPath);
+                }
+                else
+                {
+                    // اگر InstallUtil.exe وجود ندارد، از دستور sc create استفاده کنید
+                    InstallUsingScCreate(executablePath, serviceName);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error installing service: " + ex.Message);
+            }
+        }
+        private void InstallUsingInstallUtil(string executablePath, string installUtilPath)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = installUtilPath,
+                    Arguments = $"/i \"{executablePath}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process { StartInfo = psi })
+                {
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Failed to install service using InstallUtil. Error: {error}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error installing service using InstallUtil: " + ex.Message);
+            }
+        }
+
+        private void InstallUsingScCreate(string executablePath, string serviceName)
+        {
+            try
+            {
+                string command = $"create {serviceName} binPath= \"{executablePath}\"";
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "sc.exe",
+                    Arguments = command,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process { StartInfo = psi })
+                {
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Failed to install service using sc create. Error: {error}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error installing service using sc create: " + ex.Message);
+            }
+        }
 
         private void btn_start_Click(object sender, EventArgs e)
         {
+            servicePort = ReadPortFromConfig();
             ControlService(serviceName, ServiceControllerStatus.Running);
         }
 
@@ -111,10 +300,34 @@ namespace config_pos
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            ServiceController sc = new ServiceController(serviceName);
-            string str = (sc.Status.ToString() == "Running") ?"در حال اجرا است":"متوقف است";
-            label4.Text="وضعیت سرویس : " + str;
+            try
+            {
+                ServiceController[] services = ServiceController.GetServices();
+                bool serviceExists = services.Any(s => s.ServiceName == serviceName);
+
+                if (!serviceExists)
+                {
+                    label4.Text = "Service does not exist";
+                    button7.Visible = true;
+                    return;
+                }
+                else
+                {
+                    button7.Visible = false;
+
+                }
+
+                ServiceController sc = new ServiceController(serviceName);
+                string str = (sc.Status.ToString() == "Running") ? "Service is Running on port : " + servicePort : "Service is Stopped";
+                label4.Text = str;
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions if necessary
+                label4.Text = "Error: " + ex.Message;
+            }
         }
+
 
         private void btn_start_Click_1(object sender, EventArgs e)
         {
@@ -158,8 +371,14 @@ namespace config_pos
                         item.SubItems.Add(parts[1]);
                         item.SubItems.Add(parts[2]);
                         item.SubItems.Add(parts[3]);
-                        item.ImageIndex = 0;
-
+                        if (parts[4] == "1") { 
+                            item.ImageIndex = 1;
+                            posDefaultIndex = listView1.Items.Count;
+                        }
+                        else
+                        {
+                            item.ImageIndex = 0;
+                        }
                         listView1.Items.Add(item);
 
 
@@ -213,6 +432,11 @@ namespace config_pos
                             if (i < item.SubItems.Count - 1)
                                 writer.Write(","); // اضافه کردن فاصله بین ستون‌ها
                         }
+                        if(item.Index==posDefaultIndex)
+                            writer.Write(",1"); // اضافه کردن برای پیش فرض
+                        else
+                            writer.Write(",0"); // اضافه کردن برای پیش فرض
+
                         writer.WriteLine(); // پایان هر سطر
                     }
                 }
@@ -233,41 +457,359 @@ namespace config_pos
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
-            Form_config frm=new Form_config();
-            frm.editdata = true;
-            ListViewItem item = listView1.SelectedItems[0];
+            if (listView1.SelectedItems.Count > 0)
+            {
+                Form_config frm =new Form_config();
+                frm.editdata = true;
+                ListViewItem item = listView1.SelectedItems[0];
            
-            frm.pos_name = item.SubItems[0].Text;
-            frm.pos_model = item.SubItems[1].Text;
-            frm.pos_ip = item.SubItems[2].Text;
-            frm.pos_port = item.SubItems[3].Text;
+                frm.pos_name = item.SubItems[0].Text;
+                frm.pos_model = item.SubItems[1].Text;
+                frm.pos_ip = item.SubItems[2].Text;
+                frm.pos_port = item.SubItems[3].Text;
 
-            frm.ShowDialog();
+                frm.ShowDialog();
 
-            listView1.Items[listView1.SelectedIndices[0]].SubItems[0].Text = frm.pos_name;
-            listView1.Items[listView1.SelectedIndices[0]].SubItems[1].Text = frm.pos_model;
-            listView1.Items[listView1.SelectedIndices[0]].SubItems[2].Text = frm.pos_ip;
-            listView1.Items[listView1.SelectedIndices[0]].SubItems[3].Text = frm.pos_port;
-
-//listView.Items[rowIndex].SubItems[columnIndex].Text = newValue;
-        }
-
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void listView1_SelectedIndexChanged_1(object sender, EventArgs e)
-        {
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[0].Text = frm.pos_name;
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[1].Text = frm.pos_model;
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[2].Text = frm.pos_ip;
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[3].Text = frm.pos_port;
+            }
+            else
+            {
+                MessageBox.Show("No item selected.");
+            }
 
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
             if(listView1.SelectedIndices.Count > 0)
-            {
                 listView1.Items[listView1.SelectedIndices[0]].Remove();
+        }
+
+       
+
+       
+
+        public static void SendTextToTcpPort(string textToSend, string IP, int port)
+        {
+            try
+            {
+                // Connect to the remote TCP server
+                TcpClient client = new TcpClient(IP, port);
+
+                // Get the network stream from the TCP client
+                NetworkStream stream = client.GetStream();
+
+                // Convert the text to bytes
+                byte[] data = Encoding.ASCII.GetBytes(textToSend);
+
+                // Send the data to the TCP server
+                stream.Write(data, 0, data.Length);
+                Console.WriteLine($"Sent '{textToSend}' to port {port}");
+
+                // Buffer to store the response bytes.
+                byte[] responseData = new byte[256];
+
+                // Read the response from the stream
+                int bytes = stream.Read(responseData, 0, responseData.Length);
+                string response = Encoding.ASCII.GetString(responseData, 0, bytes);
+
+                // Show the response in a MessageBox
+                MessageBox.Show(response, "Response from Server");
+
+                // Close the network stream and the client
+                stream.Close();
+                client.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Exception occurred: {ex.Message}", "Error");
             }
         }
+        public string Fn_send_to_fanava(string amount, string ipAddress, int port)
+        {
+            string firstMessage = "{\"STX\":\"02\",\"Message Len\":\"0072\",\"Message ID\":\"88\",\"ETX\":\"03\",\"LRC\":\"$\"}";
+            byte[] firstData = Encoding.ASCII.GetBytes(firstMessage);
+            string secondMessage = $"{{\"STX\":\"02\",\"Message Len\":\"0393\",\"Message ID\":\"89\",\"Request Type\":\"01\",\"Processing Code\":\"000000\",\"Code Page\":\"01\",\"Print Type\":\"02\",\"Service Code\":\"01\",\"Spent Amount\":\"{amount}\",\"Discount Amount\":\"\",\"Invoice Count\":\"\",\"Invoice No\":\"\",\"Bill ID\":\"\",\"Payment ID\":\"\",\"Tel\":\"\",\"National ID\":\"\",\"Name\":\"\",\"Acc NO\":\"\",\"Charge ID\":\"41\",\"Other\":\"\",\"Print Description\":\"F1=,F2=10000,\",\"ETX\":\"03\",\"LRC\":\"$\"}}";
+            byte[] secondData = Encoding.ASCII.GetBytes(secondMessage);
+            byte[] ackData = new byte[] { 0x06 };  // ASCII code for ACK is \u0006
+
+            using (TcpClient client = new TcpClient(ipAddress, port))
+            {
+                NetworkStream stream = client.GetStream();
+                stream.Write(firstData, 0, firstData.Length);
+
+                byte[] responseData = new byte[256];
+                int bytes = stream.Read(responseData, 0, responseData.Length);
+                string responseMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
+
+                if (responseMessage == "\u0006")
+                {
+                    stream.Write(secondData, 0, secondData.Length);
+                    bytes = stream.Read(responseData, 0, responseData.Length);
+                    string responseMessage2 = Encoding.ASCII.GetString(responseData, 0, bytes);
+
+                    if (responseMessage2 == "\u0006")
+                    {
+                        string completeMessage = "";
+                        bool messageComplete = false;
+
+                        while (!messageComplete)
+                        {
+                            bytes = stream.Read(responseData, 0, responseData.Length);
+                            string partMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
+                            completeMessage += partMessage;
+
+                            if (completeMessage.Contains("\u0003"))
+                            {
+                                messageComplete = true;
+                            }
+                        }
+
+                        // پردازش کاراکترهای کنترلی
+                        completeMessage = completeMessage.Replace("\u0015", "")
+                                                         .Replace("\u0002", "")
+                                                         .Replace("\u0003", "")
+                                                         .Replace("\u0000", "");
+
+                        // اصلاح نام‌های کلید برای مطابقت با خواص کلاس
+                        completeMessage = completeMessage.Replace("Message Len", "MessageLen")
+                                                         .Replace("Message ID", "MessageID")
+                                                         .Replace("Processing Code", "ProcessingCode")
+                                                         .Replace("Term No", "TermNo")
+                                                         .Replace("Merchant No", "MerchantNo")
+                                                         .Replace("Spent Amount", "SpentAmount")
+                                                         .Replace("Response Code", "ResponseCode")
+                                                         .Replace("Card No", "CardNo")
+                                                         .Replace("Card Name", "CardName")
+                                                         .Replace("Response Desc", "ResponseDesc")
+                                                         .Replace("Used Discount", "UsedDiscount")
+                                                         .Replace("Used Wage", "UsedWage")
+                                                         .Replace("Used Loyality", "UsedLoyality")
+                                                         .Replace("Discount Amount", "DiscountAmount")
+                                                         .Replace("Tip Amount", "TipAmount")
+                                                         .Replace("Charge ID", "ChargeID")
+                                                         .Replace("Charge Serial", "ChargeSerial");
+
+                        // تبدیل JSON به شیء
+                        ResponseMessage parsedResponseMessage = JsonConvert.DeserializeObject<ResponseMessage>(completeMessage);
+                        if (parsedResponseMessage.ResponseDesc == "Swipe Card Fail")
+                            parsedResponseMessage.ResponseDesc = "کارت کشیده نشد";
+                        if(parsedResponseMessage.ResponseCode == "00")
+                            parsedResponseMessage.ResponseDesc = "عملیات موفق";
+
+                        // ساختن JSON با اطلاعات برگشتی
+                        var responseObject = new
+                        {
+                            parsedResponseMessage.TermNo,
+                            parsedResponseMessage.Date,
+                            parsedResponseMessage.Time,
+                            parsedResponseMessage.SpentAmount,
+                            parsedResponseMessage.RRN,
+                            parsedResponseMessage.TraceNo,
+                            parsedResponseMessage.CardNo,
+                            parsedResponseMessage.CardName,
+                            parsedResponseMessage.ResponseCode,
+                            parsedResponseMessage.ResponseDesc
+                        };
+
+                        // تبدیل به JSON
+                        string jsonResponse = JsonConvert.SerializeObject(responseObject);
+
+                        // بازگشت JSON به عنوان خروجی
+                        return jsonResponse;
+                    }
+                }
+            }
+
+            // در صورت بروز خطا یا پاسخ نامناسب، می‌توانید یک پیام خطا برگردانید
+            return "{\"Error\":\"Failed to get a valid response from the server.\"}";
+        }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            List<string> deviceInfo = GetDeviceInfo("fanava");
+            if (deviceInfo.Count > 0)
+            {
+                textBox3.Clear();
+                string ip = deviceInfo[0];
+                string port = deviceInfo[1];
+                string res =Fn_send_to_fanava("2500", ip,int.Parse(port));
+                textBox3.Text= res;
+                //MessageBox.Show(res);
+                //Fn_send_to_fanava("2500", "192.168.1.245", 3000);
+                //MessageBox.Show($"IP: {ip}, Port: {port}", "Device Info");
+            }
+            else
+            {
+                //MessageBox.Show("Device not found or config.txt file is missing.", "Error");
+            }
+
+        }
+        private List<string> GetDeviceInfo(string deviceName)
+        {
+            // مسیر فایل config.txt
+            string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+
+            if (File.Exists(configFilePath))
+            {
+                // خواندن تمام خطوط فایل config.txt
+                string[] lines = File.ReadAllLines(configFilePath);
+
+                // پردازش هر خط از فایل
+                foreach (string line in lines)
+                {
+                    // جدا کردن مقادیر خط با استفاده از کاما
+                    string[] parts = line.Split(',');
+
+                    if (parts.Length >= 4 && parts[1].Trim().ToLower() == deviceName.ToLower())
+                    {
+                        // برگرداندن اطلاعات دستگاهی که devicename آن برابر با ورودی است
+                        return new List<string> { parts[2], parts[3] }; // parts[2]: IP, parts[3]: Port
+                    }
+                }
+
+                // اگر دستگاه پیدا نشد، لیست خالی برگردان
+                return new List<string>();
+            }
+            else
+            {
+                // اگر فایل پیدا نشد، لیست خالی برگردان
+                return new List<string>();
+            }
+        }
+
+        private void پیشفرضToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // بررسی اینکه آیتمی در ListView انتخاب شده است یا خیر
+            if (listView1.SelectedItems.Count > 0)
+            {
+                // دریافت اولین آیتم انتخاب شده
+                listView1.Items[posDefaultIndex].ImageIndex = 0;
+
+                ListViewItem selectedItem = listView1.SelectedItems[0];
+                posDefaultIndex = selectedItem.Index;
+                selectedItem.ImageIndex = 1;
+                // چاپ شماره آیتم (ایندکس)
+                //MessageBox.Show("Selected item index: " + selectedItem.Index);
+            }
+            else
+            {
+                MessageBox.Show("No item selected.");
+            }
+        }
+
+        private void listView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // بررسی اینکه آیا آیتمی در زیر مکان کلیک قرار دارد یا خیر
+                var hitTest = listView1.HitTest(e.Location);
+                if (hitTest.Item != null)
+                {
+                    // نمایش ContextMenuStrip در موقعیت کلیک
+                    contextMenuStrip1.Show(listView1, e.Location);
+                }
+            }
+        }
+
+        private void ویرایشToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            listView1_DoubleClick(sender, e);
+
+        }
+       
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            string serviceExecutablePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WebServiceLoggerPOS.exe");
+            InstallService(serviceExecutablePath, "WebServiceLoggerPOS");
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void button2_Click_2(object sender, EventArgs e)
+        {
+            try
+            {
+                // بررسی اینکه مقدار داخل TextBox1 یک عدد صحیح است
+                if (int.TryParse(textBox1.Text, out int portNumber))
+                {
+                    // بررسی اینکه مقدار داخل محدوده مجاز پورت‌ها (200 تا 9999) باشد
+                    if (portNumber >= 200 && portNumber <= 9999)
+                    {
+                        string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configwebservice.ini");
+
+                        // خواندن محتوای فعلی فایل
+                        string[] lines = File.ReadAllLines(configFilePath);
+
+                        // جستجوی خط حاوی "port=" و جایگزینی آن با مقدار جدید
+                        for (int i = 0; i < lines.Length; i++)
+                        {
+                            if (lines[i].StartsWith("port="))
+                            {
+                                lines[i] = "port=" + portNumber.ToString();
+                                break;
+                            }
+                        }
+
+                        // نوشتن مقادیر جدید به فایل
+                        File.WriteAllLines(configFilePath, lines);
+
+                        MessageBox.Show("پورت با موفقیت ذخیره شد ، لطفا سرویس را راه اندازی مجدد کنید");
+                    }
+                    else
+                    {
+                        MessageBox.Show("مقدار پورت باید بین 200 تا 9999 باشد.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("لطفاً یک عدد صحیح معتبر برای پورت وارد کنید.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("خطا در ذخیره پورت: " + ex.Message);
+            }
+        }
+
     }
+    public class ResponseMessage
+    {
+        public string STX { get; set; }
+        public string MessageLen { get; set; }
+        public string MessageID { get; set; }
+        public string ProcessingCode { get; set; }
+        public string TermNo { get; set; }
+        public string MerchantNo { get; set; }
+        public string SpentAmount { get; set; }
+        public string RRN { get; set; }
+        public string TraceNo { get; set; }
+        public string ResponseCode { get; set; }
+        public string CardNo { get; set; }
+        public string CardName { get; set; }
+        public string Date { get; set; }
+        public string Time { get; set; }
+        public string ResponseDesc { get; set; }
+        public string UsedDiscount { get; set; }
+        public string UsedWage { get; set; }
+        public string UsedLoyality { get; set; }
+        public string DiscountAmount { get; set; }
+        public string TipAmount { get; set; }
+        public string ChargeID { get; set; }
+        public string ChargeSerial { get; set; }
+        public string Other { get; set; }
+        public string ETX { get; set; }
+        public string LRC { get; set; }
+    }
+
 }
