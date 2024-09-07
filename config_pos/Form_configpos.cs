@@ -146,7 +146,9 @@ namespace config_pos
                                     postype = parts[1],
                                     ip = parts[2],
                                     port = parts[3],
-                                    isDeafult = parts[4]
+                                    isDeafult = parts[4],
+                                    icon = Program.imagesBase64.ContainsKey(parts[1]) ? Program.imagesBase64[parts[1]] : "NOICON"
+
                                 });
                             }
                         }
