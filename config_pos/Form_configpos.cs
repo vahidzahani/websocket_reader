@@ -137,17 +137,18 @@ namespace config_pos
                             // جدا کردن مقادیر با استفاده از کاما
                             var parts = line.Split(',');
 
-                            if (parts.Length == 5)
+                            if (parts.Length == 6)
                             {
                                 // اضافه کردن هر دستگاه به لیست
                                 devices.Add(new
                                 {
-                                    devicename = parts[0],
-                                    postype = parts[1],
-                                    ip = parts[2],
-                                    port = parts[3],
-                                    isDeafult = parts[4],
-                                    icon = Program.imagesBase64.ContainsKey(parts[1]) ? Program.imagesBase64[parts[1]] : "NOICON"
+                                    id=parts[0],
+                                    devicename = parts[1],
+                                    postype = parts[2],
+                                    ip = parts[3],
+                                    port = parts[4],
+                                    isDeafult = parts[5],
+                                    icon = Program.imagesBase64.ContainsKey(parts[2]) ? Program.imagesBase64[parts[2]] : "NOICON"
 
                                 });
                             }
@@ -336,6 +337,7 @@ namespace config_pos
             listView1.Clear();
 
             listView1.View = View.Details;
+            listView1.Columns.Add("id", 20);
             listView1.Columns.Add("عنوان دستگاه", 150);
             listView1.Columns.Add("مدل", 100);
             listView1.Columns.Add("IP", 100);
@@ -370,10 +372,11 @@ namespace config_pos
                             //MessageBox.Show(part);
                         }
                         ListViewItem item = new ListViewItem(parts[0]);
-                        item.SubItems.Add(parts[1]);
-                        item.SubItems.Add(parts[2]);
-                        item.SubItems.Add(parts[3]);
-                        if (parts[4] == "1") { 
+                        item.SubItems.Add(parts[1]);//devname
+                        item.SubItems.Add(parts[2]);//
+                        item.SubItems.Add(parts[3]);//
+                        item.SubItems.Add(parts[4]);
+                        if (parts[5] == "1") { 
                             item.ImageIndex = 1;
                             posDefaultIndex = listView1.Items.Count;
                         }
@@ -381,6 +384,7 @@ namespace config_pos
                         {
                             item.ImageIndex = 0;
                         }
+
                         listView1.Items.Add(item);
 
 
@@ -407,7 +411,22 @@ namespace config_pos
             
             if (frm.pos_name != null)
             {
-                ListViewItem item = new ListViewItem(frm.pos_name);
+
+                // بدست آوردن بزرگ‌ترین id از ستون اول (id)
+                int maxId = 0; // شروع با صفر
+                foreach (ListViewItem item1 in listView1.Items)
+                {
+                    int currentId;
+                    if (int.TryParse(item1.Text, out currentId)) // چک کردن اینکه مقدار id قابل تبدیل به عدد باشد
+                        maxId = Math.Max(maxId, currentId);
+                }
+
+                // حالا maxId بزرگ‌ترین مقدار موجود است، آیتم جدید یک واحد بیشتر خواهد بود
+                int newId = maxId + 1;
+
+
+                ListViewItem item = new ListViewItem(newId.ToString());
+                item.SubItems.Add(frm.pos_name);
                 item.SubItems.Add(frm.pos_model);
                 item.SubItems.Add(frm.pos_ip);
                 item.SubItems.Add(frm.pos_port);
@@ -465,17 +484,17 @@ namespace config_pos
                 frm.editdata = true;
                 ListViewItem item = listView1.SelectedItems[0];
            
-                frm.pos_name = item.SubItems[0].Text;
-                frm.pos_model = item.SubItems[1].Text;
-                frm.pos_ip = item.SubItems[2].Text;
-                frm.pos_port = item.SubItems[3].Text;
+                frm.pos_name = item.SubItems[1].Text;
+                frm.pos_model = item.SubItems[2].Text;
+                frm.pos_ip = item.SubItems[3].Text;
+                frm.pos_port = item.SubItems[4].Text;
 
                 frm.ShowDialog();
 
-                listView1.Items[listView1.SelectedIndices[0]].SubItems[0].Text = frm.pos_name;
-                listView1.Items[listView1.SelectedIndices[0]].SubItems[1].Text = frm.pos_model;
-                listView1.Items[listView1.SelectedIndices[0]].SubItems[2].Text = frm.pos_ip;
-                listView1.Items[listView1.SelectedIndices[0]].SubItems[3].Text = frm.pos_port;
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[1].Text = frm.pos_name;
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[2].Text = frm.pos_model;
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[3].Text = frm.pos_ip;
+                listView1.Items[listView1.SelectedIndices[0]].SubItems[4].Text = frm.pos_port;
             }
             else
             {
@@ -650,7 +669,7 @@ namespace config_pos
             }
 
         }
-        private List<string> GetDeviceInfo(string deviceName)
+        private List<string> GetDeviceInfo(string postype)
         {
             // مسیر فایل config.txt
             string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
@@ -666,10 +685,10 @@ namespace config_pos
                     // جدا کردن مقادیر خط با استفاده از کاما
                     string[] parts = line.Split(',');
 
-                    if (parts.Length >= 4 && parts[1].Trim().ToLower() == deviceName.ToLower())
+                    if (parts.Length >= 4 && parts[2].Trim().ToLower() == postype.ToLower())
                     {
                         // برگرداندن اطلاعات دستگاهی که devicename آن برابر با ورودی است
-                        return new List<string> { parts[2], parts[3] }; // parts[2]: IP, parts[3]: Port
+                        return new List<string> { parts[3], parts[4] }; // parts[2]: IP, parts[3]: Port
                     }
                 }
 
