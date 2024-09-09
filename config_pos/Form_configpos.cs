@@ -184,6 +184,7 @@ namespace config_pos
             }
 
             btn_start_Click_1(sender, e);
+            this.Text += $" ver : {Application.ProductVersion} ";
             if (IsUserAdmin() == true)
             {
                 this.Text+=" : Administrator";
@@ -338,10 +339,10 @@ namespace config_pos
 
             listView1.View = View.Details;
             listView1.Columns.Add("id", 20);
-            listView1.Columns.Add("عنوان دستگاه", 150);
+            listView1.Columns.Add("عنوان دستگاه", 140);
             listView1.Columns.Add("مدل", 100);
             listView1.Columns.Add("IP", 100);
-            listView1.Columns.Add("Port", 80);
+            listView1.Columns.Add("Port", 50);
 
             // افزودن ImageList به ListView
             listView1.SmallImageList = imageList1;
@@ -433,6 +434,7 @@ namespace config_pos
                 item.ImageIndex = 0;
 
                 listView1.Items.Add(item);
+                button1.Enabled = true;
             }
         }
 
@@ -463,6 +465,7 @@ namespace config_pos
                 }
 
                 MessageBox.Show("Items saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                button1.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -495,6 +498,7 @@ namespace config_pos
                 listView1.Items[listView1.SelectedIndices[0]].SubItems[2].Text = frm.pos_model;
                 listView1.Items[listView1.SelectedIndices[0]].SubItems[3].Text = frm.pos_ip;
                 listView1.Items[listView1.SelectedIndices[0]].SubItems[4].Text = frm.pos_port;
+                button1.Enabled = true;
             }
             else
             {
@@ -506,7 +510,12 @@ namespace config_pos
         private void button6_Click(object sender, EventArgs e)
         {
             if(listView1.SelectedIndices.Count > 0)
+            {
+
                 listView1.Items[listView1.SelectedIndices[0]].Remove();
+                button1.Enabled = true;
+
+            }
         }
 
        
@@ -649,29 +658,10 @@ namespace config_pos
             return "{\"Error\":\"Failed to get a valid response from the server.\"}";
         }
 
-        private void button5_Click_1(object sender, EventArgs e)
-        {
-            List<string> deviceInfo = GetDeviceInfo("fanava");
-            if (deviceInfo.Count > 0)
-            {
-                textBox3.Clear();
-                string ip = deviceInfo[0];
-                string port = deviceInfo[1];
-                string res =Fn_send_to_fanava("2500", ip,int.Parse(port));
-                textBox3.Text= res;
-                //MessageBox.Show(res);
-                //Fn_send_to_fanava("2500", "192.168.1.245", 3000);
-                //MessageBox.Show($"IP: {ip}, Port: {port}", "Device Info");
-            }
-            else
-            {
-                //MessageBox.Show("Device not found or config.txt file is missing.", "Error");
-            }
-
-        }
+       
         private List<string> GetDeviceInfo(string postype)
         {
-            // مسیر فایل config.txt
+            // براساس نوع دستگاه یک آیپی و پورت برمیگردونه
             string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
 
             if (File.Exists(configFilePath))
@@ -759,6 +749,11 @@ namespace config_pos
 
         private void button2_Click_2(object sender, EventArgs e)
         {
+            if(!IsUserAdmin())
+            {
+                MessageBox.Show("برای تغییر پورت نیاز به دسترسی ادمین به برنامه را دارید", "دسترسی ادمین") ;
+                return;
+            }
             try
             {
                 // بررسی اینکه مقدار داخل TextBox1 یک عدد صحیح است
@@ -803,6 +798,28 @@ namespace config_pos
             }
         }
 
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form_configpos_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // نمایش پیام برای تأیید بستن برنامه
+            if (button1.Enabled == true)
+            {
+                DialogResult result = MessageBox.Show("تغییرات را ذخیره کنم ؟", "تأیید بستن", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                    {
+                        button1_Click_1(sender, e);
+                        //e.Cancel = true;
+                    }
+                else if(result == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
     }
     public class ResponseMessage
     {

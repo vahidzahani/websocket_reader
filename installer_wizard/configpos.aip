@@ -7,6 +7,7 @@
     <ROW Property="AI_APP_FILE" Value="[#config_pos.exe]"/>
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
+    <ROW Property="AI_ThemeStyle" Value="aero" MultiBuildValue="AnyCPU_Debug:style19" MsiKey="AI_ThemeStyle"/>
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPNOREPAIR" MultiBuildValue="AnyCPU_Debug:1"/>
@@ -89,7 +90,6 @@
     <ROW File="System.Numerics.dll" Component_="System.Numerics.dll" FileName="SYSTEM~5.DLL|System.Numerics.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Numerics.dll" SelfReg="false"/>
     <ROW File="System.Drawing.dll" Component_="System.Drawing.dll" FileName="SYSTEM~6.DLL|System.Drawing.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Drawing.dll" SelfReg="false"/>
     <ROW File="System.Net.Http.dll" Component_="System.Net.Http.dll" FileName="SYSTEM~7.DLL|System.Net.Http.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Net.Http.dll" SelfReg="false"/>
-    <ROW File="WindowsService2.pdb" Component_="config_pos.pdb" FileName="WINDOW~1.PDB|WindowsService2.pdb" Attributes="0" SourcePath="..\WindowsService2\bin\Debug\WindowsService2.pdb" SelfReg="false"/>
     <ROW File="System.Windows.Forms.dll" Component_="System.Windows.Forms.dll" FileName="SYSTEM~8.DLL|System.Windows.Forms.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Windows.Forms.dll" SelfReg="false"/>
     <ROW File="System.Xml.dll" Component_="System.Xml.dll" FileName="SYSTEM~9.DLL|System.Xml.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Xml.dll" SelfReg="false"/>
     <ROW File="System.Xml.Linq.dll" Component_="System.Xml.Linq.dll" FileName="SYSTE~10.DLL|System.Xml.Linq.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Xml.Linq.dll" SelfReg="false"/>
@@ -99,7 +99,6 @@
     <ROW File="System.Management.dll" Component_="System.Management.dll" FileName="SYSTE~13.DLL|System.Management.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Management.dll" SelfReg="false"/>
     <ROW File="WebServiceLoggerPOS.exe" Component_="WebServiceLoggerPOS.exe" FileName="WEBSER~1.EXE|WebServiceLoggerPOS.exe" Attributes="0" SourcePath="..\config_pos\bin\Debug\WebServiceLoggerPOS.exe" SelfReg="false" DigSign="true"/>
     <ROW File="System.ServiceProcess.dll" Component_="System.ServiceProcess.dll" FileName="SYSTE~14.DLL|System.ServiceProcess.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.ServiceProcess.dll" SelfReg="false"/>
-    <ROW File="WindowsService1.pdb" Component_="config_pos.pdb" FileName="WINDOW~2.PDB|WindowsService1.pdb" Attributes="0" SourcePath="..\WindowsService1\bin\Debug\WindowsService1.pdb" SelfReg="false"/>
     <ROW File="config_pos.exe" Component_="config_pos.pdb" FileName="CONFIG~1.EXE|config_pos.exe" Attributes="0" SourcePath="..\config_pos\bin\Debug\config_pos.exe" SelfReg="false" DigSign="true"/>
     <ROW File="config_pos.exe.config" Component_="config_pos.exe.config" FileName="CONFIG~1.CON|config_pos.exe.config" Attributes="0" SourcePath="..\config_pos\bin\Debug\config_pos.exe.config" SelfReg="false"/>
     <ROW File="Commander.dll" Component_="Commander.dll" FileName="COMMAN~1.DLL|Commander.dll" Attributes="0" SourcePath="..\..\dastgah\-203350272_2071371256\PC-POS Release v5.3.0.2 On 1398-12-27\Commander.dll" SelfReg="false"/>

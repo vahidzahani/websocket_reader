@@ -77,47 +77,61 @@ namespace config_pos
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Transaction.Connection Connect = new Transaction.Connection();
-            Result retCode = new Result();
-            Connect.CommunicationType = "TCP/IP";
-            Connect.POSPC_TCPCOMMU_SocketRecTimeout = 60000;
-            Connect.POS_PORTtcp = Convert.ToInt16(Textbox_port.Text);//1024
-            //Connect.POS_IP ="127.0.0.1";
-            Connect.POS_IP = TextBox_IP.Text;//"192.168.1.241";
+            if (TextBox_IP.Text.Trim()=="" || Textbox_port.Text.Trim() == "")
+            {
+                MessageBox.Show("مقادری نباید خالی باشد","مقادری آیپی و پورت",MessageBoxButtons.OK,MessageBoxIcon.Hand);
+                return;
+            }
+            if (comboBox1.Text == "fanava")
+            {
+                Form_configpos frm=new Form_configpos();
+                string res =frm.Fn_send_to_fanava(textBox1.Text, TextBox_IP.Text,int.Parse(Textbox_port.Text));
+                MessageBox.Show(res);
 
-            //POS_PC_v3.Result.return_codes retCode = POS_PC_v3.Result.return_codes.ERR_POS_PC_OTHER;
-            Transaction TXN = new Transaction(Connect);
-            retCode = TXN.Debits_Goods_And_Service("1", "1", textBox1.Text, "500", "hello", "good");
+            }else if(comboBox1.Text == "behpardakht")
+            {
+                Transaction.Connection Connect = new Transaction.Connection();
+                Result retCode = new Result();
+                Connect.CommunicationType = "TCP/IP";
+                Connect.POSPC_TCPCOMMU_SocketRecTimeout = 60000;
+                Connect.POS_PORTtcp = Convert.ToInt16(Textbox_port.Text);//1024
+                //Connect.POS_IP ="127.0.0.1";
+                Connect.POS_IP = TextBox_IP.Text;//"192.168.1.241";
 
-            //POS_PC_v3.Transaction.return_codes retCode = Transaction.return_codes.ERR_POS_PC_OTHER;
-            //POS_PC_v3.Transaction TXN = new POS_PC_v3.Transaction(Connect);
-            /* Debit */
-            //            retCode = TXN.Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
-            //            MerchantadditionalData);
-            //            OR /* Debit with AutoSettle */
-            //            retCode = TXN.Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
-            //            MerchantadditionalData, false);
-            //            OR /* BillPayment */
-            //            retCode = TXN.Bill_Payment_Service(RequestID, "1", strBillId, strPayCode, strAmount, strMerchantMsg,
-            //            strMerchantAddit);
-            //            OR /* Payment */
-            //            retCode = TXN.Payment(RequestID, "1", strAmount, strPayerId, strAcountId, strMerchantAddit);
-            //            OR /*MultiPayment */
-            //            retCode = TXN.MultiPayment(RequestID, "1", strTotalAmount, RequestList, PrintDetail,
-            //            strMerchantadditionalData)
-            //OR /* Inquery */
-            //retCode = TXN.Inquery_Service(RequestID, "1", MerchantadditionalData);
-            //            OR /* Last_Inquery */
-            //            retCode = TXN.Last_Inquery_Service("1", MerchantadditionalData);
-            //            OR /* Get_Card */
-            //            retCode = TXN.Get_Card_Service("20", "1", MerchantadditionalData);
-            //            OR /* Get_Card_Debits */
-            //            retCode = TXN.Get_Card_Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
-            //            MerchantadditionalData);
+                //POS_PC_v3.Result.return_codes retCode = POS_PC_v3.Result.return_codes.ERR_POS_PC_OTHER;
+                Transaction TXN = new Transaction(Connect);
+                retCode = TXN.Debits_Goods_And_Service("1", "1", textBox1.Text, "500", "hello", "good");
+
+                //POS_PC_v3.Transaction.return_codes retCode = Transaction.return_codes.ERR_POS_PC_OTHER;
+                //POS_PC_v3.Transaction TXN = new POS_PC_v3.Transaction(Connect);
+                /* Debit */
+                //            retCode = TXN.Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
+                //            MerchantadditionalData);
+                //            OR /* Debit with AutoSettle */
+                //            retCode = TXN.Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
+                //            MerchantadditionalData, false);
+                //            OR /* BillPayment */
+                //            retCode = TXN.Bill_Payment_Service(RequestID, "1", strBillId, strPayCode, strAmount, strMerchantMsg,
+                //            strMerchantAddit);
+                //            OR /* Payment */
+                //            retCode = TXN.Payment(RequestID, "1", strAmount, strPayerId, strAcountId, strMerchantAddit);
+                //            OR /*MultiPayment */
+                //            retCode = TXN.MultiPayment(RequestID, "1", strTotalAmount, RequestList, PrintDetail,
+                //            strMerchantadditionalData)
+                //OR /* Inquery */
+                //retCode = TXN.Inquery_Service(RequestID, "1", MerchantadditionalData);
+                //            OR /* Last_Inquery */
+                //            retCode = TXN.Last_Inquery_Service("1", MerchantadditionalData);
+                //            OR /* Get_Card */
+                //            retCode = TXN.Get_Card_Service("20", "1", MerchantadditionalData);
+                //            OR /* Get_Card_Debits */
+                //            retCode = TXN.Get_Card_Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
+                //            MerchantadditionalData);
 
 
-            POS_PC_v3.Result.return_codes returncode = (POS_PC_v3.Result.return_codes)retCode.ReturnCode;
-            MessageBox.Show(returncode.ToString());
+                POS_PC_v3.Result.return_codes returncode = (POS_PC_v3.Result.return_codes)retCode.ReturnCode;
+                MessageBox.Show(returncode.ToString());
+            }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
