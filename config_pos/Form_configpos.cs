@@ -184,7 +184,7 @@ namespace config_pos
             }
 
             btn_start_Click_1(sender, e);
-            this.Text += $" ver : {Application.ProductVersion} ";
+            //this.Text += $" ver : {Application.ProductVersion} ";
             if (IsUserAdmin() == true)
             {
                 this.Text+=" : Administrator";
@@ -335,74 +335,84 @@ namespace config_pos
 
         private void btn_start_Click_1(object sender, EventArgs e)
         {
-            listView1.Clear();
 
-            listView1.View = View.Details;
-            listView1.Columns.Add("id", 20);
-            listView1.Columns.Add("عنوان دستگاه", 140);
-            listView1.Columns.Add("مدل", 100);
-            listView1.Columns.Add("IP", 100);
-            listView1.Columns.Add("Port", 50);
-
-            // افزودن ImageList به ListView
-            listView1.SmallImageList = imageList1;
-
-            //AddRandomItemsToListView();
-
-
-
-            // مسیر فایل را مشخص کنید
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
-
-            // بررسی وجود فایل
-            if (File.Exists(filePath))
+            try
             {
-                // خواندن محتویات فایل
-                using (StreamReader sr = new StreamReader(filePath))
+                listView1.Clear();
+
+                listView1.View = View.Details;
+                listView1.Columns.Add("id", 20);
+                listView1.Columns.Add("عنوان دستگاه", 140);
+                listView1.Columns.Add("مدل", 100);
+                listView1.Columns.Add("IP", 100);
+                listView1.Columns.Add("Port", 50);
+
+                listView1.SmallImageList = imageList1;
+
+                // مسیر فایل را مشخص کنید
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+
+                // بررسی وجود فایل
+                if (File.Exists(filePath))
                 {
-                    string line;
-                    // خواندن هر خط از فایل
-                    while ((line = sr.ReadLine()) != null)
+                    // خواندن محتویات فایل
+                    using (StreamReader sr = new StreamReader(filePath))
                     {
-                        // تقسیم خط به عباراتی که با کاما جدا شده‌اند
-                        string[] parts = line.Split(',');
-
-                        // نمایش هر عبارت
-                        foreach (string part in parts)
+                        string line;
+                        // خواندن هر خط از فایل
+                        while ((line = sr.ReadLine()) != null)
                         {
-                            //MessageBox.Show(part);
-                        }
-                        ListViewItem item = new ListViewItem(parts[0]);
-                        item.SubItems.Add(parts[1]);//devname
-                        item.SubItems.Add(parts[2]);//
-                        item.SubItems.Add(parts[3]);//
-                        item.SubItems.Add(parts[4]);
-                        if (parts[5] == "1") { 
-                            item.ImageIndex = 1;
-                            posDefaultIndex = listView1.Items.Count;
-                        }
-                        else
-                        {
-                            item.ImageIndex = 0;
-                        }
+                            // تقسیم خط به عباراتی که با کاما جدا شده‌اند
+                            string[] parts = line.Split(',');
 
-                        listView1.Items.Add(item);
+                            // بررسی تعداد آیتم‌ها در آرایه
+                            if (parts.Length >= 6)  // اطمینان از وجود حداقل 6 جزء
+                            {
+                                ListViewItem item = new ListViewItem(parts[0]);  // id
+                                item.SubItems.Add(parts[1]); // devicename
+                                item.SubItems.Add(parts[2]); // مدل
+                                item.SubItems.Add(parts[3]); // IP
+                                item.SubItems.Add(parts[4]); // Port
 
+                                // بررسی مقدار isDefault
+                                if (parts[5] == "1")
+                                {
+                                    item.ImageIndex = 1;
+                                    posDefaultIndex = listView1.Items.Count;  // ذخیره اندیس برای دستگاه پیش‌فرض
+                                }
+                                else
+                                {
+                                    item.ImageIndex = 0;
+                                }
 
+                                listView1.Items.Add(item);
+                            }
+                            else
+                            {
+                                // گزارش خطا در صورت نادرست بودن تعداد آیتم‌ها
+                                Console.WriteLine("خطای داده: تعداد مقادیر کافی نیست.");
+                            }
+                        }
                     }
                 }
+                else
+                {
+                    MessageBox.Show("فایل config.txt یافت نشد.", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("فایل یافت نشد.");
+                // لاگ کردن اطلاعات استثنا برای اشکال‌زدایی
+                MessageBox.Show($"خطا رخ داد: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
 
 
 
 
 
         }
-      
+
 
         private void button4_Click(object sender, EventArgs e)
         {
@@ -566,93 +576,102 @@ namespace config_pos
             byte[] secondData = Encoding.ASCII.GetBytes(secondMessage);
             byte[] ackData = new byte[] { 0x06 };  // ASCII code for ACK is \u0006
 
-            using (TcpClient client = new TcpClient(ipAddress, port))
+            try
             {
-                NetworkStream stream = client.GetStream();
-                stream.Write(firstData, 0, firstData.Length);
-
-                byte[] responseData = new byte[256];
-                int bytes = stream.Read(responseData, 0, responseData.Length);
-                string responseMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
-
-                if (responseMessage == "\u0006")
+                using (TcpClient client = new TcpClient(ipAddress, port))
                 {
-                    stream.Write(secondData, 0, secondData.Length);
-                    bytes = stream.Read(responseData, 0, responseData.Length);
-                    string responseMessage2 = Encoding.ASCII.GetString(responseData, 0, bytes);
+                    NetworkStream stream = client.GetStream();
+                    stream.Write(firstData, 0, firstData.Length);
 
-                    if (responseMessage2 == "\u0006")
+                    byte[] responseData = new byte[256];
+                    int bytes = stream.Read(responseData, 0, responseData.Length);
+                    string responseMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
+
+                    if (responseMessage == "\u0006")
                     {
-                        string completeMessage = "";
-                        bool messageComplete = false;
+                        stream.Write(secondData, 0, secondData.Length);
+                        bytes = stream.Read(responseData, 0, responseData.Length);
+                        string responseMessage2 = Encoding.ASCII.GetString(responseData, 0, bytes);
 
-                        while (!messageComplete)
+                        if (responseMessage2 == "\u0006")
                         {
-                            bytes = stream.Read(responseData, 0, responseData.Length);
-                            string partMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
-                            completeMessage += partMessage;
+                            string completeMessage = "";
+                            bool messageComplete = false;
 
-                            if (completeMessage.Contains("\u0003"))
+                            while (!messageComplete)
                             {
-                                messageComplete = true;
+                                bytes = stream.Read(responseData, 0, responseData.Length);
+                                string partMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
+                                completeMessage += partMessage;
+
+                                if (completeMessage.Contains("\u0003"))
+                                {
+                                    messageComplete = true;
+                                }
                             }
+
+                            // پردازش کاراکترهای کنترلی
+                            completeMessage = completeMessage.Replace("\u0015", "")
+                                                             .Replace("\u0002", "")
+                                                             .Replace("\u0003", "")
+                                                             .Replace("\u0000", "");
+
+                            // اصلاح نام‌های کلید برای مطابقت با خواص کلاس
+                            completeMessage = completeMessage.Replace("Message Len", "MessageLen")
+                                                             .Replace("Message ID", "MessageID")
+                                                             .Replace("Processing Code", "ProcessingCode")
+                                                             .Replace("Term No", "TermNo")
+                                                             .Replace("Merchant No", "MerchantNo")
+                                                             .Replace("Spent Amount", "SpentAmount")
+                                                             .Replace("Response Code", "ResponseCode")
+                                                             .Replace("Card No", "CardNo")
+                                                             .Replace("Card Name", "CardName")
+                                                             .Replace("Response Desc", "ResponseDesc")
+                                                             .Replace("Used Discount", "UsedDiscount")
+                                                             .Replace("Used Wage", "UsedWage")
+                                                             .Replace("Used Loyality", "UsedLoyality")
+                                                             .Replace("Discount Amount", "DiscountAmount")
+                                                             .Replace("Tip Amount", "TipAmount")
+                                                             .Replace("Charge ID", "ChargeID")
+                                                             .Replace("Charge Serial", "ChargeSerial");
+
+                            // تبدیل JSON به شیء
+                            ResponseMessage parsedResponseMessage = JsonConvert.DeserializeObject<ResponseMessage>(completeMessage);
+                            if (parsedResponseMessage.ResponseDesc == "Swipe Card Fail")
+                                parsedResponseMessage.ResponseDesc = "کارت کشیده نشد";
+                            if (parsedResponseMessage.ResponseCode == "00")
+                                parsedResponseMessage.ResponseDesc = "عملیات موفق";
+
+                            // ساختن JSON با اطلاعات برگشتی
+                            var responseObject = new
+                            {
+                                parsedResponseMessage.TermNo,
+                                parsedResponseMessage.Date,
+                                parsedResponseMessage.Time,
+                                parsedResponseMessage.SpentAmount,
+                                parsedResponseMessage.RRN,
+                                parsedResponseMessage.TraceNo,
+                                parsedResponseMessage.CardNo,
+                                parsedResponseMessage.CardName,
+                                parsedResponseMessage.ResponseCode,
+                                parsedResponseMessage.ResponseDesc
+                            };
+
+                            // تبدیل به JSON
+                            string jsonResponse = JsonConvert.SerializeObject(responseObject);
+
+                            // بازگشت JSON به عنوان خروجی
+                            return jsonResponse;
                         }
-
-                        // پردازش کاراکترهای کنترلی
-                        completeMessage = completeMessage.Replace("\u0015", "")
-                                                         .Replace("\u0002", "")
-                                                         .Replace("\u0003", "")
-                                                         .Replace("\u0000", "");
-
-                        // اصلاح نام‌های کلید برای مطابقت با خواص کلاس
-                        completeMessage = completeMessage.Replace("Message Len", "MessageLen")
-                                                         .Replace("Message ID", "MessageID")
-                                                         .Replace("Processing Code", "ProcessingCode")
-                                                         .Replace("Term No", "TermNo")
-                                                         .Replace("Merchant No", "MerchantNo")
-                                                         .Replace("Spent Amount", "SpentAmount")
-                                                         .Replace("Response Code", "ResponseCode")
-                                                         .Replace("Card No", "CardNo")
-                                                         .Replace("Card Name", "CardName")
-                                                         .Replace("Response Desc", "ResponseDesc")
-                                                         .Replace("Used Discount", "UsedDiscount")
-                                                         .Replace("Used Wage", "UsedWage")
-                                                         .Replace("Used Loyality", "UsedLoyality")
-                                                         .Replace("Discount Amount", "DiscountAmount")
-                                                         .Replace("Tip Amount", "TipAmount")
-                                                         .Replace("Charge ID", "ChargeID")
-                                                         .Replace("Charge Serial", "ChargeSerial");
-
-                        // تبدیل JSON به شیء
-                        ResponseMessage parsedResponseMessage = JsonConvert.DeserializeObject<ResponseMessage>(completeMessage);
-                        if (parsedResponseMessage.ResponseDesc == "Swipe Card Fail")
-                            parsedResponseMessage.ResponseDesc = "کارت کشیده نشد";
-                        if(parsedResponseMessage.ResponseCode == "00")
-                            parsedResponseMessage.ResponseDesc = "عملیات موفق";
-
-                        // ساختن JSON با اطلاعات برگشتی
-                        var responseObject = new
-                        {
-                            parsedResponseMessage.TermNo,
-                            parsedResponseMessage.Date,
-                            parsedResponseMessage.Time,
-                            parsedResponseMessage.SpentAmount,
-                            parsedResponseMessage.RRN,
-                            parsedResponseMessage.TraceNo,
-                            parsedResponseMessage.CardNo,
-                            parsedResponseMessage.CardName,
-                            parsedResponseMessage.ResponseCode,
-                            parsedResponseMessage.ResponseDesc
-                        };
-
-                        // تبدیل به JSON
-                        string jsonResponse = JsonConvert.SerializeObject(responseObject);
-
-                        // بازگشت JSON به عنوان خروجی
-                        return jsonResponse;
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                // نمایش پیام خطا در صورت بروز مشکل در ارتباط با دستگاه
+                MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
 
             // در صورت بروز خطا یا پاسخ نامناسب، می‌توانید یک پیام خطا برگردانید
             return "{\"Error\":\"Failed to get a valid response from the server.\"}";

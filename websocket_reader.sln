@@ -7,11 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "websocket_reader", "websock
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "socket_setup", "socket_setup\socket_setup.vdproj", "{464AA619-F4EF-4E56-85ED-E8008DBC9871}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsService1", "WindowsService1\WindowsService1.csproj", "{D28D2215-6F6D-48FB-A659-63B5E90278B6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "config_pos", "config_pos\config_pos.csproj", "{3F53AA93-C39A-4730-B076-F84F66C154B6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsService2", "WindowsService2\WindowsService2.csproj", "{61139662-CBAB-4761-A053-B288B85A42D1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServiceLogger", "WebServiceLogger\WebServiceLogger.csproj", "{B1E535F4-5C83-4819-86E3-438E003A60D3}"
 EndProject
@@ -27,18 +23,10 @@ Global
 		{C676B1D7-C868-4E9A-8409-135CEC4DFF43}.Release|Any CPU.Build.0 = Release|Any CPU
 		{464AA619-F4EF-4E56-85ED-E8008DBC9871}.Debug|Any CPU.ActiveCfg = Debug
 		{464AA619-F4EF-4E56-85ED-E8008DBC9871}.Release|Any CPU.ActiveCfg = Release
-		{D28D2215-6F6D-48FB-A659-63B5E90278B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D28D2215-6F6D-48FB-A659-63B5E90278B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D28D2215-6F6D-48FB-A659-63B5E90278B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D28D2215-6F6D-48FB-A659-63B5E90278B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3F53AA93-C39A-4730-B076-F84F66C154B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3F53AA93-C39A-4730-B076-F84F66C154B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F53AA93-C39A-4730-B076-F84F66C154B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F53AA93-C39A-4730-B076-F84F66C154B6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61139662-CBAB-4761-A053-B288B85A42D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61139662-CBAB-4761-A053-B288B85A42D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61139662-CBAB-4761-A053-B288B85A42D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61139662-CBAB-4761-A053-B288B85A42D1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B1E535F4-5C83-4819-86E3-438E003A60D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B1E535F4-5C83-4819-86E3-438E003A60D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1E535F4-5C83-4819-86E3-438E003A60D3}.Release|Any CPU.ActiveCfg = Release|Any CPU

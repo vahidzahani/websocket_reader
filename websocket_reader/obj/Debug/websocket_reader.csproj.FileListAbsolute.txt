@@ -73,6 +73,7 @@ C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\Newtonsoft.
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\bin\Debug\Newtonsoft.Json.xml
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.AssemblyReference.cache
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.SuggestedBindingRedirects.cache
+C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Forms.AboutBox1.resources
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Form1.resources
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.form_config.resources
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Form_lock.resources
@@ -83,4 +84,3 @@ C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_r
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.csproj.CopyComplete
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.exe
 C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocketprinter.pdb
-C:\Users\BAHARAN\Desktop\websocket_reader\websocket_reader\obj\Debug\websocket_reader.Forms.AboutBox1.resources
