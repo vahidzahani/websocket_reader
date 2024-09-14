@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using POS_PC_v3;
 using Newtonsoft.Json;
+using OmidPayPcPos;
 
 namespace config_pos
 {
@@ -84,11 +85,22 @@ namespace config_pos
             }
             if (comboBox1.Text == "fanava")
             {
-                Form_configpos frm=new Form_configpos();
-                string res =frm.Fn_send_to_fanava(textBox1.Text, TextBox_IP.Text,int.Parse(Textbox_port.Text));
+                Form_configpos frm = new Form_configpos();
+                string res = frm.Fn_send_to_fanava(textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
                 MessageBox.Show(res);
 
-            }else if(comboBox1.Text == "behpardakht")
+            } else if (comboBox1.Text=="omidpay") {
+
+
+                Form_configpos frm = new Form_configpos();
+                string res = frm.Fn_send_to_omidpay(textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
+                MessageBox.Show(res);
+
+                //OmidPayPcPosClass omid =new OmidPayPcPosClass();
+                //ResponseJson res;
+                //res=omid.DoTcpTransaction(TextBox_IP.Text, int.Parse(Textbox_port.Text), textBox1.Text);
+            }
+            else if (comboBox1.Text == "behpardakht")
             {
                 Transaction.Connection Connect = new Transaction.Connection();
                 Result retCode = new Result();

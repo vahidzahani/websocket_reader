@@ -21,6 +21,7 @@ using System.Security.Principal;
 using Newtonsoft.Json;
 using Commander.Bean;
 using Commander;
+using OmidPayPcPos;
 
 namespace config_pos
 {
@@ -171,6 +172,23 @@ namespace config_pos
                         string ip = deviceInfo[0];
                         string port = deviceInfo[1];
                         string resJsonString = Fn_send_to_fanava(args[2], ip, int.Parse(port));
+                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        File.WriteAllText(filePath, resJsonString);
+                    }
+                    else
+                    {
+                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        File.WriteAllText(filePath, "\"Error\":\"Failed to get a valid response from the server.\"");
+                    }
+                }
+                if (args[1] == "omidpay")//wan sie sprichen postype name
+                {
+                    List<string> deviceInfo = GetDeviceInfo("omidpay");
+                    if (deviceInfo.Count > 0)
+                    {
+                        string ip = deviceInfo[0];
+                        string port = deviceInfo[1];
+                        string resJsonString = Fn_send_to_omidpay(args[2], ip, int.Parse(port));
                         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
                         File.WriteAllText(filePath, resJsonString);
                     }
@@ -568,6 +586,33 @@ namespace config_pos
                 MessageBox.Show($"Exception occurred: {ex.Message}", "Error");
             }
         }
+        public string Fn_send_to_omidpay(string amount, string ipAddress, int port)
+        {
+            // ایجاد یک نمونه از کلاس OmidPayPcPosClass
+            OmidPayPcPosClass omid = new OmidPayPcPosClass();
+
+            // فراخوانی تابع DoTcpTransaction و دریافت پاسخ
+            ResponseJson response = omid.DoTcpTransaction(ipAddress, port, amount);
+
+            // تبدیل شیء response به رشته JSON
+            string jsonResponse = JsonConvert.SerializeObject(new
+            {
+                TermNo = response.TermNo,
+                Date = response.Date,
+                Time = response.Time,
+                SpentAmount = response.SpentAmount,
+                RRN = response.RRN,
+                TraceNo = response.TraceNo,
+                CardNo = response.CardNo,
+                CardName = response.CardName,
+                ResponseCode = response.ResponseCode,
+                Result = response.Result
+            });
+
+            // بازگشت JSON به عنوان خروجی
+            return jsonResponse;
+        }
+
         public string Fn_send_to_fanava(string amount, string ipAddress, int port)
         {
             string firstMessage = "{\"STX\":\"02\",\"Message Len\":\"0072\",\"Message ID\":\"88\",\"ETX\":\"03\",\"LRC\":\"$\"}";
@@ -679,37 +724,38 @@ namespace config_pos
 
        
         private List<string> GetDeviceInfo(string postype)
+{
+    // براساس نوع دستگاه یک آیپی و پورت برمیگردونه
+    string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+
+    if (File.Exists(configFilePath))
+    {
+        // خواندن تمام خطوط فایل config.txt
+        string[] lines = File.ReadAllLines(configFilePath);
+
+        // پردازش هر خط از فایل
+        foreach (string line in lines)
         {
-            // براساس نوع دستگاه یک آیپی و پورت برمیگردونه
-            string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+            // جدا کردن مقادیر خط با استفاده از کاما
+            string[] parts = line.Split(',');
 
-            if (File.Exists(configFilePath))
+            if (parts.Length == 6 && parts[2].Trim().ToLower() == postype.ToLower())
             {
-                // خواندن تمام خطوط فایل config.txt
-                string[] lines = File.ReadAllLines(configFilePath);
-
-                // پردازش هر خط از فایل
-                foreach (string line in lines)
-                {
-                    // جدا کردن مقادیر خط با استفاده از کاما
-                    string[] parts = line.Split(',');
-
-                    if (parts.Length >= 4 && parts[2].Trim().ToLower() == postype.ToLower())
-                    {
-                        // برگرداندن اطلاعات دستگاهی که devicename آن برابر با ورودی است
-                        return new List<string> { parts[3], parts[4] }; // parts[2]: IP, parts[3]: Port
-                    }
-                }
-
-                // اگر دستگاه پیدا نشد، لیست خالی برگردان
-                return new List<string>();
-            }
-            else
-            {
-                // اگر فایل پیدا نشد، لیست خالی برگردان
-                return new List<string>();
+                // برگرداندن اطلاعات دستگاهی که postype آن برابر با ورودی است
+                return new List<string> { parts[3], parts[4] }; // parts[3]: IP, parts[4]: Port
             }
         }
+
+        // اگر دستگاه پیدا نشد، لیست خالی برگردان
+        return new List<string>();
+    }
+    else
+    {
+        // اگر فایل پیدا نشد، لیست خالی برگردان
+        return new List<string>();
+    }
+}
+
 
         private void پیشفرضToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -838,6 +884,10 @@ namespace config_pos
                     e.Cancel = true;
                 }
             }
+        }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
         }
     }
     public class ResponseMessage

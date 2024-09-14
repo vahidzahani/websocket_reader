@@ -44,12 +44,12 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="AI_ExePath" ComponentId="{A5440FAA-03E8-404F-A4C4-F40724D933E6}" Directory_="APPDIR" Attributes="4" KeyPath="AI_ExePath"/>
     <ROW Component="APPDIR" ComponentId="{BF746B87-2EBA-4A66-817B-75C6D89144A9}" Directory_="APPDIR" Attributes="0"/>
-    <ROW Component="Commander.dll" ComponentId="{4B03F33F-F3A7-47D5-B952-F218DF27E1A3}" Directory_="APPDIR" Attributes="0" KeyPath="Commander.dll"/>
     <ROW Component="Microsoft.CSharp.dll" ComponentId="{306CE891-1FBF-4F4A-893A-24DB9B0880DD}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
     <ROW Component="Newtonsoft.Json.dll" ComponentId="{366F9B9B-B0A7-4653-AE4F-5CBB15EE6CAA}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
+    <ROW Component="OmidPayPcPos.dll" ComponentId="{C09CE224-06E0-45C3-A291-23274A43D6BF}" Directory_="APPDIR" Attributes="0" KeyPath="OmidPayPcPos.dll"/>
     <ROW Component="POS_PC.dll" ComponentId="{1F32AC45-3986-46D0-BF77-019D916027EB}" Directory_="APPDIR" Attributes="0" KeyPath="POS_PC.dll"/>
     <ROW Component="ProductInformation" ComponentId="{B9984C2B-BB95-4C05-A4D3-D0621F488DA7}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
-    <ROW Component="Protocol.dll" ComponentId="{EFF494ED-12C8-47A6-BB4E-723D863BB1DC}" Directory_="APPDIR" Attributes="0" KeyPath="Protocol.dll"/>
+    <ROW Component="RJCP.SerialPortStream.dll" ComponentId="{720D37DC-564C-4EFD-8815-702BE65B7CCF}" Directory_="APPDIR" Attributes="0" KeyPath="RJCP.SerialPortStream.dll"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{FF032F6E-DAEE-4853-8739-DFB9A67D3D93}" Directory_="SHORTCUTDIR" Attributes="0"/>
     <ROW Component="System.Configuration.Install.dll" ComponentId="{03C42287-BED1-4B48-A7DA-2838E0F15595}" Directory_="APPDIR" Attributes="0" KeyPath="System.Configuration.Install.dll"/>
     <ROW Component="System.Core.dll" ComponentId="{1DF4F70E-D83B-44ED-94D2-8F536EDA40D2}" Directory_="APPDIR" Attributes="0" KeyPath="System.Core.dll"/>
@@ -80,7 +80,6 @@
     <ROW File="System.dll" Component_="System.dll" FileName="System.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.dll" SelfReg="false"/>
     <ROW File="System.Data.DataSetExtensions.dll" Component_="System.Data.DataSetExtensions.dll" FileName="SYSTEM~1.DLL|System.Data.DataSetExtensions.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Data.DataSetExtensions.dll" SelfReg="false"/>
     <ROW File="Microsoft.CSharp.dll" Component_="Microsoft.CSharp.dll" FileName="MICROS~1.DLL|Microsoft.CSharp.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\Microsoft.CSharp.dll" SelfReg="false"/>
-    <ROW File="Protocol.dll" Component_="Protocol.dll" FileName="Protocol.dll" Attributes="0" SourcePath="..\..\dastgah\-203350272_2071371256\PC-POS Release v5.3.0.2 On 1398-12-27\Protocol.dll" SelfReg="false"/>
     <ROW File="config_pos.pdb" Component_="config_pos.pdb" FileName="CONFIG~1.PDB|config_pos.pdb" Attributes="0" SourcePath="..\config_pos\bin\Debug\config_pos.pdb" SelfReg="false"/>
     <ROW File="mscorlib.dll" Component_="mscorlib.dll" FileName="mscorlib.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\mscorlib.dll" SelfReg="false"/>
     <ROW File="Newtonsoft.Json.dll" Component_="Newtonsoft.Json.dll" FileName="NEWTON~1.DLL|Newtonsoft.Json.dll" Attributes="0" SourcePath="..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll" SelfReg="false"/>
@@ -101,7 +100,6 @@
     <ROW File="System.ServiceProcess.dll" Component_="System.ServiceProcess.dll" FileName="SYSTE~14.DLL|System.ServiceProcess.dll" Attributes="0" SourcePath="..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.ServiceProcess.dll" SelfReg="false"/>
     <ROW File="config_pos.exe" Component_="config_pos.pdb" FileName="CONFIG~1.EXE|config_pos.exe" Attributes="0" SourcePath="..\config_pos\bin\Debug\config_pos.exe" SelfReg="false" DigSign="true"/>
     <ROW File="config_pos.exe.config" Component_="config_pos.exe.config" FileName="CONFIG~1.CON|config_pos.exe.config" Attributes="0" SourcePath="..\config_pos\bin\Debug\config_pos.exe.config" SelfReg="false"/>
-    <ROW File="Commander.dll" Component_="Commander.dll" FileName="COMMAN~1.DLL|Commander.dll" Attributes="0" SourcePath="..\..\dastgah\-203350272_2071371256\PC-POS Release v5.3.0.2 On 1398-12-27\Commander.dll" SelfReg="false"/>
     <ROW File="POS_PC.dll" Component_="POS_PC.dll" FileName="POS_PC.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\POS_PC.dll" SelfReg="false"/>
     <ROW File="WebServiceLoggerPOS.exe.config" Component_="config_pos.exe.config" FileName="WEBSER~1.CON|WebServiceLoggerPOS.exe.config" Attributes="0" SourcePath="..\config_pos\bin\Debug\WebServiceLoggerPOS.exe.config" SelfReg="false"/>
     <ROW File="websocketsharp.dll" Component_="websocketsharp.dll" FileName="WEBSOC~1.DLL|websocket-sharp.dll" Attributes="0" SourcePath="..\packages\WebSocketSharp-netstandard.1.0.1\lib\net45\websocket-sharp.dll" SelfReg="false"/>
@@ -109,6 +107,8 @@
     <ROW File="configwebservice.ini" Component_="config_pos.exe.config" FileName="CONFIG~1.INI|configwebservice.ini" Attributes="0" SourcePath="..\config_pos\bin\Debug\configwebservice.ini" SelfReg="false"/>
     <ROW File="webservicehelpinstall.txt" Component_="config_pos.exe.config" FileName="WEBSER~1.TXT|webservice help install.txt" Attributes="0" SourcePath="..\config_pos\bin\Debug\webservice help install.txt" SelfReg="false"/>
     <ROW File="webservice_test.html" Component_="config_pos.exe.config" FileName="WEBSER~1.HTM|webservice_test.html" Attributes="0" SourcePath="..\config_pos\bin\Debug\webservice_test.html" SelfReg="false"/>
+    <ROW File="RJCP.SerialPortStream.dll" Component_="RJCP.SerialPortStream.dll" FileName="RJCPSE~1.DLL|RJCP.SerialPortStream.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\RJCP.SerialPortStream.dll" SelfReg="false"/>
+    <ROW File="OmidPayPcPos.dll" Component_="OmidPayPcPos.dll" FileName="OMIDPA~1.DLL|OmidPayPcPos.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\OmidPayPcPos.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="249"/>
@@ -221,7 +221,6 @@
     <ROW Feature_="MainFeature" Component_="System.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Data.DataSetExtensions.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.CSharp.dll"/>
-    <ROW Feature_="MainFeature" Component_="Protocol.dll"/>
     <ROW Feature_="MainFeature" Component_="config_pos.pdb"/>
     <ROW Feature_="MainFeature" Component_="mscorlib.dll"/>
     <ROW Feature_="MainFeature" Component_="Newtonsoft.Json.dll"/>
@@ -240,11 +239,12 @@
     <ROW Feature_="MainFeature" Component_="WebServiceLoggerPOS.exe"/>
     <ROW Feature_="MainFeature" Component_="System.ServiceProcess.dll"/>
     <ROW Feature_="MainFeature" Component_="config_pos.exe.config"/>
-    <ROW Feature_="MainFeature" Component_="Commander.dll"/>
     <ROW Feature_="MainFeature" Component_="POS_PC.dll"/>
     <ROW Feature_="MainFeature" Component_="websocketsharp.dll"/>
     <ROW Feature_="MainFeature" Component_="SHORTCUTDIR"/>
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
+    <ROW Feature_="MainFeature" Component_="RJCP.SerialPortStream.dll"/>
+    <ROW Feature_="MainFeature" Component_="OmidPayPcPos.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="SystemFoldermsiexec.exe" SourcePath="&lt;AI_RES&gt;uninstall.ico" Index="0"/>
