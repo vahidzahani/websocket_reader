@@ -86,14 +86,14 @@ namespace config_pos
             if (comboBox1.Text == "fanava")
             {
                 Form_configpos frm = new Form_configpos();
-                string res = frm.Fn_send_to_fanava(textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
+                string res = frm.Fn_send_to_POS("fanava",textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
                 MessageBox.Show(res);
 
             } else if (comboBox1.Text=="omidpay") {
 
 
                 Form_configpos frm = new Form_configpos();
-                string res = frm.Fn_send_to_omidpay(textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
+                string res = frm.Fn_send_to_POS("omidpay",textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
                 MessageBox.Show(res);
 
                 //OmidPayPcPosClass omid =new OmidPayPcPosClass();

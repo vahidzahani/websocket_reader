@@ -38,7 +38,7 @@ namespace config_pos
 
         private void button1_Click(object sender, EventArgs e)
         {
-           
+
 
         }
         public bool IsUserAdmin()
@@ -107,7 +107,35 @@ namespace config_pos
 
             return port;
         }
+        public static void CheckAndCopyDll()
+        {
+            // مسیر فایل DLL در کنار برنامه
+            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string dllFilePath = Path.Combine(currentDirectory, "RJCP.SerialPortStream.dll");
 
+            // مسیر فایل DLL در پوشه bk
+            string backupDirectory = Path.Combine(currentDirectory, "bk");
+            string backupDllFilePath = Path.Combine(backupDirectory, "RJCP.SerialPortStream.dll");
+
+            // بررسی وجود فایل DLL در کنار برنامه
+            if (!File.Exists(dllFilePath))
+            {
+                // اگر فایل در کنار برنامه نبود، از پوشه bk کپی کن
+                if (File.Exists(backupDllFilePath))
+                {
+                    File.Copy(backupDllFilePath, dllFilePath);
+                    //Console.WriteLine("فایل RJCP.SerialPortStream.dll از پوشه bk کپی شد.");
+                }
+                else
+                {
+                    //Console.WriteLine("فایل RJCP.SerialPortStream.dll در پوشه bk یافت نشد.");
+                }
+            }
+            else
+            {
+                //Console.WriteLine("فایل RJCP.SerialPortStream.dll در کنار برنامه وجود دارد.");
+            }
+        }
 
         private void Form_configpos_Load(object sender, EventArgs e)
         {
@@ -115,19 +143,20 @@ namespace config_pos
 
             servicePort = ReadPortFromConfig();
             textBox1.Text = servicePort.ToString();
-           
+            CheckAndCopyDll();
             string[] args = Environment.GetCommandLineArgs();
-            
+
             if (args.Length > 1)
             {
-                if (args[1] == "getAllDevices") {
+                if (args[1] == "getAllDevices")
+                {
 
-                    // مسیر فایل config.txt که در کنار برنامه قرار دارد
-                    string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+                    // مسیر فایل config.dat که در کنار برنامه قرار دارد
+                    string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.dat");
 
                     if (File.Exists(configFilePath))
                     {
-                        // خواندن تمام خطوط فایل config.txt
+                        // خواندن تمام خطوط فایل config.dat
                         var lines = File.ReadAllLines(configFilePath);
 
                         // لیستی برای ذخیره اطلاعات JSON
@@ -143,7 +172,7 @@ namespace config_pos
                                 // اضافه کردن هر دستگاه به لیست
                                 devices.Add(new
                                 {
-                                    id=parts[0],
+                                    id = parts[0],
                                     devicename = parts[1],
                                     postype = parts[2],
                                     ip = parts[3],
@@ -164,32 +193,27 @@ namespace config_pos
                     }
 
                 }
-                if (args[1] == "fanava")//wan sie sprichen postype name
+                if (args[1] == "sendToPos")
                 {
-                    List<string> deviceInfo = GetDeviceInfo("fanava");
+                    string amount = args[3];
+                    string id = args[2];
+
+                    List<string> deviceInfo = GetDeviceInfo(id);
+                    //List<string> deviceInfo = GetDeviceInfo("fanava");
                     if (deviceInfo.Count > 0)
                     {
-                        string ip = deviceInfo[0];
-                        string port = deviceInfo[1];
-                        string resJsonString = Fn_send_to_fanava(args[2], ip, int.Parse(port));
+                        string ip = deviceInfo[1];
+                        string port = deviceInfo[2];
                         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
-                        File.WriteAllText(filePath, resJsonString);
-                    }
-                    else
-                    {
-                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
-                        File.WriteAllText(filePath, "\"Error\":\"Failed to get a valid response from the server.\"");
-                    }
-                }
-                if (args[1] == "omidpay")//wan sie sprichen postype name
-                {
-                    List<string> deviceInfo = GetDeviceInfo("omidpay");
-                    if (deviceInfo.Count > 0)
-                    {
-                        string ip = deviceInfo[0];
-                        string port = deviceInfo[1];
-                        string resJsonString = Fn_send_to_omidpay(args[2], ip, int.Parse(port));
-                        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        string resJsonString = "";
+                        if (deviceInfo[0] == "fanava")
+                        {
+                            resJsonString = Fn_send_to_POS("fanava", amount, ip, int.Parse(port));
+                        }
+                        if (deviceInfo[0] == "omidpay")
+                        {
+                            resJsonString = Fn_send_to_POS("omidpay", amount, ip, int.Parse(port));
+                        }
                         File.WriteAllText(filePath, resJsonString);
                     }
                     else
@@ -205,7 +229,7 @@ namespace config_pos
             //this.Text += $" ver : {Application.ProductVersion} ";
             if (IsUserAdmin() == true)
             {
-                this.Text+=" : Administrator";
+                this.Text += " : Administrator";
             }
             else
             {
@@ -217,7 +241,7 @@ namespace config_pos
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
+
         }
         public void InstallService(string executablePath, string serviceName)
         {
@@ -368,7 +392,7 @@ namespace config_pos
                 listView1.SmallImageList = imageList1;
 
                 // مسیر فایل را مشخص کنید
-                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.dat");
 
                 // بررسی وجود فایل
                 if (File.Exists(filePath))
@@ -415,7 +439,7 @@ namespace config_pos
                 }
                 else
                 {
-                    MessageBox.Show("فایل config.txt یافت نشد.", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show("فایل config.dat یافت نشد.", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
@@ -437,7 +461,7 @@ namespace config_pos
             Form_config frm = new Form_config();
             //save data
             frm.ShowDialog();
-            
+
             if (frm.pos_name != null)
             {
 
@@ -471,7 +495,7 @@ namespace config_pos
             try
             {
                 // باز کردن یک فایل برای نوشتن
-                using (StreamWriter writer = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ,"config.txt")))
+                using (StreamWriter writer = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.dat")))
                 {
                     // پیمایش تمام سطرهای ListView و نوشتن هر سطر به فایل
                     foreach (ListViewItem item in listView1.Items)
@@ -483,7 +507,7 @@ namespace config_pos
                             if (i < item.SubItems.Count - 1)
                                 writer.Write(","); // اضافه کردن فاصله بین ستون‌ها
                         }
-                        if(item.Index==posDefaultIndex)
+                        if (item.Index == posDefaultIndex)
                             writer.Write(",1"); // اضافه کردن برای پیش فرض
                         else
                             writer.Write(",0"); // اضافه کردن برای پیش فرض
@@ -501,7 +525,7 @@ namespace config_pos
             }
         }
 
-        
+
 
         private void button5_Click(object sender, EventArgs e)
         {
@@ -511,10 +535,10 @@ namespace config_pos
         {
             if (listView1.SelectedItems.Count > 0)
             {
-                Form_config frm =new Form_config();
+                Form_config frm = new Form_config();
                 frm.editdata = true;
                 ListViewItem item = listView1.SelectedItems[0];
-           
+
                 frm.pos_name = item.SubItems[1].Text;
                 frm.pos_model = item.SubItems[2].Text;
                 frm.pos_ip = item.SubItems[3].Text;
@@ -537,7 +561,7 @@ namespace config_pos
 
         private void button6_Click(object sender, EventArgs e)
         {
-            if(listView1.SelectedIndices.Count > 0)
+            if (listView1.SelectedIndices.Count > 0)
             {
 
                 listView1.Items[listView1.SelectedIndices[0]].Remove();
@@ -546,9 +570,9 @@ namespace config_pos
             }
         }
 
-       
 
-       
+
+
 
         public static void SendTextToTcpPort(string textToSend, string IP, int port)
         {
@@ -613,108 +637,139 @@ namespace config_pos
             return jsonResponse;
         }
 
-        public string Fn_send_to_fanava(string amount, string ipAddress, int port)
+        public string Fn_send_to_POS(string postype, string amount, string ipAddress, int port)
         {
-            string firstMessage = "{\"STX\":\"02\",\"Message Len\":\"0072\",\"Message ID\":\"88\",\"ETX\":\"03\",\"LRC\":\"$\"}";
-            byte[] firstData = Encoding.ASCII.GetBytes(firstMessage);
-            string secondMessage = $"{{\"STX\":\"02\",\"Message Len\":\"0393\",\"Message ID\":\"89\",\"Request Type\":\"01\",\"Processing Code\":\"000000\",\"Code Page\":\"01\",\"Print Type\":\"02\",\"Service Code\":\"01\",\"Spent Amount\":\"{amount}\",\"Discount Amount\":\"\",\"Invoice Count\":\"\",\"Invoice No\":\"\",\"Bill ID\":\"\",\"Payment ID\":\"\",\"Tel\":\"\",\"National ID\":\"\",\"Name\":\"\",\"Acc NO\":\"\",\"Charge ID\":\"41\",\"Other\":\"\",\"Print Description\":\"F1=,F2=10000,\",\"ETX\":\"03\",\"LRC\":\"$\"}}";
-            byte[] secondData = Encoding.ASCII.GetBytes(secondMessage);
-            byte[] ackData = new byte[] { 0x06 };  // ASCII code for ACK is \u0006
-
-            try
+            if (postype == "omidpay")
             {
-                using (TcpClient client = new TcpClient(ipAddress, port))
+                // ایجاد یک نمونه از کلاس OmidPayPcPosClass
+                OmidPayPcPosClass omid = new OmidPayPcPosClass();
+
+                // فراخوانی تابع DoTcpTransaction و دریافت پاسخ
+                ResponseJson response = omid.DoTcpTransaction(ipAddress, port, amount);
+
+                // تبدیل شیء response به رشته JSON
+                string jsonResponse = JsonConvert.SerializeObject(new
                 {
-                    NetworkStream stream = client.GetStream();
-                    stream.Write(firstData, 0, firstData.Length);
+                    TermNo = response.TermNo,
+                    Date = response.Date,
+                    Time = response.Time,
+                    SpentAmount = response.SpentAmount,
+                    RRN = response.RRN,
+                    TraceNo = response.TraceNo,
+                    CardNo = response.CardNo,
+                    CardName = response.CardName,
+                    ResponseCode = response.ResponseCode,
+                    Result = response.Result
+                });
 
-                    byte[] responseData = new byte[256];
-                    int bytes = stream.Read(responseData, 0, responseData.Length);
-                    string responseMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
+                // بازگشت JSON به عنوان خروجی
+                return jsonResponse;
+            }
 
-                    if (responseMessage == "\u0006")
+            if (postype == "fanava")
+            {
+
+                string firstMessage = "{\"STX\":\"02\",\"Message Len\":\"0072\",\"Message ID\":\"88\",\"ETX\":\"03\",\"LRC\":\"$\"}";
+                byte[] firstData = Encoding.ASCII.GetBytes(firstMessage);
+                string secondMessage = $"{{\"STX\":\"02\",\"Message Len\":\"0393\",\"Message ID\":\"89\",\"Request Type\":\"01\",\"Processing Code\":\"000000\",\"Code Page\":\"01\",\"Print Type\":\"02\",\"Service Code\":\"01\",\"Spent Amount\":\"{amount}\",\"Discount Amount\":\"\",\"Invoice Count\":\"\",\"Invoice No\":\"\",\"Bill ID\":\"\",\"Payment ID\":\"\",\"Tel\":\"\",\"National ID\":\"\",\"Name\":\"\",\"Acc NO\":\"\",\"Charge ID\":\"41\",\"Other\":\"\",\"Print Description\":\"F1=,F2=10000,\",\"ETX\":\"03\",\"LRC\":\"$\"}}";
+                byte[] secondData = Encoding.ASCII.GetBytes(secondMessage);
+                byte[] ackData = new byte[] { 0x06 };  // ASCII code for ACK is \u0006
+
+                try
+                {
+                    using (TcpClient client = new TcpClient(ipAddress, port))
                     {
-                        stream.Write(secondData, 0, secondData.Length);
-                        bytes = stream.Read(responseData, 0, responseData.Length);
-                        string responseMessage2 = Encoding.ASCII.GetString(responseData, 0, bytes);
+                        NetworkStream stream = client.GetStream();
+                        stream.Write(firstData, 0, firstData.Length);
 
-                        if (responseMessage2 == "\u0006")
+                        byte[] responseData = new byte[256];
+                        int bytes = stream.Read(responseData, 0, responseData.Length);
+                        string responseMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
+
+                        if (responseMessage == "\u0006")
                         {
-                            string completeMessage = "";
-                            bool messageComplete = false;
+                            stream.Write(secondData, 0, secondData.Length);
+                            bytes = stream.Read(responseData, 0, responseData.Length);
+                            string responseMessage2 = Encoding.ASCII.GetString(responseData, 0, bytes);
 
-                            while (!messageComplete)
+                            if (responseMessage2 == "\u0006")
                             {
-                                bytes = stream.Read(responseData, 0, responseData.Length);
-                                string partMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
-                                completeMessage += partMessage;
+                                string completeMessage = "";
+                                bool messageComplete = false;
 
-                                if (completeMessage.Contains("\u0003"))
+                                while (!messageComplete)
                                 {
-                                    messageComplete = true;
+                                    bytes = stream.Read(responseData, 0, responseData.Length);
+                                    string partMessage = Encoding.ASCII.GetString(responseData, 0, bytes);
+                                    completeMessage += partMessage;
+
+                                    if (completeMessage.Contains("\u0003"))
+                                    {
+                                        messageComplete = true;
+                                    }
                                 }
+
+                                // پردازش کاراکترهای کنترلی
+                                completeMessage = completeMessage.Replace("\u0015", "")
+                                                                 .Replace("\u0002", "")
+                                                                 .Replace("\u0003", "")
+                                                                 .Replace("\u0000", "");
+
+                                // اصلاح نام‌های کلید برای مطابقت با خواص کلاس
+                                completeMessage = completeMessage.Replace("Message Len", "MessageLen")
+                                                                 .Replace("Message ID", "MessageID")
+                                                                 .Replace("Processing Code", "ProcessingCode")
+                                                                 .Replace("Term No", "TermNo")
+                                                                 .Replace("Merchant No", "MerchantNo")
+                                                                 .Replace("Spent Amount", "SpentAmount")
+                                                                 .Replace("Response Code", "ResponseCode")
+                                                                 .Replace("Card No", "CardNo")
+                                                                 .Replace("Card Name", "CardName")
+                                                                 .Replace("Response Desc", "ResponseDesc")
+                                                                 .Replace("Used Discount", "UsedDiscount")
+                                                                 .Replace("Used Wage", "UsedWage")
+                                                                 .Replace("Used Loyality", "UsedLoyality")
+                                                                 .Replace("Discount Amount", "DiscountAmount")
+                                                                 .Replace("Tip Amount", "TipAmount")
+                                                                 .Replace("Charge ID", "ChargeID")
+                                                                 .Replace("Charge Serial", "ChargeSerial");
+
+                                // تبدیل JSON به شیء
+                                ResponseMessage parsedResponseMessage = JsonConvert.DeserializeObject<ResponseMessage>(completeMessage);
+                                if (parsedResponseMessage.ResponseDesc == "Swipe Card Fail")
+                                    parsedResponseMessage.ResponseDesc = "کارت کشیده نشد";
+                                if (parsedResponseMessage.ResponseCode == "00")
+                                    parsedResponseMessage.ResponseDesc = "عملیات موفق";
+
+                                // ساختن JSON با اطلاعات برگشتی
+                                var responseObject = new
+                                {
+                                    parsedResponseMessage.TermNo,
+                                    parsedResponseMessage.Date,
+                                    parsedResponseMessage.Time,
+                                    parsedResponseMessage.SpentAmount,
+                                    parsedResponseMessage.RRN,
+                                    parsedResponseMessage.TraceNo,
+                                    parsedResponseMessage.CardNo,
+                                    parsedResponseMessage.CardName,
+                                    parsedResponseMessage.ResponseCode,
+                                    parsedResponseMessage.ResponseDesc
+                                };
+
+                                // تبدیل به JSON
+                                string jsonResponse = JsonConvert.SerializeObject(responseObject);
+
+                                // بازگشت JSON به عنوان خروجی
+                                return jsonResponse;
                             }
-
-                            // پردازش کاراکترهای کنترلی
-                            completeMessage = completeMessage.Replace("\u0015", "")
-                                                             .Replace("\u0002", "")
-                                                             .Replace("\u0003", "")
-                                                             .Replace("\u0000", "");
-
-                            // اصلاح نام‌های کلید برای مطابقت با خواص کلاس
-                            completeMessage = completeMessage.Replace("Message Len", "MessageLen")
-                                                             .Replace("Message ID", "MessageID")
-                                                             .Replace("Processing Code", "ProcessingCode")
-                                                             .Replace("Term No", "TermNo")
-                                                             .Replace("Merchant No", "MerchantNo")
-                                                             .Replace("Spent Amount", "SpentAmount")
-                                                             .Replace("Response Code", "ResponseCode")
-                                                             .Replace("Card No", "CardNo")
-                                                             .Replace("Card Name", "CardName")
-                                                             .Replace("Response Desc", "ResponseDesc")
-                                                             .Replace("Used Discount", "UsedDiscount")
-                                                             .Replace("Used Wage", "UsedWage")
-                                                             .Replace("Used Loyality", "UsedLoyality")
-                                                             .Replace("Discount Amount", "DiscountAmount")
-                                                             .Replace("Tip Amount", "TipAmount")
-                                                             .Replace("Charge ID", "ChargeID")
-                                                             .Replace("Charge Serial", "ChargeSerial");
-
-                            // تبدیل JSON به شیء
-                            ResponseMessage parsedResponseMessage = JsonConvert.DeserializeObject<ResponseMessage>(completeMessage);
-                            if (parsedResponseMessage.ResponseDesc == "Swipe Card Fail")
-                                parsedResponseMessage.ResponseDesc = "کارت کشیده نشد";
-                            if (parsedResponseMessage.ResponseCode == "00")
-                                parsedResponseMessage.ResponseDesc = "عملیات موفق";
-
-                            // ساختن JSON با اطلاعات برگشتی
-                            var responseObject = new
-                            {
-                                parsedResponseMessage.TermNo,
-                                parsedResponseMessage.Date,
-                                parsedResponseMessage.Time,
-                                parsedResponseMessage.SpentAmount,
-                                parsedResponseMessage.RRN,
-                                parsedResponseMessage.TraceNo,
-                                parsedResponseMessage.CardNo,
-                                parsedResponseMessage.CardName,
-                                parsedResponseMessage.ResponseCode,
-                                parsedResponseMessage.ResponseDesc
-                            };
-
-                            // تبدیل به JSON
-                            string jsonResponse = JsonConvert.SerializeObject(responseObject);
-
-                            // بازگشت JSON به عنوان خروجی
-                            return jsonResponse;
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                // نمایش پیام خطا در صورت بروز مشکل در ارتباط با دستگاه
-                MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                catch (Exception ex)
+                {
+                    // نمایش پیام خطا در صورت بروز مشکل در ارتباط با دستگاه
+                    MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
 
 
@@ -722,39 +777,40 @@ namespace config_pos
             return "{\"Error\":\"Failed to get a valid response from the server.\"}";
         }
 
-       
-        private List<string> GetDeviceInfo(string postype)
-{
-    // براساس نوع دستگاه یک آیپی و پورت برمیگردونه
-    string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
 
-    if (File.Exists(configFilePath))
-    {
-        // خواندن تمام خطوط فایل config.txt
-        string[] lines = File.ReadAllLines(configFilePath);
-
-        // پردازش هر خط از فایل
-        foreach (string line in lines)
+        private List<string> GetDeviceInfo(string id)
         {
-            // جدا کردن مقادیر خط با استفاده از کاما
-            string[] parts = line.Split(',');
+            // براساس نوع دستگاه یک آیپی و پورت برمیگردونه
+            string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.dat");
 
-            if (parts.Length == 6 && parts[2].Trim().ToLower() == postype.ToLower())
+            if (File.Exists(configFilePath))
             {
-                // برگرداندن اطلاعات دستگاهی که postype آن برابر با ورودی است
-                return new List<string> { parts[3], parts[4] }; // parts[3]: IP, parts[4]: Port
+                // خواندن تمام خطوط فایل config.dat
+                string[] lines = File.ReadAllLines(configFilePath);
+
+                // پردازش هر خط از فایل
+                foreach (string line in lines)
+                {
+                    // جدا کردن مقادیر خط با استفاده از کاما
+                    string[] parts = line.Split(',');
+
+                    //if (parts.Length == 6 && parts[0].Trim() == id)
+                    if (parts[0].Trim() == id)
+                    {
+                        // برگرداندن اطلاعات دستگاهی که postype آن برابر با ورودی است
+                        return new List<string> { parts[2], parts[3], parts[4] }; // parts[3]: IP, parts[4]: Port
+                    }
+                }
+
+                // اگر دستگاه پیدا نشد، لیست خالی برگردان
+                return new List<string>();
+            }
+            else
+            {
+                // اگر فایل پیدا نشد، لیست خالی برگردان
+                return new List<string>();
             }
         }
-
-        // اگر دستگاه پیدا نشد، لیست خالی برگردان
-        return new List<string>();
-    }
-    else
-    {
-        // اگر فایل پیدا نشد، لیست خالی برگردان
-        return new List<string>();
-    }
-}
 
 
         private void پیشفرضToolStripMenuItem_Click(object sender, EventArgs e)
@@ -796,7 +852,7 @@ namespace config_pos
             listView1_DoubleClick(sender, e);
 
         }
-       
+
         private void button2_Click_1(object sender, EventArgs e)
         {
         }
@@ -809,14 +865,14 @@ namespace config_pos
 
         private void label4_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void button2_Click_2(object sender, EventArgs e)
         {
-            if(!IsUserAdmin())
+            if (!IsUserAdmin())
             {
-                MessageBox.Show("برای تغییر پورت نیاز به دسترسی ادمین به برنامه را دارید", "دسترسی ادمین") ;
+                MessageBox.Show("برای تغییر پورت نیاز به دسترسی ادمین به برنامه را دارید", "دسترسی ادمین");
                 return;
             }
             try
@@ -875,20 +931,17 @@ namespace config_pos
             {
                 DialogResult result = MessageBox.Show("تغییرات را ذخیره کنم ؟", "تأیید بستن", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
-                    {
-                        button1_Click_1(sender, e);
-                        //e.Cancel = true;
-                    }
-                else if(result == DialogResult.Cancel)
+                {
+                    button1_Click_1(sender, e);
+                    //e.Cancel = true;
+                }
+                else if (result == DialogResult.Cancel)
                 {
                     e.Cancel = true;
                 }
             }
         }
 
-        private void button5_Click_1(object sender, EventArgs e)
-        {
-        }
     }
     public class ResponseMessage
     {

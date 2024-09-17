@@ -36,6 +36,7 @@
     <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
     <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="bk_Dir" Directory_Parent="APPDIR" DefaultDir="bk"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SideBySideGuidComponent">
     <ROW Component="APPDIR" Value="{BF746B87-2EBA-4A66-817B-75C6D89144A9}"/>
@@ -50,6 +51,7 @@
     <ROW Component="POS_PC.dll" ComponentId="{1F32AC45-3986-46D0-BF77-019D916027EB}" Directory_="APPDIR" Attributes="0" KeyPath="POS_PC.dll"/>
     <ROW Component="ProductInformation" ComponentId="{B9984C2B-BB95-4C05-A4D3-D0621F488DA7}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
     <ROW Component="RJCP.SerialPortStream.dll" ComponentId="{720D37DC-564C-4EFD-8815-702BE65B7CCF}" Directory_="APPDIR" Attributes="0" KeyPath="RJCP.SerialPortStream.dll"/>
+    <ROW Component="RJCP.SerialPortStream.dll_1" ComponentId="{87E40739-8D45-4362-97D8-12ED0EC658BA}" Directory_="bk_Dir" Attributes="0" KeyPath="RJCP.SerialPortStream.dll_1"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{FF032F6E-DAEE-4853-8739-DFB9A67D3D93}" Directory_="SHORTCUTDIR" Attributes="0"/>
     <ROW Component="System.Configuration.Install.dll" ComponentId="{03C42287-BED1-4B48-A7DA-2838E0F15595}" Directory_="APPDIR" Attributes="0" KeyPath="System.Configuration.Install.dll"/>
     <ROW Component="System.Core.dll" ComponentId="{1DF4F70E-D83B-44ED-94D2-8F536EDA40D2}" Directory_="APPDIR" Attributes="0" KeyPath="System.Core.dll"/>
@@ -105,10 +107,10 @@
     <ROW File="websocketsharp.dll" Component_="websocketsharp.dll" FileName="WEBSOC~1.DLL|websocket-sharp.dll" Attributes="0" SourcePath="..\packages\WebSocketSharp-netstandard.1.0.1\lib\net45\websocket-sharp.dll" SelfReg="false"/>
     <ROW File="WebServiceLoggerPOS.pdb" Component_="WebServiceLoggerPOS.exe" FileName="WEBSER~1.PDB|WebServiceLoggerPOS.pdb" Attributes="0" SourcePath="..\config_pos\bin\Debug\WebServiceLoggerPOS.pdb" SelfReg="false"/>
     <ROW File="configwebservice.ini" Component_="config_pos.exe.config" FileName="CONFIG~1.INI|configwebservice.ini" Attributes="0" SourcePath="..\config_pos\bin\Debug\configwebservice.ini" SelfReg="false"/>
-    <ROW File="webservicehelpinstall.txt" Component_="config_pos.exe.config" FileName="WEBSER~1.TXT|webservice help install.txt" Attributes="0" SourcePath="..\config_pos\bin\Debug\webservice help install.txt" SelfReg="false"/>
-    <ROW File="webservice_test.html" Component_="config_pos.exe.config" FileName="WEBSER~1.HTM|webservice_test.html" Attributes="0" SourcePath="..\config_pos\bin\Debug\webservice_test.html" SelfReg="false"/>
-    <ROW File="RJCP.SerialPortStream.dll" Component_="RJCP.SerialPortStream.dll" FileName="RJCPSE~1.DLL|RJCP.SerialPortStream.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\RJCP.SerialPortStream.dll" SelfReg="false"/>
+    <ROW File="RJCP.SerialPortStream.dll" Component_="RJCP.SerialPortStream.dll" FileName="RJCPSE~1.DLL|RJCP.SerialPortStream.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\others\RJCP.SerialPortStream.dll" SelfReg="false"/>
     <ROW File="OmidPayPcPos.dll" Component_="OmidPayPcPos.dll" FileName="OMIDPA~1.DLL|OmidPayPcPos.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\OmidPayPcPos.dll" SelfReg="false"/>
+    <ROW File="webservice_test.html" Component_="config_pos.exe.config" FileName="WEBSER~1.HTM|webservice_test.html" Attributes="0" SourcePath="..\config_pos\bin\Debug\webservice_test.html" SelfReg="false"/>
+    <ROW File="RJCP.SerialPortStream.dll_1" Component_="RJCP.SerialPortStream.dll_1" FileName="RJCPSE~1.DLL|RJCP.SerialPortStream.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\others\RJCP.SerialPortStream.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="249"/>
@@ -245,6 +247,7 @@
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
     <ROW Feature_="MainFeature" Component_="RJCP.SerialPortStream.dll"/>
     <ROW Feature_="MainFeature" Component_="OmidPayPcPos.dll"/>
+    <ROW Feature_="MainFeature" Component_="RJCP.SerialPortStream.dll_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="SystemFoldermsiexec.exe" SourcePath="&lt;AI_RES&gt;uninstall.ico" Index="0"/>

@@ -7,6 +7,8 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace WebServiceLogger
 {
@@ -65,8 +67,8 @@ namespace WebServiceLogger
                 HttpListenerContext context = listener.GetContext();
                 HttpListenerRequest request = context.Request;
                 IPServer = ExtractAddress(request.Url.ToString());
-                LogToFile("URL",IPServer);
-               
+                LogToFile("URL", IPServer);
+
                 if (request.HttpMethod == "OPTIONS")
                 {
                     HandleOptionsRequest(context);
@@ -145,22 +147,13 @@ namespace WebServiceLogger
                 // اجرای فایل config_pos.exe
                 ExecuteExternalProcess(arguments);
 
-                // مسیر فایل response.json که باید وجود داشته باشد
-                string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
 
-                if (File.Exists(responseFilePath))
-                {
-                    // خواندن محتوای فایل response.json
-                    string jsonResponse = File.ReadAllText(responseFilePath);
 
-                    // ارسال JSON به کلاینت
-                    ServeJsonResponse(context, jsonResponse);
-                }
-                else
-                {
-                    // در صورتی که فایل response.json وجود نداشته باشد، خطا ارسال می‌شود
-                    ServeSimpleResponse(context, "Error: response.json file not found.");
-                }
+
+                HandleResponse(context);
+
+
+
             }
             else
             {
@@ -177,17 +170,37 @@ namespace WebServiceLogger
 
             }
         }
+        public void HandleResponse(HttpListenerContext context)
+        {
+            string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+            Response responseObject = new Response();
+            if (File.Exists(responseFilePath))
+            {
+                string jsonResponse = File.ReadAllText(responseFilePath);
+                var responseData = JsonConvert.DeserializeObject<List<dynamic>>(jsonResponse);
+                responseObject.response_code = 200; // موفقیت
+                responseObject.response_data = responseData; // آرایه بازگردانده می‌شود
+            }
+            else
+            {
+                responseObject.response_code = 404; // خطا
+                responseObject.response_data = "هیچ دستگاهی ثبت نشده است"; // رشته در حالت خطا
+            }
+            string jsonResponseOutput = JsonConvert.SerializeObject(responseObject, Formatting.Indented);
+            ServeJsonResponse(context, jsonResponseOutput);
+        }
+
 
 
         private string BuildArguments(JObject jsonObject)
         {
-            string postype = jsonObject["postype"].ToString();
+            string id = jsonObject["id"].ToString();
             string amount = jsonObject["amount"].ToString();
             string batchnr = jsonObject["batchnr"].ToString();
             string sanadyear = jsonObject["sanadyear"].ToString();
             string sandoghnr = jsonObject["sandoghnr"].ToString();
 
-            return $"\"{postype}\" \"{amount}\" \"{batchnr}\" \"{sanadyear}\" \"{sandoghnr}\"";
+            return $"sendToPos \"{id}\" \"{amount}\" \"{batchnr}\" \"{sanadyear}\" \"{sandoghnr}\"";
         }
 
         private string ExecuteExternalProcess(string arguments)
@@ -326,4 +339,10 @@ namespace WebServiceLogger
             listenerThread.Abort();
         }
     }
+    public class Response
+    {
+        public int response_code { get; set; }
+        public object response_data { get; set; }
+    }
+
 }
