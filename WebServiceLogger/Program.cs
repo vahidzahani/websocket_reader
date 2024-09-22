@@ -4,6 +4,8 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
+
 
 namespace WebServiceLogger
 {
@@ -22,4 +24,7 @@ namespace WebServiceLogger
             ServiceBase.Run(ServicesToRun);
         }
     }
+
+
+
 }

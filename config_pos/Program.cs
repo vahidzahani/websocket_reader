@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace config_pos
@@ -23,5 +22,57 @@ namespace config_pos
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form_configpos());
         }
+    }
+    public class DateConverter
+    {
+
+        public static string ConvertToPersianDate(string dateString)
+        {
+            dateString = dateString.Trim();
+            DateTime gregorianDate;
+            try
+            {
+                gregorianDate = DateTime.Parse(dateString);
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException("INVALIDDATE");
+            }
+            PersianCalendar persianCalendar = new PersianCalendar();
+            int persianYear = persianCalendar.GetYear(gregorianDate);
+            int persianMonth = persianCalendar.GetMonth(gregorianDate);
+            int persianDay = persianCalendar.GetDayOfMonth(gregorianDate);
+            return $"{persianYear:D4}{persianMonth:D2}{persianDay:D2}";
+        }
+        public static string ConvertToFormattedTime(string timeString)
+        {
+            // تلاش برای پارس کردن رشته زمان
+            try
+            {
+                // جدا کردن ساعت، دقیقه و ثانیه
+                string[] timeParts = timeString.Split(':');
+
+                if (timeParts.Length != 3)
+                {
+                    throw new ArgumentException("INVALIDTIMEFORMAT");
+                }
+
+                // جدا کردن ثانیه و اعشار ثانیه
+                string[] secondParts = timeParts[2].Split('.');
+
+                // اگر ثانیه ها عدد اعشاری ندارند، فقط ثانیه را برمی‌داریم
+                string seconds = secondParts[0];
+
+                // قالب‌بندی و بازگرداندن ساعت، دقیقه و ثانیه به صورت دو رقمی
+                return $"{int.Parse(timeParts[0]):D2}:{int.Parse(timeParts[1]):D2}:{int.Parse(seconds):D2}";
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException("INVALIDTIMEFORMAT");
+            }
+        }
+
+
+
     }
 }

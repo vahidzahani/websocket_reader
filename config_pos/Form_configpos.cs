@@ -1,27 +1,15 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Windows.Forms;
-
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Text;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using Microsoft.Win32;
-using POS_PC_v3;
-using System.IO;
-using System.Security.Principal;
-using Newtonsoft.Json;
-using Commander.Bean;
-using Commander;
+﻿using Newtonsoft.Json;
 using OmidPayPcPos;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net.Sockets;
+using System.Security.Principal;
+using System.ServiceProcess;
+using System.Text;
+using System.Windows.Forms;
 
 namespace config_pos
 {
@@ -651,16 +639,17 @@ namespace config_pos
                 string jsonResponse = JsonConvert.SerializeObject(new
                 {
                     TermNo = response.TermNo,
-                    Date = response.Date,
-                    Time = response.Time,
+                    Date = DateConverter.ConvertToPersianDate(response.Date),
+                    Time = DateConverter.ConvertToFormattedTime(response.Time),
                     SpentAmount = response.SpentAmount,
                     RRN = response.RRN,
                     TraceNo = response.TraceNo,
                     CardNo = response.CardNo,
                     CardName = response.CardName,
-                    ResponseCode = response.ResponseCode,
+                    ResponseCode = response.ResponseCode == "00" ? "200" : response.ResponseCode,
                     Result = response.Result
                 });
+
 
                 // بازگشت JSON به عنوان خروجی
                 return jsonResponse;
@@ -745,14 +734,14 @@ namespace config_pos
                                 var responseObject = new
                                 {
                                     parsedResponseMessage.TermNo,
-                                    parsedResponseMessage.Date,
-                                    parsedResponseMessage.Time,
+                                    Date = DateConverter.ConvertToPersianDate(parsedResponseMessage.Date),
+                                    Time=DateConverter.ConvertToFormattedTime(parsedResponseMessage.Time),
                                     parsedResponseMessage.SpentAmount,
                                     parsedResponseMessage.RRN,
                                     parsedResponseMessage.TraceNo,
                                     parsedResponseMessage.CardNo,
                                     parsedResponseMessage.CardName,
-                                    parsedResponseMessage.ResponseCode,
+                                    ResponseCode=parsedResponseMessage.ResponseCode=="00"?"200":parsedResponseMessage.ResponseCode,
                                     parsedResponseMessage.ResponseDesc
                                 };
 

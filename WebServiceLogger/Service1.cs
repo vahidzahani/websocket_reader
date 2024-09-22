@@ -157,13 +157,16 @@ namespace WebServiceLogger
             }
             else
             {
+                //string inputDate = "2024/06/25";
+                //string inputDate = "9/22/2024 ";
+                //string persianDate = DateConverter.ConvertToPersianDate(inputDate);
                 string htmlMessage = @"
                                         <html>
                                         <head><title>Service Status</title></head>
                                         <body>
                                             <p>Service is running. <a href='/test'>/test</a> | <a href='/devices'>/devices</a></p>
                                         </body>
-                                        </html>";
+                                        </html>" /*+ persianDate*/;
 
                 // ارسال پاسخ
                 ServeSimpleResponse(context, htmlMessage);
@@ -172,22 +175,30 @@ namespace WebServiceLogger
         }
         public void HandleResponse(HttpListenerContext context)
         {
-            string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
-            Response responseObject = new Response();
-            if (File.Exists(responseFilePath))
+            try
             {
-                string jsonResponse = File.ReadAllText(responseFilePath);
-                var responseData = JsonConvert.DeserializeObject<List<dynamic>>(jsonResponse);
-                responseObject.response_code = 200; // موفقیت
-                responseObject.response_data = responseData; // آرایه بازگردانده می‌شود
+                string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                Response responseObject = new Response();
+                if (File.Exists(responseFilePath))
+                {
+                    string jsonResponse = File.ReadAllText(responseFilePath);
+                    var responseData = JsonConvert.DeserializeObject<List<dynamic>>(jsonResponse);
+                    responseObject.response_code = 200; // موفقیت
+                    responseObject.response_data = responseData; // آرایه بازگردانده می‌شود
+                }
+                else
+                {
+                    responseObject.response_code = 404; // خطا
+                    responseObject.response_data = "هیچ دستگاهی ثبت نشده است"; // رشته در حالت خطا
+                }
+                string jsonResponseOutput = JsonConvert.SerializeObject(responseObject, Formatting.Indented);
+                ServeJsonResponse(context, jsonResponseOutput);
             }
-            else
+            catch (Exception)
             {
-                responseObject.response_code = 404; // خطا
-                responseObject.response_data = "هیچ دستگاهی ثبت نشده است"; // رشته در حالت خطا
+
+                throw;
             }
-            string jsonResponseOutput = JsonConvert.SerializeObject(responseObject, Formatting.Indented);
-            ServeJsonResponse(context, jsonResponseOutput);
         }
 
 
