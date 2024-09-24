@@ -629,30 +629,33 @@ namespace config_pos
         {
             if (postype == "omidpay")
             {
-                // ایجاد یک نمونه از کلاس OmidPayPcPosClass
-                OmidPayPcPosClass omid = new OmidPayPcPosClass();
-
-                // فراخوانی تابع DoTcpTransaction و دریافت پاسخ
-                ResponseJson response = omid.DoTcpTransaction(ipAddress, port, amount);
-
-                // تبدیل شیء response به رشته JSON
-                string jsonResponse = JsonConvert.SerializeObject(new
+                try
                 {
-                    TermNo = response.TermNo,
-                    Date = DateConverter.ConvertToPersianDate(response.Date),
-                    Time = DateConverter.ConvertToFormattedTime(response.Time),
-                    SpentAmount = response.SpentAmount,
-                    RRN = response.RRN,
-                    TraceNo = response.TraceNo,
-                    CardNo = response.CardNo,
-                    CardName = response.CardName,
-                    ResponseCode = response.ResponseCode == "00" ? "200" : response.ResponseCode,
-                    Result = response.Result
-                });
-
+                    OmidPayPcPosClass omid = new OmidPayPcPosClass();
+                    ResponseJson response = omid.DoTcpTransaction(ipAddress, port, amount);
+                    string jsonResponse = JsonConvert.SerializeObject(new
+                    {
+                        TermNo = response.TermNo,
+                        Date = DateConverter.ConvertToPersianDate(response.Date),
+                        Time = DateConverter.ConvertToFormattedTime(response.Time),
+                        SpentAmount = response.SpentAmount,
+                        RRN = response.RRN,
+                        TraceNo = response.TraceNo,
+                        CardNo = response.CardNo,
+                        CardName = response.CardName,
+                        ResponseCode = response.ResponseCode == "00" ? "200" : response.ResponseCode,
+                        Result = response.Result
+                    });
+                    return jsonResponse;
+                }
+                catch (Exception ex)
+                {
+                    // نمایش پیام خطا در صورت بروز مشکل در ارتباط با دستگاه
+                    //MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return "{\"Error\":\"" + ex.Message + ".\"}";
+                }
 
                 // بازگشت JSON به عنوان خروجی
-                return jsonResponse;
             }
 
             if (postype == "fanava")
@@ -735,13 +738,13 @@ namespace config_pos
                                 {
                                     parsedResponseMessage.TermNo,
                                     Date = DateConverter.ConvertToPersianDate(parsedResponseMessage.Date),
-                                    Time=DateConverter.ConvertToFormattedTime(parsedResponseMessage.Time),
+                                    Time = DateConverter.ConvertToFormattedTime(parsedResponseMessage.Time),
                                     parsedResponseMessage.SpentAmount,
                                     parsedResponseMessage.RRN,
                                     parsedResponseMessage.TraceNo,
                                     parsedResponseMessage.CardNo,
                                     parsedResponseMessage.CardName,
-                                    ResponseCode=parsedResponseMessage.ResponseCode=="00"?"200":parsedResponseMessage.ResponseCode,
+                                    ResponseCode = parsedResponseMessage.ResponseCode == "00" ? "200" : parsedResponseMessage.ResponseCode,
                                     parsedResponseMessage.ResponseDesc
                                 };
 
@@ -757,7 +760,9 @@ namespace config_pos
                 catch (Exception ex)
                 {
                     // نمایش پیام خطا در صورت بروز مشکل در ارتباط با دستگاه
-                    MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return "{\"Error\":\"" + ex.Message + ".\"}";
+
                 }
             }
 
@@ -769,7 +774,7 @@ namespace config_pos
 
         private List<string> GetDeviceInfo(string id)
         {
-            // براساس نوع دستگاه یک آیپی و پورت برمیگردونه
+            // براساس آیدی یک آیپی و پورت برمیگردونه
             string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.dat");
 
             if (File.Exists(configFilePath))
