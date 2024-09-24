@@ -1,14 +1,14 @@
-﻿using System.Text.RegularExpressions;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.ServiceProcess;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace WebServiceLogger
 {
@@ -218,7 +218,9 @@ namespace WebServiceLogger
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
             if (File.Exists(filePath))
-            { File.Delete(filePath); }
+            {
+                File.Delete(filePath);
+            }
 
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config_pos.exe");
             LogToFile("Executing process", exePath + " - " + arguments);
@@ -247,34 +249,117 @@ namespace WebServiceLogger
             context.Response.OutputStream.Close();
         }
 
+        //private void SendJsonResponse(HttpListenerContext context, string result)
+        //{
+        //    string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+
+
+        //    if (File.Exists(filePath))
+        //    {
+        //        string jsonResponse = File.ReadAllText(filePath);
+        //        LogToFile("Sending JSON response", jsonResponse);
+
+        //        context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        //        context.Response.ContentType = "application/json";
+        //        byte[] responseBuffer = Encoding.UTF8.GetBytes(jsonResponse);
+        //        context.Response.ContentLength64 = responseBuffer.Length;
+        //        context.Response.OutputStream.Write(responseBuffer, 0, responseBuffer.Length);
+        //        context.Response.OutputStream.Close();
+        //    }
+        //    else
+        //    {
+        //        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        //        string errorMessage = "Response file not found.";
+        //        LogToFile("Error", errorMessage);
+        //        byte[] errorBuffer = Encoding.UTF8.GetBytes(errorMessage);
+        //        context.Response.ContentLength64 = errorBuffer.Length;
+        //        context.Response.OutputStream.Write(errorBuffer, 0, errorBuffer.Length);
+        //        context.Response.OutputStream.Close();
+        //    }
+        //}
+        //private void SendJsonResponse(HttpListenerContext context, string result)
+        //{
+        //    string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+
+        //    // ایجاد شیء پاسخ از کلاس Response
+        //    var responseObj = new Response();
+
+        //    if (File.Exists(filePath))
+        //    {
+        //        string jsonResponse = File.ReadAllText(filePath);
+
+        //        // تنظیم کد موفقیت و داده‌ها
+        //        responseObj.response_code = 200;
+        //        responseObj.response_data = JsonConvert.DeserializeObject(jsonResponse); // داده‌ها از فایل JSON
+
+        //        LogToFile("Sending JSON response", jsonResponse);
+        //    }
+        //    else
+        //    {
+        //        // تنظیم کد خطا و پیام خطا
+        //        responseObj.response_code = 404;
+        //        responseObj.response_data = "Response file not found.";
+
+        //        LogToFile("Error", "Response file not found.");
+        //    }
+
+        //    // تبدیل شیء responseObj به JSON
+        //    string jsonResponseOutput = JsonConvert.SerializeObject(responseObj);
+        //    context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        //    context.Response.ContentType = "application/json";
+        //    byte[] responseBuffer = Encoding.UTF8.GetBytes(jsonResponseOutput);
+        //    context.Response.ContentLength64 = responseBuffer.Length;
+        //    context.Response.OutputStream.Write(responseBuffer, 0, responseBuffer.Length);
+        //    context.Response.OutputStream.Close();
+        //}
         private void SendJsonResponse(HttpListenerContext context, string result)
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
 
+            // ایجاد شیء پاسخ از کلاس Response
+            var responseObj = new Response();
 
             if (File.Exists(filePath))
             {
                 string jsonResponse = File.ReadAllText(filePath);
-                LogToFile("Sending JSON response", jsonResponse);
 
-                context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                context.Response.ContentType = "application/json";
-                byte[] responseBuffer = Encoding.UTF8.GetBytes(jsonResponse);
-                context.Response.ContentLength64 = responseBuffer.Length;
-                context.Response.OutputStream.Write(responseBuffer, 0, responseBuffer.Length);
-                context.Response.OutputStream.Close();
+                // Deserialize کردن محتوای JSON به یک شیء داینامیک
+                dynamic parsedResponse = JsonConvert.DeserializeObject(jsonResponse);
+
+                // بررسی و تنظیم کد ResponseCode از فایل JSON
+                if (parsedResponse != null && parsedResponse.ResponseCode != null)
+                {
+                    responseObj.response_code = int.Parse(parsedResponse.ResponseCode.ToString());
+                }
+                else
+                {
+                    responseObj.response_code = 500; // مقدار پیش‌فرض در صورت عدم وجود ResponseCode
+                }
+
+                // تنظیم داده‌ها
+                responseObj.response_data = parsedResponse; // داده‌ها از فایل JSON
+
+                LogToFile("Sending JSON response", jsonResponse);
             }
             else
             {
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                string errorMessage = "Response file not found.";
-                LogToFile("Error", errorMessage);
-                byte[] errorBuffer = Encoding.UTF8.GetBytes(errorMessage);
-                context.Response.ContentLength64 = errorBuffer.Length;
-                context.Response.OutputStream.Write(errorBuffer, 0, errorBuffer.Length);
-                context.Response.OutputStream.Close();
+                // تنظیم کد خطا و پیام خطا
+                responseObj.response_code = 404;
+                responseObj.response_data = "Response file not found.";
+
+                LogToFile("Error", "Response file not found.");
             }
+
+            // تبدیل شیء responseObj به JSON
+            string jsonResponseOutput = JsonConvert.SerializeObject(responseObj);
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            context.Response.ContentType = "application/json";
+            byte[] responseBuffer = Encoding.UTF8.GetBytes(jsonResponseOutput);
+            context.Response.ContentLength64 = responseBuffer.Length;
+            context.Response.OutputStream.Write(responseBuffer, 0, responseBuffer.Length);
+            context.Response.OutputStream.Close();
         }
+
 
         private void ServeHtmlFile(HttpListenerContext context, string fileName)
         {

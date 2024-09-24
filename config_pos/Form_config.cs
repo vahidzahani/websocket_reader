@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using POS_PC_v3;
 using Newtonsoft.Json;
 using OmidPayPcPos;
+using System.Diagnostics;
 
 namespace config_pos
 {
@@ -179,6 +180,23 @@ namespace config_pos
             //}
             return "";
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // ایجاد یک شیء ProcessStartInfo برای تنظیمات اجرای فرآیند CMD
+            ProcessStartInfo processInfo = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",                // اجرای CMD
+                Arguments = "/C ping "+TextBox_IP.Text, // دستور ping با آرگومان
+                RedirectStandardOutput = false,      // جلوگیری از ریدایرکت خروجی
+                UseShellExecute = true,              // برای نمایش پنجره CMD
+                CreateNoWindow = false               // پنجره CMD را نشان بده
+            };
+
+            // شروع فرآیند
+            Process process = Process.Start(processInfo);
+        }
+
     }
     public class RegData
     {

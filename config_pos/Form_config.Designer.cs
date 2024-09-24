@@ -43,6 +43,7 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button3 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -51,20 +52,20 @@
             // 
             this.textBox1.Location = new System.Drawing.Point(56, 24);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(87, 20);
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 4;
             this.textBox1.Text = "2000";
             // 
             // Textbox_port
             // 
-            this.Textbox_port.Location = new System.Drawing.Point(65, 102);
+            this.Textbox_port.Location = new System.Drawing.Point(56, 103);
             this.Textbox_port.Name = "Textbox_port";
             this.Textbox_port.Size = new System.Drawing.Size(100, 21);
             this.Textbox_port.TabIndex = 3;
             // 
             // TextBox_IP
             // 
-            this.TextBox_IP.Location = new System.Drawing.Point(65, 76);
+            this.TextBox_IP.Location = new System.Drawing.Point(56, 77);
             this.TextBox_IP.Name = "TextBox_IP";
             this.TextBox_IP.Size = new System.Drawing.Size(100, 21);
             this.TextBox_IP.TabIndex = 2;
@@ -81,7 +82,7 @@
             // button2
             // 
             this.button2.Image = ((System.Drawing.Image)(resources.GetObject("button2.Image")));
-            this.button2.Location = new System.Drawing.Point(147, 22);
+            this.button2.Location = new System.Drawing.Point(162, 22);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(28, 23);
             this.button2.TabIndex = 5;
@@ -93,7 +94,7 @@
             // 
             this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
             this.button1.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.button1.Location = new System.Drawing.Point(117, 217);
+            this.button1.Location = new System.Drawing.Point(143, 217);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(82, 36);
             this.button1.TabIndex = 6;
@@ -105,7 +106,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 105);
+            this.label2.Location = new System.Drawing.Point(15, 106);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(27, 13);
             this.label2.TabIndex = 4;
@@ -114,7 +115,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 79);
+            this.label1.Location = new System.Drawing.Point(15, 80);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(17, 13);
             this.label1.TabIndex = 5;
@@ -123,7 +124,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(24, 53);
+            this.label4.Location = new System.Drawing.Point(15, 54);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(34, 13);
             this.label4.TabIndex = 5;
@@ -131,7 +132,7 @@
             // 
             // textBox_name
             // 
-            this.textBox_name.Location = new System.Drawing.Point(65, 50);
+            this.textBox_name.Location = new System.Drawing.Point(56, 51);
             this.textBox_name.Name = "textBox_name";
             this.textBox_name.Size = new System.Drawing.Size(100, 21);
             this.textBox_name.TabIndex = 1;
@@ -139,7 +140,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(24, 27);
+            this.label5.Location = new System.Drawing.Point(15, 28);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(35, 13);
             this.label5.TabIndex = 5;
@@ -152,7 +153,7 @@
             "behpardakht",
             "fanava",
             "omidpay"});
-            this.comboBox1.Location = new System.Drawing.Point(65, 19);
+            this.comboBox1.Location = new System.Drawing.Point(56, 20);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(100, 21);
             this.comboBox1.TabIndex = 0;
@@ -161,6 +162,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.comboBox1);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.label2);
@@ -172,7 +174,7 @@
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(187, 132);
+            this.groupBox1.Size = new System.Drawing.Size(213, 132);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "مشخصات";
@@ -184,16 +186,27 @@
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Location = new System.Drawing.Point(12, 150);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(187, 61);
+            this.groupBox2.Size = new System.Drawing.Size(213, 61);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Test";
+            // 
+            // button3
+            // 
+            this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button3.Location = new System.Drawing.Point(162, 78);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(34, 20);
+            this.button3.TabIndex = 14;
+            this.button3.Text = "PING";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // Form_config
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(211, 268);
+            this.ClientSize = new System.Drawing.Size(237, 259);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox1);
@@ -230,5 +243,6 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button button3;
     }
 }
