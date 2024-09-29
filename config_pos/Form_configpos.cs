@@ -789,16 +789,32 @@ namespace config_pos
 
             if (File.Exists(configFilePath))
             {
+                string devname = "";
+                string ip = "";
+                string port = "";
                 // خواندن تمام خطوط فایل config.dat
                 string[] lines = File.ReadAllLines(configFilePath);
+                
                 // پردازش هر خط از فایل
                 foreach (string line in lines)
                 {
                     string[] parts = line.Split(',');
+                    if (parts[5] == "1") {//for default record
+                        devname = parts[2].Trim();
+                        ip = parts[3].Trim();
+                        port = parts[4].Trim();
+                    }
                     if (parts[0].Trim() == id)
                     {
-                        return new List<string> { parts[2], parts[3], parts[4] }; // parts[3]: IP, parts[4]: Port
+                        devname = parts[2].Trim();
+                        ip = parts[3].Trim();
+                        port = parts[4].Trim();
                     }
+                }
+                if (ip != "")//یا دیفالت رو یافت یا کد رو
+                {
+                    return new List<string> { devname,ip, port}; // parts[3]: IP, parts[4]: Port
+
                 }
                 // اگر دستگاه پیدا نشد، لیست خالی برگردان
                 return new List<string>();
@@ -945,11 +961,7 @@ namespace config_pos
 
         }
 
-        private void button5_Click_1(object sender, EventArgs e)
-        {
-            List<string> aa=GetDeviceInfo("4");
-            MessageBox.Show(aa.ToString());
-        }
+       
     }
     public class ResponseMessage
     {
