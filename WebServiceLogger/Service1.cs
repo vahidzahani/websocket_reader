@@ -318,10 +318,11 @@ namespace WebServiceLogger
 
             // ایجاد شیء پاسخ از کلاس Response
             var responseObj = new Response();
-
+            string sssssss = "";
             if (File.Exists(filePath))
             {
                 string jsonResponse = File.ReadAllText(filePath);
+                sssssss = jsonResponse;
 
                 // Deserialize کردن محتوای JSON به یک شیء داینامیک
                 dynamic parsedResponse = JsonConvert.DeserializeObject(jsonResponse);
@@ -351,7 +352,8 @@ namespace WebServiceLogger
             }
 
             // تبدیل شیء responseObj به JSON
-            string jsonResponseOutput = JsonConvert.SerializeObject(responseObj);
+            string jsonResponseOutput = JsonConvert.SerializeObject(responseObj);//به صورت آرایه در آرایه
+            //string jsonResponseOutput = (sssssss);
             context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             context.Response.ContentType = "application/json";
             byte[] responseBuffer = Encoding.UTF8.GetBytes(jsonResponseOutput);

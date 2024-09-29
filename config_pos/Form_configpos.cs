@@ -207,7 +207,17 @@ namespace config_pos
                     else
                     {
                         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
-                        File.WriteAllText(filePath, "\"Error\":\"Failed to get a valid response from the server.\"");
+                        // ساخت یک آبجکت برای خطا
+                        var errorObject = new
+                        {
+                            Error = "Failed to get a valid response from the server."
+                        };
+
+                        // تبدیل آبجکت به JSON
+                        string jsonString = JsonConvert.SerializeObject(errorObject, Formatting.Indented);
+                        File.WriteAllText(filePath, jsonString);
+
+                        //File.WriteAllText(filePath, "\"Error\":\"Failed to get a valid response from the server.\"");
                     }
                 }
                 Application.Exit();
@@ -781,21 +791,15 @@ namespace config_pos
             {
                 // خواندن تمام خطوط فایل config.dat
                 string[] lines = File.ReadAllLines(configFilePath);
-
                 // پردازش هر خط از فایل
                 foreach (string line in lines)
                 {
-                    // جدا کردن مقادیر خط با استفاده از کاما
                     string[] parts = line.Split(',');
-
-                    //if (parts.Length == 6 && parts[0].Trim() == id)
                     if (parts[0].Trim() == id)
                     {
-                        // برگرداندن اطلاعات دستگاهی که postype آن برابر با ورودی است
                         return new List<string> { parts[2], parts[3], parts[4] }; // parts[3]: IP, parts[4]: Port
                     }
                 }
-
                 // اگر دستگاه پیدا نشد، لیست خالی برگردان
                 return new List<string>();
             }
@@ -939,6 +943,12 @@ namespace config_pos
         private void listView1_SelectedIndexChanged_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            List<string> aa=GetDeviceInfo("4");
+            MessageBox.Show(aa.ToString());
         }
     }
     public class ResponseMessage

@@ -49,6 +49,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -234,6 +235,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button5);
             this.groupBox1.Controls.Add(this.listView1);
             this.groupBox1.Controls.Add(this.btn_start);
             this.groupBox1.Controls.Add(this.button1);
@@ -270,6 +272,16 @@
             this.label1.Size = new System.Drawing.Size(32, 13);
             this.label1.TabIndex = 10;
             this.label1.Text = "Port :";
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(348, 222);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(42, 21);
+            this.button5.TabIndex = 5;
+            this.button5.Text = "button5";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click_1);
             // 
             // Form_configpos
             // 
@@ -314,5 +326,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button button5;
     }
 }
