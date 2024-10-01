@@ -47,9 +47,9 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.button5 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.button5 = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -248,6 +248,17 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Pos management";
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(338, 218);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(90, 21);
+            this.button5.TabIndex = 5;
+            this.button5.Text = "TEST";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Visible = false;
+            this.button5.Click += new System.EventHandler(this.button5_Click_1);
+            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.label1);
@@ -272,15 +283,6 @@
             this.label1.Size = new System.Drawing.Size(32, 13);
             this.label1.TabIndex = 10;
             this.label1.Text = "Port :";
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(348, 222);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(42, 21);
-            this.button5.TabIndex = 5;
-            this.button5.Text = "button5";
-            this.button5.UseVisualStyleBackColor = true;
             // 
             // Form_configpos
             // 

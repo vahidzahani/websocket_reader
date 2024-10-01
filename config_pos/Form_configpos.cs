@@ -10,6 +10,7 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Text;
 using System.Windows.Forms;
+using System.Data.SQLite;
 
 namespace config_pos
 {
@@ -22,6 +23,11 @@ namespace config_pos
         public Form_configpos()
         {
             InitializeComponent();
+#if DEBUG
+            // ایجاد دکمه فقط برای حالت دیباگ
+            button5.Visible = true;
+#endif
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -183,13 +189,18 @@ namespace config_pos
                 }
                 if (args[1] == "sendToPos")
                 {
-                    string amount = args[3];
                     string id = args[2];
+                    string amount = args[3];
+                    string batchnr = args[4];
+                    string sanadyear = args[5];
+                    string sandoghnr = args[6];
+
 
                     List<string> deviceInfo = GetDeviceInfo(id);
                     //List<string> deviceInfo = GetDeviceInfo("fanava");
                     if (deviceInfo.Count > 0)
                     {
+                        fn_sqlite_insert(amount,batchnr,sanadyear, sandoghnr);
                         string ip = deviceInfo[1];
                         string port = deviceInfo[2];
                         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
@@ -961,8 +972,130 @@ namespace config_pos
 
         }
 
-       
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            //MessageBox.Show(fn_sqlite_insert());
+            MessageBox.Show(fn_sqlite_insert("amount","batchnr", "sanadyear", "sanadyear").ToString());
+            
+        }
+        private string fn_sqlite_find(string searchTerm)
+        {
+            // مسیر فایل دیتابیس SQLite
+            string dbPath = "configpos.db"; // مسیر به فایل دیتابیس SQLite
+            string connectionString = $"Data Source={dbPath};Version=3;";
+            string result = "";
+
+            // دستور SQL برای جستجو
+            string query = "SELECT name FROM tbl_transactions WHERE name LIKE @searchTerm";
+
+            try
+            {
+                // ایجاد اتصال به دیتابیس
+                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // ایجاد فرمان SQL
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        // تنظیم پارامتر برای جستجو (از LIKE برای جستجوی جزئی استفاده می‌کنیم)
+                        command.Parameters.AddWithValue("@searchTerm", "%" + searchTerm + "%");
+
+                        // اجرای جستجو و خواندن نتیجه
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    // خواندن مقادیر و ذخیره آن‌ها در رشته result
+                                    result += reader["name"].ToString() + Environment.NewLine;
+                                }
+                            }
+                            else
+                            {
+                                result = "هیچ رکوردی یافت نشد.";
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "خطا در هنگام جستجو: " + ex.Message;
+            }
+
+            return result;
+        }
+
+        private long fn_sqlite_insert(string amount,string batchnr, string sanadyear, string sandoghnr)
+        {
+            // مسیر فایل دیتابیس SQLite
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configpos.db");
+            string connectionString = $"Data Source={dbPath};Version=3;";
+
+            // دستور SQL برای درج رکورد جدید
+            string query = "INSERT INTO tbl_transactions (amount,batchnr, sanadyear, sandoghnr) VALUES (@amount,@batchnr, @sanadyear, @sandoghnr)";
+            string lastInsertedIdQuery = "SELECT last_insert_rowid()"; // کوئری برای دریافت ID آخرین رکورد درج شده
+
+            try
+            {
+                // ایجاد اتصال به دیتابیس
+                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // ایجاد فرمان SQL برای درج
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        // تنظیم پارامترها برای مقادیر batchnr, sanadyear, sandoghnr
+                        command.Parameters.AddWithValue("@amount", amount);
+                        command.Parameters.AddWithValue("@batchnr", batchnr);
+                        command.Parameters.AddWithValue("@sanadyear", sanadyear);
+                        command.Parameters.AddWithValue("@sandoghnr", sandoghnr);
+
+                        // اجرای فرمان
+                        int rowsAffected = command.ExecuteNonQuery();
+
+                        // بررسی اینکه آیا درج با موفقیت انجام شد
+                        if (rowsAffected > 0)
+                        {
+                            // ایجاد فرمان SQL برای دریافت ID آخرین رکورد درج شده
+                            using (SQLiteCommand lastIdCommand = new SQLiteCommand(lastInsertedIdQuery, connection))
+                            {
+                                long lastInsertedId = (long)lastIdCommand.ExecuteScalar();
+                                return lastInsertedId;
+                            }
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogToFile("error sqlite", ex.Message);
+                return 0;
+            }
+        }
+
+        private void LogToFile(string title, string message)
+        {
+            string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string logFilePath = Path.Combine(exeDirectory, "webservice_log.txt");
+
+            using (StreamWriter writer = new StreamWriter(logFilePath, true))
+            {
+                writer.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {title}");
+                writer.WriteLine(message);
+                writer.WriteLine("------------------------------------------------------");
+            }
+        }
+
     }
+
     public class ResponseMessage
     {
         public string STX { get; set; }
