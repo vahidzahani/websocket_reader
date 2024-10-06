@@ -37,6 +37,8 @@
     <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="bk_Dir" Directory_Parent="APPDIR" DefaultDir="bk"/>
+    <ROW Directory="x64_Dir" Directory_Parent="APPDIR" DefaultDir="x64"/>
+    <ROW Directory="x86_Dir" Directory_Parent="APPDIR" DefaultDir="x86"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SideBySideGuidComponent">
     <ROW Component="APPDIR" Value="{BF746B87-2EBA-4A66-817B-75C6D89144A9}"/>
@@ -53,9 +55,14 @@
     <ROW Component="RJCP.SerialPortStream.dll" ComponentId="{720D37DC-564C-4EFD-8815-702BE65B7CCF}" Directory_="APPDIR" Attributes="0" KeyPath="RJCP.SerialPortStream.dll"/>
     <ROW Component="RJCP.SerialPortStream.dll_1" ComponentId="{87E40739-8D45-4362-97D8-12ED0EC658BA}" Directory_="bk_Dir" Attributes="0" KeyPath="RJCP.SerialPortStream.dll_1"/>
     <ROW Component="SHORTCUTDIR" ComponentId="{FF032F6E-DAEE-4853-8739-DFB9A67D3D93}" Directory_="SHORTCUTDIR" Attributes="0"/>
+    <ROW Component="SQLite.Interop.dll" ComponentId="{10E94AEC-46F4-4BE0-9493-0900433D2650}" Directory_="x64_Dir" Attributes="256" KeyPath="SQLite.Interop.dll"/>
+    <ROW Component="SQLite.Interop.dll_1" ComponentId="{DFBB5805-B7A5-4163-9099-0AF2E39EA768}" Directory_="x86_Dir" Attributes="0" KeyPath="SQLite.Interop.dll_1"/>
     <ROW Component="System.Configuration.Install.dll" ComponentId="{03C42287-BED1-4B48-A7DA-2838E0F15595}" Directory_="APPDIR" Attributes="0" KeyPath="System.Configuration.Install.dll"/>
     <ROW Component="System.Core.dll" ComponentId="{1DF4F70E-D83B-44ED-94D2-8F536EDA40D2}" Directory_="APPDIR" Attributes="0" KeyPath="System.Core.dll"/>
     <ROW Component="System.Data.DataSetExtensions.dll" ComponentId="{F4AE1F61-2F24-4FF0-AF98-3AEE62FF7B05}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.DataSetExtensions.dll"/>
+    <ROW Component="System.Data.SQLite.EF6.dll" ComponentId="{C0A0BF5A-D090-4B3E-84FE-C343E3E29AE6}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.SQLite.EF6.dll"/>
+    <ROW Component="System.Data.SQLite.Linq.dll" ComponentId="{683AB622-339E-446E-A8CA-1C604F214503}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.SQLite.Linq.dll"/>
+    <ROW Component="System.Data.SQLite.dll" ComponentId="{D493F775-1629-4FB8-9901-D61ED507F721}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.SQLite.dll"/>
     <ROW Component="System.Data.dll" ComponentId="{037AA076-09E4-4111-8C7F-4702A648F58D}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.dll"/>
     <ROW Component="System.Deployment.dll" ComponentId="{5D650843-1899-41B9-84AD-3DCC5EEF742B}" Directory_="APPDIR" Attributes="0" KeyPath="System.Deployment.dll"/>
     <ROW Component="System.Drawing.dll" ComponentId="{40A4B494-C8E1-46B6-98F1-44AC6D31A985}" Directory_="APPDIR" Attributes="0" KeyPath="System.Drawing.dll"/>
@@ -105,12 +112,17 @@
     <ROW File="POS_PC.dll" Component_="POS_PC.dll" FileName="POS_PC.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\POS_PC.dll" SelfReg="false"/>
     <ROW File="WebServiceLoggerPOS.exe.config" Component_="config_pos.exe.config" FileName="WEBSER~1.CON|WebServiceLoggerPOS.exe.config" Attributes="0" SourcePath="..\config_pos\bin\Debug\WebServiceLoggerPOS.exe.config" SelfReg="false"/>
     <ROW File="websocketsharp.dll" Component_="websocketsharp.dll" FileName="WEBSOC~1.DLL|websocket-sharp.dll" Attributes="0" SourcePath="..\packages\WebSocketSharp-netstandard.1.0.1\lib\net45\websocket-sharp.dll" SelfReg="false"/>
-    <ROW File="WebServiceLoggerPOS.pdb" Component_="WebServiceLoggerPOS.exe" FileName="WEBSER~1.PDB|WebServiceLoggerPOS.pdb" Attributes="0" SourcePath="..\config_pos\bin\Debug\WebServiceLoggerPOS.pdb" SelfReg="false"/>
     <ROW File="configwebservice.ini" Component_="config_pos.exe.config" FileName="CONFIG~1.INI|configwebservice.ini" Attributes="0" SourcePath="..\config_pos\bin\Debug\configwebservice.ini" SelfReg="false"/>
     <ROW File="RJCP.SerialPortStream.dll" Component_="RJCP.SerialPortStream.dll" FileName="RJCPSE~1.DLL|RJCP.SerialPortStream.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\others\RJCP.SerialPortStream.dll" SelfReg="false"/>
     <ROW File="OmidPayPcPos.dll" Component_="OmidPayPcPos.dll" FileName="OMIDPA~1.DLL|OmidPayPcPos.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\OmidPayPcPos.dll" SelfReg="false"/>
     <ROW File="webservice_test.html" Component_="config_pos.exe.config" FileName="WEBSER~1.HTM|webservice_test.html" Attributes="0" SourcePath="..\config_pos\bin\Debug\webservice_test.html" SelfReg="false"/>
     <ROW File="RJCP.SerialPortStream.dll_1" Component_="RJCP.SerialPortStream.dll_1" FileName="RJCPSE~1.DLL|RJCP.SerialPortStream.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\others\RJCP.SerialPortStream.dll" SelfReg="false"/>
+    <ROW File="System.Data.SQLite.dll" Component_="System.Data.SQLite.dll" FileName="SYSTE~15.DLL|System.Data.SQLite.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\System.Data.SQLite.dll" SelfReg="false"/>
+    <ROW File="System.Data.SQLite.Linq.dll" Component_="System.Data.SQLite.Linq.dll" FileName="SYSTE~16.DLL|System.Data.SQLite.Linq.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\System.Data.SQLite.Linq.dll" SelfReg="false"/>
+    <ROW File="System.Data.SQLite.EF6.dll" Component_="System.Data.SQLite.EF6.dll" FileName="SYSTE~17.DLL|System.Data.SQLite.EF6.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\System.Data.SQLite.EF6.dll" SelfReg="false"/>
+    <ROW File="configpos.db" Component_="config_pos.exe.config" FileName="CONFIG~1.DB|configpos.db" Attributes="0" SourcePath="..\config_pos\bin\Debug\configpos.db" SelfReg="false"/>
+    <ROW File="SQLite.Interop.dll" Component_="SQLite.Interop.dll" FileName="SQLITE~1.DLL|SQLite.Interop.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\x64\SQLite.Interop.dll" SelfReg="false"/>
+    <ROW File="SQLite.Interop.dll_1" Component_="SQLite.Interop.dll_1" FileName="SQLITE~1.DLL|SQLite.Interop.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\x86\SQLite.Interop.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="249"/>
@@ -248,6 +260,11 @@
     <ROW Feature_="MainFeature" Component_="RJCP.SerialPortStream.dll"/>
     <ROW Feature_="MainFeature" Component_="OmidPayPcPos.dll"/>
     <ROW Feature_="MainFeature" Component_="RJCP.SerialPortStream.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.SQLite.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.SQLite.Linq.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.SQLite.EF6.dll"/>
+    <ROW Feature_="MainFeature" Component_="SQLite.Interop.dll"/>
+    <ROW Feature_="MainFeature" Component_="SQLite.Interop.dll_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="SystemFoldermsiexec.exe" SourcePath="&lt;AI_RES&gt;uninstall.ico" Index="0"/>

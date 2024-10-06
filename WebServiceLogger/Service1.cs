@@ -146,15 +146,69 @@ namespace WebServiceLogger
 
                 // اجرای فایل config_pos.exe
                 ExecuteExternalProcess(arguments);
-
-
-
-
                 HandleResponse(context);
-
-
-
             }
+            else if (requestPath.StartsWith("/deleteTransactions"))
+            {
+                // دریافت مقدارهای اختیاری از QueryString
+                string idString = context.Request.QueryString["id"];
+                string amountString = context.Request.QueryString["amount"];
+                string batchnrString = context.Request.QueryString["batchnr"];
+                string sanadyearString = context.Request.QueryString["sanadyear"];
+                string sandoghnrString = context.Request.QueryString["sandoghnr"];
+
+                long id = 0;
+                decimal amount = 0;
+                int batchnr = 0, sanadyear = 0, sandoghnr = 0;
+
+                // ساختن آرگومان‌ها برای ارسال به فایل اجرایی
+                var arguments = "deleteTransactions";
+
+                if (!string.IsNullOrEmpty(idString) && long.TryParse(idString, out id))
+                {
+                    arguments += $" id:{id}";
+                }
+                if (!string.IsNullOrEmpty(amountString) && decimal.TryParse(amountString, out amount))
+                {
+                    arguments += $" amount:{amount}";
+                }
+                if (!string.IsNullOrEmpty(batchnrString) && int.TryParse(batchnrString, out batchnr))
+                {
+                    arguments += $" batchnr:{batchnr}";
+                }
+                if (!string.IsNullOrEmpty(sanadyearString) && int.TryParse(sanadyearString, out sanadyear))
+                {
+                    arguments += $" sanadyear:{sanadyear}";
+                }
+                if (!string.IsNullOrEmpty(sandoghnrString) && int.TryParse(sandoghnrString, out sandoghnr))
+                {
+                    arguments += $" sandoghnr:{sandoghnr}";
+                }
+
+                // اجرای فایل config_pos.exe با آرگومان‌های ساخته شده
+                ExecuteExternalProcess(arguments);
+
+                string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                Response responseObject = new Response();
+
+                if (File.Exists(responseFilePath))
+                {
+                    responseObject.response_code = 200; // موفقیت
+                    responseObject.response_data = JsonConvert.DeserializeObject(File.ReadAllText(responseFilePath));
+                }
+                else
+                {
+                    responseObject.response_code = 404; // خطا
+                    responseObject.response_data = "not find file"; // رشته در حالت خطا
+                }
+
+                // ساخت JSON پاسخ و ارسال آن
+                ServeJsonResponse(context, JsonConvert.SerializeObject(responseObject, Formatting.Indented));
+            }
+
+            
+
+
             else
             {
                 //string inputDate = "2024/06/25";
@@ -164,7 +218,11 @@ namespace WebServiceLogger
                                         <html>
                                         <head><title>Service Status</title></head>
                                         <body>
-                                            <p>Service is running. <a href='/test'>/test</a> | <a href='/devices'>/devices</a></p>
+                                            <p>Service is running. 
+<a href='/test'>/test</a> | 
+<a href='/devices'>/devices</a> |
+<a href='/deleteTransactions'>/deleteTransactions</a> |
+</p>
                                         </body>
                                         </html>" /*+ persianDate*/;
 
@@ -194,10 +252,10 @@ namespace WebServiceLogger
                 string jsonResponseOutput = JsonConvert.SerializeObject(responseObject, Formatting.Indented);
                 ServeJsonResponse(context, jsonResponseOutput);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                LogToFile("ERROR HandleResponse", ex.Message);
+                //throw;
             }
         }
 
@@ -223,7 +281,7 @@ namespace WebServiceLogger
             }
 
             string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config_pos.exe");
-            LogToFile("Executing process", exePath + " - " + arguments);
+            LogToFile("Executing process", exePath +" "+ arguments);
 
             ProcessStartInfo processStartInfo = new ProcessStartInfo(exePath, arguments)
             {

@@ -10,7 +10,6 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Text;
 using System.Windows.Forms;
-using System.Data.SQLite;
 
 namespace config_pos
 {
@@ -23,10 +22,7 @@ namespace config_pos
         public Form_configpos()
         {
             InitializeComponent();
-#if DEBUG
-            // ایجاد دکمه فقط برای حالت دیباگ
-            button5.Visible = true;
-#endif
+
 
         }
 
@@ -142,6 +138,80 @@ namespace config_pos
 
             if (args.Length > 1)
             {
+                if (args[1] == "deleteTransactions")
+                {
+
+
+                    SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
+
+                    // تعریف آرگومان‌ها و مقادیر پیش‌فرض
+                    Dictionary<string, string> argValues = new Dictionary<string, string>
+                        {
+                            { "id", null },
+                            { "amount", null },
+                            { "batchnr", null },
+                            { "sanadyear", null },
+                            { "sandoghnr", null }
+                        };
+
+                    // چک کردن آرگومان‌ها از args[2] به بعد
+                    for (int i = 2; i < args.Length; i++)
+                    {
+                        foreach (var key in argValues.Keys.ToList())
+                        {
+                            if (args[i].StartsWith($"{key}:"))
+                            {
+                                argValues[key] = args[i].Split(':')[1];  // مقدار را جدا می‌کنیم
+                            }
+                        }
+                    }
+
+                    // حالا هر کدام از مقادیر را می‌توانید چک کنید
+                    string id = argValues["id"];
+                    string amount = argValues["amount"];
+                    string batchnr = argValues["batchnr"];
+                    string sanadyear = argValues["sanadyear"];
+                    string sandoghnr = argValues["sandoghnr"];
+
+                    if (id != null)
+                    {
+                        dbHelper.Delete("tbl_transactions_mini", long.Parse(id));
+                    }
+                    else
+                    {
+                        if (amount != null)
+                        {
+                            Dictionary<string, object> searchParams = new Dictionary<string, object>
+                            {
+                            { "amount", amount },
+                            { "batchnr", batchnr },
+                            { "sanadyear", sanadyear },
+                            { "sandoghnr", sandoghnr }
+                            };
+                            long recordId = dbHelper.FindRecordId("tbl_transactions_mini", searchParams);
+                            //string xxxxx = "";
+                            //foreach (var param in searchParams)
+                            //{
+                            //    xxxxx += $" AND {param.Key} = '{param.Value}'";
+                            //}
+                            //LogToFile("EEEEEEEEEEEEEEE.FindRecordId", recordId.ToString());
+                            if (recordId != 0)
+                            {
+                                dbHelper.Delete("tbl_transactions_mini", recordId);
+                            }
+
+                        }
+                    }
+
+
+                    LogToFile("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", id + "X" + amount + "X" + batchnr + "X" + sanadyear + "X" + sandoghnr);
+
+
+                    int res = dbHelper.Delete("tbl_transactions_mini", 0);
+                    string jsondata = JsonConvert.SerializeObject(res, Formatting.Indented);
+                    string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                    File.WriteAllText(responseFilePath, jsondata);
+                }
                 if (args[1] == "getAllDevices")
                 {
 
@@ -195,12 +265,12 @@ namespace config_pos
                     string sanadyear = args[5];
                     string sandoghnr = args[6];
 
-
                     List<string> deviceInfo = GetDeviceInfo(id);
-                    //List<string> deviceInfo = GetDeviceInfo("fanava");
+
                     if (deviceInfo.Count > 0)
                     {
-                        fn_sqlite_insert(amount,batchnr,sanadyear, sandoghnr);
+
+
                         string ip = deviceInfo[1];
                         string port = deviceInfo[2];
                         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
@@ -213,6 +283,22 @@ namespace config_pos
                         {
                             resJsonString = Fn_send_to_POS("omidpay", amount, ip, int.Parse(port));
                         }
+
+
+                        Dictionary<string, object> posData = JsonConvert.DeserializeObject<Dictionary<string, object>>(resJsonString);
+
+                        SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
+                        Dictionary<string, object> data = new Dictionary<string, object>
+                        {
+                            { "amount", amount },
+                            { "batchnr", batchnr },
+                            { "sanadyear", sanadyear },
+                            { "sandoghnr", sandoghnr }
+                        };
+
+                        long insertedId = dbHelper.Insert("tbl_transactions", data);
+
+
                         File.WriteAllText(filePath, resJsonString);
                     }
                     else
@@ -654,7 +740,7 @@ namespace config_pos
                 {
                     OmidPayPcPosClass omid = new OmidPayPcPosClass();
                     ResponseJson response = omid.DoTcpTransaction(ipAddress, port, amount);
-                    string jsonResponse = JsonConvert.SerializeObject(new
+                    var jj = new
                     {
                         TermNo = response.TermNo,
                         Date = DateConverter.ConvertToPersianDate(response.Date),
@@ -666,17 +752,15 @@ namespace config_pos
                         CardName = response.CardName,
                         ResponseCode = response.ResponseCode == "00" ? "200" : response.ResponseCode,
                         Result = response.Result
-                    });
+
+                    };
+                    string jsonResponse = JsonConvert.SerializeObject(jj);
                     return jsonResponse;
                 }
                 catch (Exception ex)
                 {
-                    // نمایش پیام خطا در صورت بروز مشکل در ارتباط با دستگاه
-                    //MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return "{\"Error\":\"" + ex.Message + ".\"}";
                 }
-
-                // بازگشت JSON به عنوان خروجی
             }
 
             if (postype == "fanava")
@@ -766,7 +850,7 @@ namespace config_pos
                                     parsedResponseMessage.CardNo,
                                     parsedResponseMessage.CardName,
                                     ResponseCode = parsedResponseMessage.ResponseCode == "00" ? "200" : parsedResponseMessage.ResponseCode,
-                                    parsedResponseMessage.ResponseDesc
+                                    Result = parsedResponseMessage.ResponseDesc
                                 };
 
                                 // تبدیل به JSON
@@ -780,15 +864,11 @@ namespace config_pos
                 }
                 catch (Exception ex)
                 {
-                    // نمایش پیام خطا در صورت بروز مشکل در ارتباط با دستگاه
-                    //MessageBox.Show($"خطا در ارتباط با دستگاه: {ex.Message}", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return "{\"Error\":\"" + ex.Message + ".\"}";
-
                 }
             }
 
 
-            // در صورت بروز خطا یا پاسخ نامناسب، می‌توانید یک پیام خطا برگردانید
             return "{\"Error\":\"Failed to get a valid response from the server.\"}";
         }
 
@@ -805,12 +885,13 @@ namespace config_pos
                 string port = "";
                 // خواندن تمام خطوط فایل config.dat
                 string[] lines = File.ReadAllLines(configFilePath);
-                
+
                 // پردازش هر خط از فایل
                 foreach (string line in lines)
                 {
                     string[] parts = line.Split(',');
-                    if (parts[5] == "1") {//for default record
+                    if (parts[5] == "1")
+                    {//for default record
                         devname = parts[2].Trim();
                         ip = parts[3].Trim();
                         port = parts[4].Trim();
@@ -824,7 +905,7 @@ namespace config_pos
                 }
                 if (ip != "")//یا دیفالت رو یافت یا کد رو
                 {
-                    return new List<string> { devname,ip, port}; // parts[3]: IP, parts[4]: Port
+                    return new List<string> { devname, ip, port }; // parts[3]: IP, parts[4]: Port
 
                 }
                 // اگر دستگاه پیدا نشد، لیست خالی برگردان
@@ -974,112 +1055,41 @@ namespace config_pos
 
         private void button5_Click_1(object sender, EventArgs e)
         {
-            //MessageBox.Show(fn_sqlite_insert());
-            MessageBox.Show(fn_sqlite_insert("amount","batchnr", "sanadyear", "sanadyear").ToString());
-            
-        }
-        private string fn_sqlite_find(string searchTerm)
-        {
-            // مسیر فایل دیتابیس SQLite
-            string dbPath = "configpos.db"; // مسیر به فایل دیتابیس SQLite
-            string connectionString = $"Data Source={dbPath};Version=3;";
-            string result = "";
 
-            // دستور SQL برای جستجو
-            string query = "SELECT name FROM tbl_transactions WHERE name LIKE @searchTerm";
-
-            try
+            SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
+            //bool res = dbHelper.Delete("tbl_transactions_mini", 0);
+            //MessageBox.Show(res.ToString());
+            //return;
+            var data = new Dictionary<string, object>
             {
-                // ایجاد اتصال به دیتابیس
-                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-                {
-                    connection.Open();
+                ["amount"] = "1000",
+                ["batchnr"] = "B12345",
+                ["sanadyear"] = "2024",
+                ["sandoghnr"] = "S123"
+            };
+            long insertedId = dbHelper.Insert("tbl_transactions", data);
+            MessageBox.Show(insertedId.ToString());
+            //string searchResult = dbHelper.Find("tbl_transactions", "amount", "1000");
+            //MessageBox.Show(searchResult.ToString());
 
-                    // ایجاد فرمان SQL
-                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
-                    {
-                        // تنظیم پارامتر برای جستجو (از LIKE برای جستجوی جزئی استفاده می‌کنیم)
-                        command.Parameters.AddWithValue("@searchTerm", "%" + searchTerm + "%");
-
-                        // اجرای جستجو و خواندن نتیجه
-                        using (SQLiteDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.HasRows)
-                            {
-                                while (reader.Read())
-                                {
-                                    // خواندن مقادیر و ذخیره آن‌ها در رشته result
-                                    result += reader["name"].ToString() + Environment.NewLine;
-                                }
-                            }
-                            else
-                            {
-                                result = "هیچ رکوردی یافت نشد.";
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
+            Dictionary<string, object> updatedData = new Dictionary<string, object>
             {
-                result = "خطا در هنگام جستجو: " + ex.Message;
-            }
+            { "TermNo", "12345" },
+            { "Date", "2024-01-01" },
+            { "SpentAmount", "555555" }
+            };
 
-            return result;
+            long iddd = dbHelper.Update("tbl_transactions", insertedId, updatedData);
+            MessageBox.Show(iddd.ToString());
+
+
+
         }
 
-        private long fn_sqlite_insert(string amount,string batchnr, string sanadyear, string sandoghnr)
-        {
-            // مسیر فایل دیتابیس SQLite
-            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configpos.db");
-            string connectionString = $"Data Source={dbPath};Version=3;";
 
-            // دستور SQL برای درج رکورد جدید
-            string query = "INSERT INTO tbl_transactions (amount,batchnr, sanadyear, sandoghnr) VALUES (@amount,@batchnr, @sanadyear, @sandoghnr)";
-            string lastInsertedIdQuery = "SELECT last_insert_rowid()"; // کوئری برای دریافت ID آخرین رکورد درج شده
 
-            try
-            {
-                // ایجاد اتصال به دیتابیس
-                using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-                {
-                    connection.Open();
 
-                    // ایجاد فرمان SQL برای درج
-                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
-                    {
-                        // تنظیم پارامترها برای مقادیر batchnr, sanadyear, sandoghnr
-                        command.Parameters.AddWithValue("@amount", amount);
-                        command.Parameters.AddWithValue("@batchnr", batchnr);
-                        command.Parameters.AddWithValue("@sanadyear", sanadyear);
-                        command.Parameters.AddWithValue("@sandoghnr", sandoghnr);
 
-                        // اجرای فرمان
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        // بررسی اینکه آیا درج با موفقیت انجام شد
-                        if (rowsAffected > 0)
-                        {
-                            // ایجاد فرمان SQL برای دریافت ID آخرین رکورد درج شده
-                            using (SQLiteCommand lastIdCommand = new SQLiteCommand(lastInsertedIdQuery, connection))
-                            {
-                                long lastInsertedId = (long)lastIdCommand.ExecuteScalar();
-                                return lastInsertedId;
-                            }
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogToFile("error sqlite", ex.Message);
-                return 0;
-            }
-        }
 
         private void LogToFile(string title, string message)
         {

@@ -12,6 +12,7 @@ using POS_PC_v3;
 using Newtonsoft.Json;
 using OmidPayPcPos;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace config_pos
 {
@@ -21,7 +22,7 @@ namespace config_pos
         public string pos_ip;
         public string pos_port;
         public string pos_model;
-        public bool savedata=false;
+        public bool savedata = false;
         public bool editdata = false;
 
         public Form_config()
@@ -79,27 +80,89 @@ namespace config_pos
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (TextBox_IP.Text.Trim()=="" || Textbox_port.Text.Trim() == "")
+            if (TextBox_IP.Text.Trim() == "" || Textbox_port.Text.Trim() == "")
             {
-                MessageBox.Show("مقادری نباید خالی باشد","مقادری آیپی و پورت",MessageBoxButtons.OK,MessageBoxIcon.Hand);
+                MessageBox.Show("مقادری نباید خالی باشد", "مقادری آیپی و پورت", MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
+
+            string IP = TextBox_IP.Text;
+            string PORT = Textbox_port.Text;
+            string AMOUNT = textBox1.Text;
             if (comboBox1.Text == "fanava")
             {
                 Form_configpos frm = new Form_configpos();
-                string res = frm.Fn_send_to_POS("fanava",textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
+                string res = frm.Fn_send_to_POS("fanava", AMOUNT, IP, int.Parse(PORT));
                 MessageBox.Show(res);
 
-            } else if (comboBox1.Text=="omidpay") {
-
+            }
+            else if (comboBox1.Text == "omidpay")
+            {
 
                 Form_configpos frm = new Form_configpos();
-                string res = frm.Fn_send_to_POS("omidpay",textBox1.Text, TextBox_IP.Text, int.Parse(Textbox_port.Text));
+
+                SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
+                Dictionary<string, object> data = new Dictionary<string, object>
+                        {
+                            { "amount", AMOUNT },
+                            { "batchnr", "TEST" },
+                            { "sanadyear", "TEST" },
+                            { "sandoghnr", "TEST" }
+                        };
+                long insertedId = dbHelper.Insert("tbl_transactions", data);
+                
+                var datamini =new  Dictionary<string, object>(data){ { "id_tbl_transactions", insertedId.ToString()} };
+                long insertedId_mini = dbHelper.Insert("tbl_transactions_mini", datamini);
+
+                string res = frm.Fn_send_to_POS("omidpay", AMOUNT, IP, int.Parse(PORT));
                 MessageBox.Show(res);
 
-                //OmidPayPcPosClass omid =new OmidPayPcPosClass();
-                //ResponseJson res;
-                //res=omid.DoTcpTransaction(TextBox_IP.Text, int.Parse(Textbox_port.Text), textBox1.Text);
+                JObject jsonResponse = JObject.Parse(res);
+
+
+
+
+
+
+                //if (jsonResponse.ContainsKey("ResponseCode") && jsonResponse["ResponseCode"].ToString() == "200")
+                if (jsonResponse.ContainsKey("ResponseCode"))
+                {
+                    Dictionary<string, object> data2 = new Dictionary<string, object>
+                        {
+                            { "TermNo", jsonResponse["TermNo"]?.ToString() },
+                            { "Date", jsonResponse["Date"]?.ToString() },
+                            { "Time", jsonResponse["Time"]?.ToString() },
+                            { "SpentAmount", jsonResponse["SpentAmount"]?.ToString() },
+                            { "RRN", jsonResponse["RRN"]?.ToString() },
+                            { "TraceNo", jsonResponse["TraceNo"]?.ToString() },
+                            { "CardNo", jsonResponse["CardNo"]?.ToString() },
+                            { "CardName", jsonResponse["CardName"]?.ToString() },
+                            { "ResponseCode", jsonResponse["ResponseCode"]?.ToString() },
+                            { "Result", jsonResponse["Result"]?.ToString() }
+                        };
+                    dbHelper.Update("tbl_transactions",insertedId, data2);
+                    if(jsonResponse["ResponseCode"].ToString() != "200")
+                    {
+                        dbHelper.Delete("tbl_transactions_mini", insertedId_mini);
+                    }
+                }
+                else
+                {
+                    dbHelper.Delete("tbl_transactions_mini",insertedId_mini);
+                }
+
+
+                //long insertedId = dbHelper.Insert("tbl_transactions", data);
+
+                //Dictionary<string, object> posData = JsonConvert.DeserializeObject<Dictionary<string, object>>(res);
+
+
+
+
+                //MessageBox.Show(insertedId.ToString());
+
+
+
             }
             else if (comboBox1.Text == "behpardakht")
             {
@@ -149,22 +212,23 @@ namespace config_pos
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var a=read_registry(comboBox1.Text);
+            var a = read_registry(comboBox1.Text);
             register_json_reader(a);
 
         }
         private void register_json_reader(string json_data)
         {
 
-            
+
             //var a =JsonConvert.DeserializeObject<RegData>(json_data);
             ////MessageBox.Show(a.pos_ip);
-           
+
             //TextBox_IP.Text = a.pos_ip ?? "";
             //Textbox_port.Text = a.pos_port ?? "";
             //textBox_name.Text = a.pos_name ?? "";//check null
         }
-        private string read_registry(string valuename) {
+        private string read_registry(string valuename)
+        {
             //try
             //{
             //    const string userRoot = "HKEY_CURRENT_USER";
@@ -187,7 +251,7 @@ namespace config_pos
             ProcessStartInfo processInfo = new ProcessStartInfo
             {
                 FileName = "cmd.exe",                // اجرای CMD
-                Arguments = "/C ping "+TextBox_IP.Text, // دستور ping با آرگومان
+                Arguments = "/C ping " + TextBox_IP.Text, // دستور ping با آرگومان
                 RedirectStandardOutput = false,      // جلوگیری از ریدایرکت خروجی
                 UseShellExecute = true,              // برای نمایش پنجره CMD
                 CreateNoWindow = false               // پنجره CMD را نشان بده
@@ -200,8 +264,8 @@ namespace config_pos
     }
     public class RegData
     {
-       public string pos_ip { get; set; }
-        public string pos_port { get; set; } 
+        public string pos_ip { get; set; }
+        public string pos_port { get; set; }
         public string pos_name { get; set; }
 
     }
