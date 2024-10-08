@@ -89,10 +89,13 @@ namespace config_pos
             string IP = TextBox_IP.Text;
             string PORT = Textbox_port.Text;
             string AMOUNT = textBox1.Text;
+
+            
+
             if (comboBox1.Text == "fanava")
             {
                 Form_configpos frm = new Form_configpos();
-                string res = frm.Fn_send_to_POS("fanava", AMOUNT, IP, int.Parse(PORT));
+                string res = frm.Fn_send_to_POS("fanava", AMOUNT, IP, int.Parse(PORT), "batchnrTEST", "sanadyearTEST", "sandoghnrTEST");
                 MessageBox.Show(res);
 
             }
@@ -100,68 +103,8 @@ namespace config_pos
             {
 
                 Form_configpos frm = new Form_configpos();
-
-                SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
-                Dictionary<string, object> data = new Dictionary<string, object>
-                        {
-                            { "amount", AMOUNT },
-                            { "batchnr", "TEST" },
-                            { "sanadyear", "TEST" },
-                            { "sandoghnr", "TEST" }
-                        };
-                long insertedId = dbHelper.Insert("tbl_transactions", data);
-                
-                var datamini =new  Dictionary<string, object>(data){ { "id_tbl_transactions", insertedId.ToString()} };
-                long insertedId_mini = dbHelper.Insert("tbl_transactions_mini", datamini);
-
-                string res = frm.Fn_send_to_POS("omidpay", AMOUNT, IP, int.Parse(PORT));
+                string res = frm.Fn_send_to_POS("omidpay", AMOUNT, IP, int.Parse(PORT), "batchnrTEST", "sanadyearTEST", "sandoghnrTEST");
                 MessageBox.Show(res);
-
-                JObject jsonResponse = JObject.Parse(res);
-
-
-
-
-
-
-                //if (jsonResponse.ContainsKey("ResponseCode") && jsonResponse["ResponseCode"].ToString() == "200")
-                if (jsonResponse.ContainsKey("ResponseCode"))
-                {
-                    Dictionary<string, object> data2 = new Dictionary<string, object>
-                        {
-                            { "TermNo", jsonResponse["TermNo"]?.ToString() },
-                            { "Date", jsonResponse["Date"]?.ToString() },
-                            { "Time", jsonResponse["Time"]?.ToString() },
-                            { "SpentAmount", jsonResponse["SpentAmount"]?.ToString() },
-                            { "RRN", jsonResponse["RRN"]?.ToString() },
-                            { "TraceNo", jsonResponse["TraceNo"]?.ToString() },
-                            { "CardNo", jsonResponse["CardNo"]?.ToString() },
-                            { "CardName", jsonResponse["CardName"]?.ToString() },
-                            { "ResponseCode", jsonResponse["ResponseCode"]?.ToString() },
-                            { "Result", jsonResponse["Result"]?.ToString() }
-                        };
-                    dbHelper.Update("tbl_transactions",insertedId, data2);
-                    if(jsonResponse["ResponseCode"].ToString() != "200")
-                    {
-                        dbHelper.Delete("tbl_transactions_mini", insertedId_mini);
-                    }
-                }
-                else
-                {
-                    dbHelper.Delete("tbl_transactions_mini",insertedId_mini);
-                }
-
-
-                //long insertedId = dbHelper.Insert("tbl_transactions", data);
-
-                //Dictionary<string, object> posData = JsonConvert.DeserializeObject<Dictionary<string, object>>(res);
-
-
-
-
-                //MessageBox.Show(insertedId.ToString());
-
-
 
             }
             else if (comboBox1.Text == "behpardakht")
@@ -208,6 +151,9 @@ namespace config_pos
                 POS_PC_v3.Result.return_codes returncode = (POS_PC_v3.Result.return_codes)retCode.ReturnCode;
                 MessageBox.Show(returncode.ToString());
             }
+
+            
+
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -251,7 +197,7 @@ namespace config_pos
             ProcessStartInfo processInfo = new ProcessStartInfo
             {
                 FileName = "cmd.exe",                // اجرای CMD
-                Arguments = "/C ping " + TextBox_IP.Text, // دستور ping با آرگومان
+                Arguments = "/C ping " + TextBox_IP.Text + " -t ", // دستور ping با آرگومان
                 RedirectStandardOutput = false,      // جلوگیری از ریدایرکت خروجی
                 UseShellExecute = true,              // برای نمایش پنجره CMD
                 CreateNoWindow = false               // پنجره CMD را نشان بده

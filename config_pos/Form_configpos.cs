@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OmidPayPcPos;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,6 @@ namespace config_pos
         public Form_configpos()
         {
             InitializeComponent();
-
-
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -142,7 +141,7 @@ namespace config_pos
                 {
 
 
-                    SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
+                    SQLiteHelper dbHelper = new SQLiteHelper(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configpos.db"));
 
                     // تعریف آرگومان‌ها و مقادیر پیش‌فرض
                     Dictionary<string, string> argValues = new Dictionary<string, string>
@@ -273,30 +272,21 @@ namespace config_pos
 
                         string ip = deviceInfo[1];
                         string port = deviceInfo[2];
+
                         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
                         string resJsonString = "";
+
                         if (deviceInfo[0] == "fanava")
                         {
-                            resJsonString = Fn_send_to_POS("fanava", amount, ip, int.Parse(port));
+                            resJsonString = Fn_send_to_POS("fanava", amount, ip, int.Parse(port), batchnr, sanadyear, sandoghnr);
                         }
                         if (deviceInfo[0] == "omidpay")
                         {
-                            resJsonString = Fn_send_to_POS("omidpay", amount, ip, int.Parse(port));
+                            resJsonString = Fn_send_to_POS("omidpay", amount, ip, int.Parse(port), batchnr, sanadyear, sandoghnr);
                         }
 
 
-                        Dictionary<string, object> posData = JsonConvert.DeserializeObject<Dictionary<string, object>>(resJsonString);
-
-                        SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
-                        Dictionary<string, object> data = new Dictionary<string, object>
-                        {
-                            { "amount", amount },
-                            { "batchnr", batchnr },
-                            { "sanadyear", sanadyear },
-                            { "sandoghnr", sandoghnr }
-                        };
-
-                        long insertedId = dbHelper.Insert("tbl_transactions", data);
+                        
 
 
                         File.WriteAllText(filePath, resJsonString);
@@ -732,8 +722,24 @@ namespace config_pos
             return jsonResponse;
         }
 
-        public string Fn_send_to_POS(string postype, string amount, string ipAddress, int port)
+        public string Fn_send_to_POS(string postype, string amount, string ipAddress, int port, string batchnr, string sanadyear, string sandoghnr)
         {
+            //================================================== >> save data json in DB
+            SQLiteHelper dbHelper = new SQLiteHelper(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configpos.db"));
+            Dictionary<string, object> data = new Dictionary<string, object>
+                        {
+                            { "amount", amount },
+                            { "batchnr", batchnr },
+                            { "sanadyear", sanadyear },
+                            { "sandoghnr", sandoghnr }
+                        };
+            long insertedId = dbHelper.Insert("tbl_transactions", data);
+
+            var datamini = new Dictionary<string, object>(data) { { "id_tbl_transactions", insertedId.ToString() } };
+            long insertedId_mini = dbHelper.Insert("tbl_transactions_mini", datamini);
+            string result = "";
+            //================================================== >> save data json in DB
+
             if (postype == "omidpay")
             {
                 try
@@ -754,16 +760,15 @@ namespace config_pos
                         Result = response.Result
 
                     };
-                    string jsonResponse = JsonConvert.SerializeObject(jj);
-                    return jsonResponse;
+                    result = JsonConvert.SerializeObject(jj);
+                    LogToFile("from device OMIDPAY", result);
+                    //return result;
                 }
                 catch (Exception ex)
                 {
-                    return "{\"Error\":\"" + ex.Message + ".\"}";
+                    result = "{\"Error\":\"" + ex.Message + ".\"}";
                 }
-            }
-
-            if (postype == "fanava")
+            }else if (postype == "fanava")
             {
 
                 string firstMessage = "{\"STX\":\"02\",\"Message Len\":\"0072\",\"Message ID\":\"88\",\"ETX\":\"03\",\"LRC\":\"$\"}";
@@ -811,7 +816,7 @@ namespace config_pos
                                                                  .Replace("\u0002", "")
                                                                  .Replace("\u0003", "")
                                                                  .Replace("\u0000", "");
-
+                                LogToFile("from Device FANAVA", completeMessage);
                                 // اصلاح نام‌های کلید برای مطابقت با خواص کلاس
                                 completeMessage = completeMessage.Replace("Message Len", "MessageLen")
                                                                  .Replace("Message ID", "MessageID")
@@ -854,22 +859,60 @@ namespace config_pos
                                 };
 
                                 // تبدیل به JSON
-                                string jsonResponse = JsonConvert.SerializeObject(responseObject);
+                                result = JsonConvert.SerializeObject(responseObject);
 
                                 // بازگشت JSON به عنوان خروجی
-                                return jsonResponse;
+                                //return result;
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    return "{\"Error\":\"" + ex.Message + ".\"}";
+                    result = "{\"Error\":\"" + ex.Message + ".\"}";
                 }
             }
 
 
-            return "{\"Error\":\"Failed to get a valid response from the server.\"}";
+            //================================================== >> save data json in DB
+            JObject jsonResponse2 = JObject.Parse(result);
+            if (jsonResponse2.ContainsKey("ResponseCode"))
+            {
+                string responseCode = jsonResponse2["ResponseCode"]?.ToString();
+                Dictionary<string, object> data2 = new Dictionary<string, object>
+                    {
+                        { "TermNo", jsonResponse2["TermNo"]?.ToString() },
+                        { "Date", jsonResponse2["Date"]?.ToString() },
+                        { "Time", jsonResponse2["Time"]?.ToString() },
+                        { "SpentAmount", jsonResponse2["SpentAmount"]?.ToString() },
+                        { "RRN", jsonResponse2["RRN"]?.ToString() },
+                        { "TraceNo", jsonResponse2["TraceNo"]?.ToString() },
+                        { "CardNo", jsonResponse2["CardNo"]?.ToString() },
+                        { "CardName", jsonResponse2["CardName"]?.ToString() },
+                        { "ResponseCode", responseCode },
+                        { "Result", jsonResponse2["Result"]?.ToString() }
+                    };
+                dbHelper.Update("tbl_transactions", insertedId, data2);
+                if (responseCode != "200")
+                {
+                    dbHelper.Delete("tbl_transactions_mini", insertedId_mini);
+                }
+            }
+            else
+            {
+                dbHelper.Delete("tbl_transactions_mini", insertedId_mini);
+            }
+
+            //================================================== >> save data json in DB
+            if (result != "")
+            {
+                return (result);
+            }
+            else
+            {
+                return "{\"Error\":\"Failed to get a valid response from the server.\"}";
+            }
+
         }
 
 
@@ -901,6 +944,7 @@ namespace config_pos
                         devname = parts[2].Trim();
                         ip = parts[3].Trim();
                         port = parts[4].Trim();
+                        break;
                     }
                 }
                 if (ip != "")//یا دیفالت رو یافت یا کد رو
@@ -1056,7 +1100,7 @@ namespace config_pos
         private void button5_Click_1(object sender, EventArgs e)
         {
 
-            SQLiteHelper dbHelper = new SQLiteHelper("configpos.db");
+            SQLiteHelper dbHelper = new SQLiteHelper(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configpos.db"));
             //bool res = dbHelper.Delete("tbl_transactions_mini", 0);
             //MessageBox.Show(res.ToString());
             //return;
@@ -1104,6 +1148,38 @@ namespace config_pos
             }
         }
 
+        private void iPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                Clipboard.SetText(listView1.SelectedItems[0].SubItems[3].Text);
+                return;
+            }
+            MessageBox.Show("No item selected.");
+        }
+
+        private void portToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                Clipboard.SetText(listView1.SelectedItems[0].SubItems[4].Text);
+                return;
+            }
+            MessageBox.Show("No item selected.");
+
+        }
+
+        private void allToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                ListViewItem LVI = listView1.SelectedItems[0];
+                Clipboard.SetText(LVI.SubItems[2].Text + "," + LVI.SubItems[3].Text + "," + LVI.SubItems[4].Text);
+                return;
+            }
+            MessageBox.Show("No item selected.");
+
+        }
     }
 
     public class ResponseMessage
