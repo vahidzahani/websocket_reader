@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OmidPayPcPos;
+using POS_PC_v3;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -202,15 +203,37 @@ namespace config_pos
                         }
                     }
 
-
-                    LogToFile("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", id + "X" + amount + "X" + batchnr + "X" + sanadyear + "X" + sandoghnr);
-
-
                     int res = dbHelper.Delete("tbl_transactions_mini", 0);
                     string jsondata = JsonConvert.SerializeObject(res, Formatting.Indented);
                     string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
                     File.WriteAllText(responseFilePath, jsondata);
                 }
+                if (args[1] == "showtransactions")
+                {
+                    // ساختن helper برای دسترسی به دیتابیس
+                    SQLiteHelper dbHelper = new SQLiteHelper(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configpos.db"));
+
+                    // خواندن همه رکوردها از جدول
+                    List<Dictionary<string, object>> transactions = dbHelper.GetAllTransactions("tbl_transactions_mini");
+
+                    if (transactions != null && transactions.Count > 0)
+                    {
+                        // تبدیل لیست از رکوردها به فرمت JSON
+                        string jsondata = JsonConvert.SerializeObject(transactions, Formatting.Indented);
+
+                        // ذخیره JSON در فایل response.json
+                        string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        File.WriteAllText(responseFilePath, jsondata);
+                    }
+                    else
+                    {
+                        // در صورتی که داده‌ای موجود نباشد
+                        string jsondata = JsonConvert.SerializeObject(new { message = "No transactions found" }, Formatting.Indented);
+                        string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                        File.WriteAllText(responseFilePath, jsondata);
+                    }
+                }
+
                 if (args[1] == "getAllDevices")
                 {
 
@@ -276,17 +299,10 @@ namespace config_pos
                         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
                         string resJsonString = "";
 
-                        if (deviceInfo[0] == "fanava")
+                        if (deviceInfo[0] != "")//fanava,omidpay,behpardakht
                         {
-                            resJsonString = Fn_send_to_POS("fanava", amount, ip, int.Parse(port), batchnr, sanadyear, sandoghnr);
+                            resJsonString = Fn_send_to_POS(deviceInfo[0], amount, ip, int.Parse(port), batchnr, sanadyear, sandoghnr);
                         }
-                        if (deviceInfo[0] == "omidpay")
-                        {
-                            resJsonString = Fn_send_to_POS("omidpay", amount, ip, int.Parse(port), batchnr, sanadyear, sandoghnr);
-                        }
-
-
-                        
 
 
                         File.WriteAllText(filePath, resJsonString);
@@ -768,7 +784,74 @@ namespace config_pos
                 {
                     result = "{\"Error\":\"" + ex.Message + ".\"}";
                 }
-            }else if (postype == "fanava")
+            }else if (postype=="behpardakht"){
+                try
+                {
+                    Transaction.Connection Connect = new Transaction.Connection();
+                    Result retCode = new Result();
+                    Connect.CommunicationType = "TCP/IP";
+                    Connect.POSPC_TCPCOMMU_SocketRecTimeout = 60000;
+                    Connect.POS_PORTtcp = port;//1024
+                    Connect.POS_IP = ipAddress;//"192.168.1.241";
+
+                    Transaction TXN = new Transaction(Connect);
+                    retCode = TXN.Debits_Goods_And_Service("1", "1", amount, "500", "hello", "good");
+
+                    var jj = new
+                    {
+                        TermNo = retCode.TerminalNo,
+                        Date = DateConverter.ConvertToPersianDate(retCode.TransactionDate),
+                        Time = DateConverter.ConvertToFormattedTime(retCode.TransactionTime),
+                        SpentAmount = amount,
+                        RRN = "",//ندارد
+                        TraceNo = retCode.TraceNumber,
+                        CardNo = "",//nadarad
+                        CardName = "",
+                        ResponseCode = retCode.ReturnCode == 100 ? "200" : retCode.ReturnCode.ToString(),
+                        Result = ((POS_PC_v3.Result.return_codes)retCode.ReturnCode).ToString()
+                    };
+                    result = JsonConvert.SerializeObject(jj);
+                    LogToFile("from device behpardkaht", result);
+
+
+                    if (false)
+                    {
+                        //POS_PC_v3.Transaction.return_codes retCode = Transaction.return_codes.ERR_POS_PC_OTHER;
+                        //POS_PC_v3.Transaction TXN = new POS_PC_v3.Transaction(Connect);
+                        ///* Debit */
+                        //retCode = TXN.Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
+                        //MerchantadditionalData);
+                        //OR /* Debit with AutoSettle */
+                        //retCode = TXN.Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
+                        //MerchantadditionalData, false);
+                        //OR /* BillPayment */
+                        //retCode = TXN.Bill_Payment_Service(RequestID, "1", strBillId, strPayCode, strAmount, strMerchantMsg,
+                        //strMerchantAddit);
+                        //OR /* Payment */
+                        //retCode = TXN.Payment(RequestID, "1", strAmount, strPayerId, strAcountId, strMerchantAddit);
+                        //OR /*MultiPayment */
+                        //retCode = TXN.MultiPayment(RequestID, "1", strTotalAmount, RequestList, PrintDetail,
+                        //strMerchantadditionalData)
+                        //OR /* Inquery */
+                        //retCode = TXN.Inquery_Service(RequestID, "1", MerchantadditionalData);
+                        //OR /* Last_Inquery */
+                        //retCode = TXN.Last_Inquery_Service("1", MerchantadditionalData);
+                        //OR /* Get_Card */
+                        //retCode = TXN.Get_Card_Service("20", "1", MerchantadditionalData);
+                        //OR /* Get_Card_Debits */
+                        //retCode = TXN.Get_Card_Debits_Goods_And_Service(RequestID, "1", Amount, PayerID, MerchantMsg,
+                        //MerchantadditionalData);
+
+                    }//this is for archive
+
+
+                }
+                catch (Exception ex)
+                {
+                    result = "{\"Error\":\"" + ex.Message + ".\"}";
+                }
+            }
+            else if (postype == "fanava")
             {
 
                 string firstMessage = "{\"STX\":\"02\",\"Message Len\":\"0072\",\"Message ID\":\"88\",\"ETX\":\"03\",\"LRC\":\"$\"}";

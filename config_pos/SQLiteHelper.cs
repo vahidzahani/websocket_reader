@@ -15,6 +15,41 @@ namespace config_pos
         {
             _connectionString = $"Data Source={dbPath};Version=3;";
         }
+        public List<Dictionary<string, object>> GetAllTransactions(string tableName)
+        {
+            List<Dictionary<string, object>> result = new List<Dictionary<string, object>>();
+            string query = $"SELECT * FROM {tableName}";
+
+            try
+            {
+                using (SQLiteConnection connection = new SQLiteConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Dictionary<string, object> row = new Dictionary<string, object>();
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    row[reader.GetName(i)] = reader.GetValue(i);
+                                }
+                                result.Add(row);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // مدیریت خطا
+                Console.WriteLine($"Error retrieving data: {ex.Message}");
+            }
+
+            return result;
+        }
 
         // تابع برای درج رکورد در جدول به صورت داینامیک
         public long Insert(string tableName, Dictionary<string, object> columnData)

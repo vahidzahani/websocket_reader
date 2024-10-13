@@ -123,6 +123,7 @@
     <ROW File="configpos.db" Component_="config_pos.exe.config" FileName="CONFIG~1.DB|configpos.db" Attributes="0" SourcePath="..\config_pos\bin\Debug\configpos.db" SelfReg="false"/>
     <ROW File="SQLite.Interop.dll" Component_="SQLite.Interop.dll" FileName="SQLITE~1.DLL|SQLite.Interop.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\x64\SQLite.Interop.dll" SelfReg="false"/>
     <ROW File="SQLite.Interop.dll_1" Component_="SQLite.Interop.dll_1" FileName="SQLITE~1.DLL|SQLite.Interop.dll" Attributes="0" SourcePath="..\config_pos\bin\Debug\x86\SQLite.Interop.dll" SelfReg="false"/>
+    <ROW File="webservice_main.html" Component_="config_pos.exe.config" FileName="WEBSER~2.HTM|webservice_main.html" Attributes="0" SourcePath="..\config_pos\bin\Debug\webservice_main.html" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="249"/>

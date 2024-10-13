@@ -148,6 +148,15 @@ namespace WebServiceLogger
                 ExecuteExternalProcess(arguments);
                 HandleResponse(context);
             }
+            else if (requestPath == "/showtransactions")
+            {
+                // آرگومان‌های اجرای فایل
+                string arguments = "showtransactions";
+
+                // اجرای فایل config_pos.exe
+                ExecuteExternalProcess(arguments);
+                HandleResponse(context);
+            }
             else if (requestPath.StartsWith("/deleteTransactions"))
             {
                 // دریافت مقدارهای اختیاری از QueryString
@@ -211,23 +220,26 @@ namespace WebServiceLogger
 
             else
             {
-                //string inputDate = "2024/06/25";
-                //string inputDate = "9/22/2024 ";
-                //string persianDate = DateConverter.ConvertToPersianDate(inputDate);
-                string htmlMessage = @"
-                                        <html>
-                                        <head><title>Service Status</title></head>
-                                        <body>
-                                            <p>Service is running. 
-<a href='/test'>/test</a> | 
-<a href='/devices'>/devices</a> |
-<a href='/deleteTransactions'>/deleteTransactions</a> |
-</p>
-                                        </body>
-                                        </html>" /*+ persianDate*/;
 
-                // ارسال پاسخ
-                ServeSimpleResponse(context, htmlMessage);
+                string htmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "webservice_main.html");
+
+                if (File.Exists(htmlFilePath))
+                {
+                    // خواندن محتوای فایل HTML
+                    string htmlMessage = File.ReadAllText(htmlFilePath);
+
+                    // ارسال پاسخ
+                    ServeSimpleResponse(context, htmlMessage);
+                }
+                else
+                {
+                    // اگر فایل پیدا نشد، یک پیام خطا نمایش داده می‌شود
+                    string errorMessage = "<html><body><h1>Error</h1><p>File not found: webservice_main.html</p></body></html>";
+                    ServeSimpleResponse(context, errorMessage);
+                }
+
+
+
 
             }
         }
