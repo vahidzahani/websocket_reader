@@ -137,6 +137,46 @@ namespace config_pos
 
             return result;
         }
+        public Dictionary<string, object> FindById(string tableName, long id)
+        {
+            Dictionary<string, object> result = null; // نتیجه به صورت دیکشنری خواهد بود
+            string query = $"SELECT * FROM {tableName} WHERE id = @id"; // فرض بر این است که نام ستون ID برابر "id" است
+
+            try
+            {
+                using (SQLiteConnection connection = new SQLiteConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@id", id); // مقدار id به پارامتر اضافه می‌شود
+
+                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows && reader.Read()) // فقط اگر داده‌ای وجود داشته باشد
+                            {
+                                result = new Dictionary<string, object>();
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    result[reader.GetName(i)] = reader.GetValue(i); // نام ستون و مقدار آن در دیکشنری قرار می‌گیرد
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // در صورت بروز خطا
+                result = new Dictionary<string, object>
+        {
+            { "Error", "خطا در هنگام جستجو: " + ex.Message }
+        };
+            }
+
+            return result; // نتیجه برگردانده می‌شود
+        }
+
         public long FindRecordId(string tableName, Dictionary<string, object> searchParams)
         {
             long resultId = 0;

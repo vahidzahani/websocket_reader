@@ -40,7 +40,7 @@ namespace WebServiceLogger
         }
         private int ReadPortFromConfig()
         {
-            int port = 2024; // مقدار پیش‌فرض
+            int port = 2024; // default
 
             if (File.Exists(configFilePath))
             {
@@ -148,7 +148,7 @@ namespace WebServiceLogger
                 ExecuteExternalProcess(arguments);
                 HandleResponse(context);
             }
-            else if (requestPath == "/showtransactions")
+            else if (requestPath == "/showtransactions")// all transaction from tbl_transactions_mini
             {
                 // آرگومان‌های اجرای فایل
                 string arguments = "showtransactions";
@@ -156,6 +156,42 @@ namespace WebServiceLogger
                 // اجرای فایل config_pos.exe
                 ExecuteExternalProcess(arguments);
                 HandleResponse(context);
+            }
+            else if (requestPath.StartsWith("/showtransaction"))//selected a transaction from table tbl_transactions_mini
+            {
+                string amount = context.Request.QueryString["amount"];
+                string batchnr = context.Request.QueryString["batchnr"];
+                string sanadyear = context.Request.QueryString["sanadyear"];
+                string sandoghnr = context.Request.QueryString["sandoghnr"];
+
+                var arguments = "showtransaction";
+
+                if (!string.IsNullOrEmpty(batchnr) && !string.IsNullOrEmpty(sanadyear) && !string.IsNullOrEmpty(sandoghnr) && !string.IsNullOrEmpty(amount))
+                {
+                    arguments += $" amount:{amount}";
+                    arguments += $" batchnr:{batchnr}";
+                    arguments += $" sanadyear:{sanadyear}";
+                    arguments += $" sandoghnr:{sandoghnr}";
+                }
+                
+                ExecuteExternalProcess(arguments);
+
+                string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                Response responseObject = new Response();
+
+                if (File.Exists(responseFilePath))
+                {
+                    responseObject.response_code = 200; // موفقیت
+                    responseObject.response_data = JsonConvert.DeserializeObject(File.ReadAllText(responseFilePath));
+                }
+                else
+                {
+                    responseObject.response_code = 404; // خطا
+                    responseObject.response_data = "not find file"; // رشته در حالت خطا
+                }
+
+                // ساخت JSON پاسخ و ارسال آن
+                ServeJsonResponse(context, JsonConvert.SerializeObject(responseObject, Formatting.Indented));
             }
             else if (requestPath.StartsWith("/deleteTransactions"))
             {
@@ -216,8 +252,6 @@ namespace WebServiceLogger
             }
 
             
-
-
             else
             {
 
@@ -267,7 +301,6 @@ namespace WebServiceLogger
             catch (Exception ex)
             {
                 LogToFile("ERROR HandleResponse", ex.Message);
-                //throw;
             }
         }
 

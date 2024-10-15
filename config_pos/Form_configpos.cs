@@ -189,12 +189,6 @@ namespace config_pos
                             { "sandoghnr", sandoghnr }
                             };
                             long recordId = dbHelper.FindRecordId("tbl_transactions_mini", searchParams);
-                            //string xxxxx = "";
-                            //foreach (var param in searchParams)
-                            //{
-                            //    xxxxx += $" AND {param.Key} = '{param.Value}'";
-                            //}
-                            //LogToFile("EEEEEEEEEEEEEEE.FindRecordId", recordId.ToString());
                             if (recordId != 0)
                             {
                                 dbHelper.Delete("tbl_transactions_mini", recordId);
@@ -204,6 +198,60 @@ namespace config_pos
                     }
 
                     int res = dbHelper.Delete("tbl_transactions_mini", 0);
+                    string jsondata = JsonConvert.SerializeObject(res, Formatting.Indented);
+                    string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
+                    File.WriteAllText(responseFilePath, jsondata);
+                }
+                if (args[1] == "showtransaction")
+                {
+                    SQLiteHelper dbHelper = new SQLiteHelper(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configpos.db"));
+                    // تعریف آرگومان‌ها و مقادیر پیش‌فرض
+                    Dictionary<string, string> argValues = new Dictionary<string, string>
+                        {
+                            { "amount", null },
+                            { "batchnr", null },
+                            { "sanadyear", null },
+                            { "sandoghnr", null }
+                        };
+
+                    // چک کردن آرگومان‌ها از args[2] به بعد
+                    for (int i = 2; i < args.Length; i++)
+                    {
+                        foreach (var key in argValues.Keys.ToList())
+                        {
+                            if (args[i].StartsWith($"{key}:"))
+                            {
+                                argValues[key] = args[i].Split(':')[1];  // مقدار را جدا می‌کنیم
+                            }
+                        }
+                    }
+
+                    // حالا هر کدام از مقادیر را می‌توانید چک کنید
+                    string amount = argValues["amount"];
+                    string batchnr = argValues["batchnr"];
+                    string sanadyear = argValues["sanadyear"];
+                    string sandoghnr = argValues["sandoghnr"];
+
+                    //string res = "HICH";
+
+                    //if (amount != null)
+                    //{
+                        Dictionary<string, object> searchParams = new Dictionary<string, object>
+                            {
+                            { "amount", amount },
+                            { "batchnr", batchnr },
+                            { "sanadyear", sanadyear },
+                            { "sandoghnr", sandoghnr }
+                            };
+                        long id = dbHelper.FindRecordId("tbl_transactions_mini", searchParams);
+                        //res = dbHelper.Find("tbl_transactions_mini", ,searchParams);
+                        var res = dbHelper.FindById("tbl_transactions_mini", id); // مثال با ID 42
+                        
+
+
+                    //}
+
+
                     string jsondata = JsonConvert.SerializeObject(res, Formatting.Indented);
                     string responseFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "response.json");
                     File.WriteAllText(responseFilePath, jsondata);
@@ -784,7 +832,9 @@ namespace config_pos
                 {
                     result = "{\"Error\":\"" + ex.Message + ".\"}";
                 }
-            }else if (postype=="behpardakht"){
+            }
+            else if (postype == "behpardakht")
+            {
                 try
                 {
                     Transaction.Connection Connect = new Transaction.Connection();
