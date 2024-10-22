@@ -759,32 +759,7 @@ namespace config_pos
                 MessageBox.Show($"Exception occurred: {ex.Message}", "Error");
             }
         }
-        public string Fn_send_to_omidpay(string amount, string ipAddress, int port)
-        {
-            // ایجاد یک نمونه از کلاس OmidPayPcPosClass
-            OmidPayPcPosClass omid = new OmidPayPcPosClass();
-
-            // فراخوانی تابع DoTcpTransaction و دریافت پاسخ
-            ResponseJson response = omid.DoTcpTransaction(ipAddress, port, amount);
-
-            // تبدیل شیء response به رشته JSON
-            string jsonResponse = JsonConvert.SerializeObject(new
-            {
-                TermNo = response.TermNo,
-                Date = response.Date,
-                Time = response.Time,
-                SpentAmount = response.SpentAmount,
-                RRN = response.RRN,
-                TraceNo = response.TraceNo,
-                CardNo = response.CardNo,
-                CardName = response.CardName,
-                ResponseCode = response.ResponseCode,
-                Result = response.Result
-            });
-
-            // بازگشت JSON به عنوان خروجی
-            return jsonResponse;
-        }
+       
 
         public string Fn_send_to_POS(string postype, string amount, string ipAddress, int port, string batchnr, string sanadyear, string sandoghnr)
         {
@@ -812,7 +787,7 @@ namespace config_pos
                     ResponseJson response = omid.DoTcpTransaction(ipAddress, port, amount);
                     var jj = new
                     {
-                        TermNo = response.TermNo,
+                        TermNo = string.IsNullOrEmpty(response.TermNo)?"11111":response.TermNo,
                         Date = DateConverter.ConvertToPersianDate(response.Date),
                         Time = DateConverter.ConvertToFormattedTime(response.Time),
                         SpentAmount = response.SpentAmount,
@@ -826,7 +801,6 @@ namespace config_pos
                     };
                     result = JsonConvert.SerializeObject(jj);
                     LogToFile("from device OMIDPAY", result);
-                    //return result;
                 }
                 catch (Exception ex)
                 {
@@ -849,7 +823,7 @@ namespace config_pos
 
                     var jj = new
                     {
-                        TermNo = retCode.TerminalNo,
+                        TermNo = string.IsNullOrEmpty(retCode.TerminalNo)?retCode.TerminalNo:"11111",
                         Date = DateConverter.ConvertToPersianDate(retCode.TransactionDate),
                         Time = DateConverter.ConvertToFormattedTime(retCode.TransactionTime),
                         SpentAmount = amount,
@@ -979,7 +953,7 @@ namespace config_pos
                                 // ساختن JSON با اطلاعات برگشتی
                                 var responseObject = new
                                 {
-                                    parsedResponseMessage.TermNo,
+                                    TermNo=string.IsNullOrEmpty(parsedResponseMessage.TermNo)?"11111":parsedResponseMessage.TermNo,
                                     Date = DateConverter.ConvertToPersianDate(parsedResponseMessage.Date),
                                     Time = DateConverter.ConvertToFormattedTime(parsedResponseMessage.Time),
                                     parsedResponseMessage.SpentAmount,
@@ -1109,6 +1083,7 @@ namespace config_pos
                 selectedItem.ImageIndex = 1;
                 // چاپ شماره آیتم (ایندکس)
                 //MessageBox.Show("Selected item index: " + selectedItem.Index);
+                button1.Enabled = true;
             }
             else
             {
